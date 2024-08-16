@@ -25,10 +25,10 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({ recipes }) => {
     };
 
     const adjustedIngredients = adjustIngredients(recipe.ingredients, recipe.servings, servings);
-    
+
     return (
         <div className="max-w-2xl mx-auto">
-            <h1>{recipe.title}</h1>
+            <h1 className="text-3xl font-semibold mb-4">{recipe.title}</h1>
             <div className="mb-4">
                 <label htmlFor="servings">Portions:</label>
                 <Input
