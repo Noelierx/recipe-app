@@ -1,0 +1,30 @@
+{
+    "recipes": [
+      {
+        "id": 1,
+        "title": "Spaghetti Bolognese",
+        "ingredients": [
+          {"name": "Spaghetti", "amount": 400, "unit": "g"},
+          {"name": "Ground beef", "amount": 500, "unit": "g"},
+          {"name": "Tomato sauce", "amount": 400, "unit": "ml"},
+          {"name": "Onion", "amount": 1, "unit": "piece"}
+        ],
+        "instructions": "1. Cook spaghetti. 2. Brown the beef. 3. Add sauce. 4. Serve.",
+        "servings": 4,
+        "tags": ["Italian", "Pasta", "Beef"]
+      },
+      {
+        "id": 2,
+        "title": "Caesar Salad",
+        "ingredients": [
+          {"name": "Romaine lettuce", "amount": 1, "unit": "head"},
+          {"name": "Croutons", "amount": 100, "unit": "g"},
+          {"name": "Parmesan cheese", "amount": 50, "unit": "g"},
+          {"name": "Caesar dressing", "amount": 60, "unit": "ml"}
+        ],
+        "instructions": "1. Chop lettuce. 2. Mix ingredients. 3. Add dressing. 4. Toss and serve.",
+        "servings": 2,
+        "tags": ["Salad", "Quick", "Vegetarian"]
+      }
+    ]
+  }
