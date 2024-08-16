@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Recipe, Ingredient } from '@/types/types';
@@ -10,7 +10,7 @@ interface RecipeDetailProps {
 const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipes }) => {
     const [servings, setServings] = useState<number>(0);
     const { id } = useParams<{ id: string }>();
-    const recipe = recipes.find(r => r.id === parseInt(id || '0'));
+    const recipe = recipes.find(r => r.id === parseInt(id || '0', 10));
 
     useEffect(() => {
         if (recipe) {
@@ -20,7 +20,7 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipes }) => {
 
     const handleServingsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newServings = Number(e.target.value);
-        if (newServings >= 1) {
+        if (!isNaN(newServings) && newServings >= 1) {
             setServings(newServings);
         }
     };
@@ -36,7 +36,7 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipes }) => {
         }));
     };
 
-    const adjustedIngredients = adjustIngredients(recipe.ingredients, recipe.servings, servings);
+    const adjustedIngredients = useMemo(() => adjustIngredients(recipe.ingredients, recipe.servings, servings), [recipe.ingredients, recipe.servings, servings]);
 
     return (
         <div className="max-w-2xl mx-auto">
