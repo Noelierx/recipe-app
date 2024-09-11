@@ -15,10 +15,14 @@ export const useAddRecipe = () => {
       setLoading(true);
       setError(null);
 
-      const { data, error } = await supabase.from('recipes').insert(recipe).select('id').single();
-      if (error) throw error;
+      const { data: recipeData, error: recipeError } = await supabase
+        .from('recipes')
+        .insert(recipe)
+        .select('id')
+        .single();
 
-      const recipeId = data.id;
+      if (recipeError) throw recipeError;
+      const recipeId = recipeData.id;
 
       const formattedIngredients = ingredients.map(ing => ({
         recipe_id: recipeId,
@@ -26,15 +30,13 @@ export const useAddRecipe = () => {
         amount: ing.amount,
         unit: ing.unit,
       }));
-      const uniqueIngredients = deduplicate(formattedIngredients, 'ingredient_id');
 
       const { error: ingredientsError } = await supabase
         .from('recipe_ingredients')
-        .upsert(uniqueIngredients, { onConflict: 'recipe_id,ingredient_id' });
+        .insert(formattedIngredients);
 
-      if (ingredientsError) throw new Error(`Ingredients insertion error: ${ingredientsError.message}`);
+      if (ingredientsError) throw ingredientsError;
 
-      // Insert tags
       const existingTags = tags.filter(tag => tag.id !== undefined);
       const newTags = tags.filter(tag => tag.id === undefined);
 
@@ -42,9 +44,9 @@ export const useAddRecipe = () => {
         const { data: insertedTags, error: newTagsError } = await supabase
           .from('tags')
           .insert(newTags.map(tag => ({ name: tag.name })))
-          .select();
+          .select('id, name');
 
-        if (newTagsError) throw new Error(`New tags insertion error: ${newTagsError.message}`);
+        if (newTagsError) throw newTagsError;
 
         existingTags.push(...insertedTags);
       }
@@ -58,18 +60,8 @@ export const useAddRecipe = () => {
         .from('recipe_tags')
         .insert(recipeTags);
 
-      if (recipeTagsError) throw new Error(`Recipe tags insertion error: ${recipeTagsError.message}`);
+      if (recipeTagsError) throw recipeTagsError;
 
-      // Remove the following block as it's redundant
-      // if (tags.length > 0) {
-      //   const { error: tagError } = await supabase
-      //     .from('recipe_tags')
-      //     .insert(tags.map(tag => ({ recipe_id: recipeId, tag_id: tag.id })));
-      
-      //   if (tagError) throw tagError;
-      // }
-
-      alert('Recipe added successfully!');
       return recipeId;
     } catch (err) {
       const error = err as Error;
