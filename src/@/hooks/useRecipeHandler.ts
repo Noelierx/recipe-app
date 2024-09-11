@@ -65,7 +65,6 @@ export const useRecipeHandler = (recipeId?: number) => {
     setError(null);
 
     try {
-      // 1. Update or insert the main recipe
       const { title, instructions, servings } = recipe;
       let recipeResult: RecipeResult;
 
@@ -88,7 +87,6 @@ export const useRecipeHandler = (recipeId?: number) => {
         recipeResult = data;
       }
 
-      // 2. Handle main ingredients
       if (recipeId) {
         await supabase
           .from('recipe_ingredients')
@@ -110,9 +108,7 @@ export const useRecipeHandler = (recipeId?: number) => {
         .from('recipe_ingredients')
         .insert(updatedIngredients);
 
-      // 3. Handle sub-recipes
       if (recipeId) {
-        // Fetch existing sub-recipes
         const { data: existingSubRecipes } = await supabase
           .from('sub_recipes')
           .select('id')
@@ -120,7 +116,6 @@ export const useRecipeHandler = (recipeId?: number) => {
 
         for (const subRecipe of subRecipes) {
           if (subRecipe.id && existingSubRecipes?.some(esr => esr.id === subRecipe.id)) {
-            // Update existing sub-recipe
             await supabase
               .from('sub_recipes')
               .update({
@@ -129,7 +124,6 @@ export const useRecipeHandler = (recipeId?: number) => {
               })
               .eq('id', subRecipe.id);
           } else {
-            // Add new sub-recipe
             const { data: subRecipeData, error: subRecipeError } = await supabase
               .from('sub_recipes')
               .insert({
@@ -144,7 +138,6 @@ export const useRecipeHandler = (recipeId?: number) => {
             subRecipe.id = subRecipeData.id;
           }
 
-          // Update or add sub-recipe ingredients
           await supabase
             .from('sub_recipe_ingredients')
             .delete()
@@ -166,7 +159,6 @@ export const useRecipeHandler = (recipeId?: number) => {
         }
       }
 
-      // 4. Handle tags
       const allTagNames = [...existingTags.map(tag => tag.name), ...newTags];
       const allTagObjects = await Promise.all(allTagNames.map(createTagIfNotExists));
       

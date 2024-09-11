@@ -40,7 +40,6 @@ export const useRecipeDetails = (recipeId: number) => {
 
         if (tagsError) throw new Error(tagsError.message);
 
-        // Fetch sub-recipes
         const { data: subRecipesData, error: subRecipesError } = await supabase
           .from('sub_recipes')
           .select(`
