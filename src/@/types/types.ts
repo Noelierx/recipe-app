@@ -23,7 +23,20 @@ export interface Tag {
   name: string;
 }
 
+export interface SubRecipe {
+  id: number;
+  title: string;
+  instructions: string;
+  ingredients: SubRecipeIngredient[];
+}
+
+export interface SubRecipeIngredient extends RecipeIngredient {
+  id: string;
+}
+
 export interface RecipeWithDetails extends Recipe {
+  sub_recipes: SubRecipe[];
+  main_instructions?: string;
   recipe_ingredients: RecipeIngredient[];
   tags: Tag[];
 }

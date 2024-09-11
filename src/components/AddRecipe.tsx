@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import IngredientHandler from 'components/IngredientHandler';
 import TagHandler from 'components/TagHandler';
-import { Recipe, RecipeIngredient, Tag } from '@/types/types';
+import SubRecipeHandler from 'components/SubRecipeHandler';
+import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/types';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 
 const AddRecipe: React.FC = () => {
@@ -20,11 +21,18 @@ const AddRecipe: React.FC = () => {
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
     const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
     const [newTags, setNewTags] = useState<string[]>([]);
+    const [subRecipes, setSubRecipes] = useState<SubRecipe[]>([]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (recipe.title && ingredients.length && recipe.instructions) {
-            const result = await handleRecipe(recipe as Recipe, ingredients, selectedTags, newTags);
+        if (recipe.title && (ingredients.length || subRecipes.length) && (recipe.instructions || subRecipes.length)) {
+            const result = await handleRecipe(
+                recipe,
+                ingredients,
+                subRecipes,
+                selectedTags,
+                newTags
+            );
             if (typeof result === 'number') {
                 navigate(`/recipe/${result}`);
             } else {
@@ -70,13 +78,23 @@ const AddRecipe: React.FC = () => {
                 />
             </div>
 
-            <IngredientHandler ingredients={ingredients} setIngredients={setIngredients} />
+            <IngredientHandler 
+                ingredients={ingredients} 
+                setIngredients={setIngredients} 
+            />
 
             <TagHandler 
                 selectedTags={selectedTags} 
                 setSelectedTags={setSelectedTags}
                 newTags={newTags}
                 setNewTags={setNewTags}
+            />
+
+            <SubRecipeHandler 
+                subRecipes={subRecipes}
+                setSubRecipes={setSubRecipes}
+                onSubRecipesChange={setSubRecipes}
+                recipeId={undefined}
             />
 
             <div>

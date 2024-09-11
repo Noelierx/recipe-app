@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RecipeIngredient, Ingredient } from '@/types/types';
 import { supabase } from '@/utils/supabaseClient';
 
@@ -69,14 +70,40 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
     setIngredients(prev => prev.filter((_, i) => i !== index));
   };
 
+  const updateIngredient = (index: number, field: string, value: string | number) => {
+    setIngredients(prev => prev.map((ing, i) => 
+      i === index ? { ...ing, [field]: field === 'amount' ? Number(value) : value } : ing
+    ));
+  };
+
   return (
     <div>
-      {ingredients.map((ing, index) => (
-        <div key={index} className="flex items-center space-x-2 mb-2">
-          <span>{ing.amount} {ing.unit} {ing.ingredient.name}</span>
-          <Button type="button" onClick={() => removeIngredient(index)} variant="destructive" size="sm">Remove</Button>
-        </div>
-      ))}
+      <Label htmlFor="ingredients">Ingredients</Label>
+      {ingredients && ingredients.length > 0 ? (
+        ingredients.map((ing, index) => (
+          <div key={index} className="flex items-center space-x-2 mb-2">
+            <Input
+              value={ing.amount}
+              onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
+              type="number"
+              className="w-20"
+            />
+            <Input
+              value={ing.unit}
+              onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
+              className="w-20"
+            />
+            <Input
+              value={ing.ingredient.name}
+              onChange={(e) => updateIngredient(index, 'name', e.target.value)}
+              className="flex-grow"
+            />
+            <Button type="button" onClick={() => removeIngredient(index)} variant="destructive" size="sm">Remove</Button>
+          </div>
+        ))
+      ) : (
+        <p>No ingredients added yet.</p>
+      )}
       <div className="flex space-x-2">
         <Input
           name="name"
@@ -101,6 +128,6 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
       </div>
     </div>
   );
-};
+}
 
 export default IngredientHandler;
