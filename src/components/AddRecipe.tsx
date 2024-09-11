@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Recipe, Ingredient, RecipeIngredient } from '@/types/types';
 import { useAddRecipe } from '@/hooks/useAddRecipe';
+import { useGetTags } from '@/hooks/useGetTags';
 import { supabase } from '@/utils/supabaseClient';
+import { Tag } from '@/types/types';
 
 const AddRecipe: React.FC = () => {
+    const navigate = useNavigate();
     const { addRecipe, loading, error } = useAddRecipe();
+    const [tags, setTags] = useState<Tag[]>([]);
+    const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+    const [newTag, setNewTag] = useState('');
+    const { getTags } = useGetTags();
+    const tagsLoaded = useRef(false);
 
     const [recipe, setRecipe] = useState<Partial<Recipe>>({
         title: '',
@@ -23,19 +32,25 @@ const AddRecipe: React.FC = () => {
         unit: '',
     });
 
+    useEffect(() => {
+        if (!tagsLoaded.current) {
+            const fetchTags = async () => {
+                const fetchedTags = await getTags();
+                setTags(fetchedTags);
+                tagsLoaded.current = true;
+            };
+            fetchTags();
+        }
+    }, [getTags]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (recipe.title && ingredients.length && recipe.instructions) {
             try {
-                await addRecipe(
-                    { ...recipe as Recipe },
-                    ingredients,
-                );
-                
-                setRecipe({ title: '', instructions: '', servings: 1 });
-                setIngredients([]);
+                const newRecipeId = await addRecipe(recipe as Recipe, ingredients, selectedTags);
+                navigate(`/recipe/${newRecipeId}`);
             } catch (error) {
-                console.error('Error adding recipe:', error);
+                alert('Failed to add recipe. Please try again.');
             }
         } else {
             alert('Please fill in all required fields (title, ingredients, and instructions).');
@@ -68,7 +83,6 @@ const AddRecipe: React.FC = () => {
     const addIngredient = async () => {
         if (newIngredient.name && newIngredient.amount !== undefined && newIngredient.unit) {
             try {
-                // First, check if the ingredient already exists
                 const { data, error } = await supabase
                     .from('ingredients')
                     .select('id')
@@ -104,7 +118,6 @@ const AddRecipe: React.FC = () => {
                 ]);
                 setNewIngredient({ name: '', amount: 0, unit: '' });
             } catch (error) {
-                console.error('Error adding ingredient:', error);
                 alert('Failed to add ingredient. Please try again.');
             }
         } else {
@@ -114,6 +127,21 @@ const AddRecipe: React.FC = () => {
 
     const removeIngredient = (index: number) => {
         setIngredients(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleTagSelect = (tag: Tag) => {
+        setSelectedTags(prev => 
+            prev.some(t => t.id === tag.id)
+                ? prev.filter(t => t.id !== tag.id)
+                : [...prev, tag]
+        );
+    };
+
+    const addNewTag = () => {
+        if (newTag && !selectedTags.some(tag => tag.name.toLowerCase() === newTag.toLowerCase())) {
+            setSelectedTags(prev => [...prev, { name: newTag } as Tag]);
+            setNewTag('');
+        }
     };
 
     return (
@@ -172,6 +200,41 @@ const AddRecipe: React.FC = () => {
                         placeholder="Unit"
                     />
                     <Button type="button" onClick={addIngredient}>Add Ingredient</Button>
+                </div>
+            </div>
+
+            <div>
+                <Label>Tags</Label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                    {tags.map(tag => (
+                        <Button
+                            key={tag.id}
+                            type="button"
+                            onClick={() => handleTagSelect(tag)}
+                            variant={selectedTags.some(t => t.id === tag.id) ? "secondary" : "outline"}
+                        >
+                            {tag.name}
+                        </Button>
+                    ))}
+                    {selectedTags.filter(tag => !tag.id).map((tag, index) => (
+                        <Button
+                            key={`new-${index}`}
+                            type="button"
+                            onClick={() => handleTagSelect(tag)}
+                            variant="secondary"
+                        >
+                            {tag.name} (New)
+                        </Button>
+                    ))}
+                </div>
+                <div className="flex gap-2">
+                    <Input
+                        type="text"
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        placeholder="New tag"
+                    />
+                    <Button type="button" onClick={addNewTag}>Add Tag</Button>
                 </div>
             </div>
 
