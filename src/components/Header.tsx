@@ -5,25 +5,48 @@ import { Button } from '@/components/ui/button';
 const Header: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    
     const isRecipeDetailPage = location.pathname.includes('/recipe/');
+    const isAddRecipePage = location.pathname === '/add-recipe';
+
+    const handleBack = () => {
+        if (window.history.length > 2) {
+            navigate(-1);
+        } else {
+            navigate('/');
+        }
+    };
 
     return (
         <header className="bg-gray-800 text-white p-4">
             <div className="container mx-auto flex justify-between items-center">
-                {isRecipeDetailPage && (
-                    <Button
-                        onClick={() => navigate(-1)}
-                        variant="outline"
-                        className="text-white"
-                    >
-                        Back
-                    </Button>
-                )}
+                <div>
+                    {isRecipeDetailPage && (
+                        <Button
+                            onClick={handleBack}
+                            variant="outline"
+                            className="text-white"
+                            aria-label="Go back to the previous page"
+                        >
+                            Back
+                        </Button>
+                    )}
+                </div>
                 <h1 className="text-2xl font-bold">
-                    {isRecipeDetailPage ? 'Recipe Detail' : 'Recipe List'}
+                    {isRecipeDetailPage ? 'Recipe Detail' : isAddRecipePage ? 'Add Recipe' : 'Recipe List'}
                 </h1>
-                {/* Empty div to keep space for the back button */}
-                <div></div>
+                <div>
+                    {!isAddRecipePage && (
+                        <Button
+                            onClick={() => navigate('/add-recipe')}
+                            variant="outline"
+                            className="text-white"
+                            aria-label="Go to Add Recipe page"
+                        >
+                            Add Recipe
+                        </Button>
+                    )}
+                </div>
             </div>
         </header>
     );
