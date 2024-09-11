@@ -7,7 +7,6 @@ export const useGetTags = () => {
   const [error, setError] = useState<string | null>(null);
 
   const getTags = useCallback(async (): Promise<Tag[]> => {
-    console.log('getTags function called');
     try {
       setLoading(true);
       setError(null);
@@ -18,8 +17,6 @@ export const useGetTags = () => {
         .order('name');
 
       if (error) throw new Error(`Error fetching tags: ${error.message}`);
-
-      console.log('Tags fetched:', data);
       return data as Tag[];
     } catch (err) {
       console.error('Error in getTags:', err);
