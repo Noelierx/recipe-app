@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import IngredientHandler from 'components/IngredientHandler';
 import TagHandler from 'components/TagHandler';
-import { Recipe, RecipeIngredient, Tag } from '@/types/types';
+import SubRecipeHandler from 'components/SubRecipeHandler';
+import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 
@@ -20,12 +21,14 @@ const EditRecipe: React.FC = () => {
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
     const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
     const [newTags, setNewTags] = useState<string[]>([]);
+    const [subRecipes, setSubRecipes] = useState<SubRecipe[]>([]);
 
     useEffect(() => {
         if (initialRecipe) {
             setRecipe(initialRecipe);
             setIngredients(initialRecipe.recipe_ingredients || []);
             setSelectedTags(initialRecipe.tags || []);
+            setSubRecipes(initialRecipe.sub_recipes || []);
         }
     }, [initialRecipe]);
 
@@ -39,13 +42,20 @@ const EditRecipe: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (recipe.title && ingredients.length && recipe.instructions) {
-            const success = await handleRecipe(recipe as Recipe, ingredients, selectedTags, newTags);
+        if (recipe.title && (ingredients.length || subRecipes.length) && recipe.instructions) {
+            const transformedSubRecipes = subRecipes.map(subRecipe => ({
+                ...subRecipe,
+                ingredients: subRecipe.ingredients.map(ingredient => ({
+                    ...ingredient,
+                    id: (ingredient as any).id || '' // Type assertion to bypass type check
+                }))
+            }));
+            const success = await handleRecipe(recipe, ingredients, transformedSubRecipes, selectedTags, newTags);
             if (success) {
                 navigate(`/recipe/${recipeId}`);
             }
         } else {
-            alert('Please fill in all required fields: title, at least one ingredient, and instructions.');
+            alert('Please fill in all required fields: title, at least one ingredient or subrecipe, and instructions.');
         }
     };
 
@@ -81,6 +91,12 @@ const EditRecipe: React.FC = () => {
             </div>
 
             <IngredientHandler ingredients={ingredients} setIngredients={setIngredients} />
+
+            <SubRecipeHandler 
+                subRecipes={subRecipes}
+                setSubRecipes={setSubRecipes}
+                recipeId={recipeId}
+            />
 
             <TagHandler 
                 selectedTags={selectedTags} 

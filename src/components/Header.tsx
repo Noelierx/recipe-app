@@ -7,6 +7,7 @@ const Header: React.FC = () => {
     const location = useLocation();
     
     const isHomePage = location.pathname === '/';
+    const isAddRecipePage = location.pathname === '/add-recipe';
 
     return (
         <header className="bg-gray-800 text-white p-4">
@@ -29,7 +30,7 @@ const Header: React.FC = () => {
                      location.pathname === '/edit-recipe' ? 'Edit Recipe' : 'Recipe List'}
                 </h1>
                 <div>
-                    {isHomePage && (
+                    {!isAddRecipePage && (
                         <Button
                             onClick={() => navigate('/add-recipe')}
                             variant="outline"

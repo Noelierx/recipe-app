@@ -40,10 +40,34 @@ export const useRecipeDetails = (recipeId: number) => {
 
         if (tagsError) throw new Error(tagsError.message);
 
+        const { data: subRecipesData, error: subRecipesError } = await supabase
+          .from('sub_recipes')
+          .select(`
+            id,
+            title,
+            instructions,
+            sub_recipe_ingredients (
+              amount,
+              unit,
+              ingredient:ingredients (id, name)
+            )
+          `)
+          .eq('recipe_id', recipeId);
+
+        if (subRecipesError) throw new Error(subRecipesError.message);
+
         const recipeWithDetails: RecipeWithDetails = {
           ...recipeData,
           recipe_ingredients: ingredientsData || [],
-          tags: tagsData ? tagsData.map(t => t.tag) : []
+          tags: tagsData ? tagsData.map(t => t.tag) : [],
+          sub_recipes: subRecipesData ? subRecipesData.map(sr => ({
+            ...sr,
+            ingredients: sr.sub_recipe_ingredients.map(sri => ({
+              amount: sri.amount,
+              unit: sri.unit,
+              ingredient: sri.ingredient
+            }))
+          })) : []
         };
 
         setRecipe(recipeWithDetails);
