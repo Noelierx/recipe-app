@@ -6,6 +6,46 @@ interface RecipeResult {
   id: number;
 }
 
+const createIngredientIfNotExists = async (ingredient: Partial<RecipeIngredient['ingredient']>) => {
+  const { data, error } = await supabase
+    .from('ingredients')
+    .select()
+    .eq('name', ingredient.name)
+    .single();
+
+  if (error) {
+    const { data: newData, error: insertError } = await supabase
+      .from('ingredients')
+      .insert({ name: ingredient.name })
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+    return newData;
+  }
+  return data;
+};
+
+const createTagIfNotExists = async (tagName: string) => {
+  const { data, error } = await supabase
+    .from('tags')
+    .select()
+    .eq('name', tagName)
+    .single();
+
+  if (error) {
+    const { data: newData, error: insertError } = await supabase
+      .from('tags')
+      .insert({ name: tagName })
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+    return newData;
+  }
+  return data;
+};
+
 export const useRecipeHandler = (recipeId?: number) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +62,6 @@ export const useRecipeHandler = (recipeId?: number) => {
     try {
       let recipeResult: RecipeResult;
       if (recipeId) {
-        // Update existing recipe
         const { error: recipeError } = await supabase
           .from('recipes')
           .update({
@@ -35,7 +74,6 @@ export const useRecipeHandler = (recipeId?: number) => {
         if (recipeError) throw recipeError;
         recipeResult = { id: recipeId };
       } else {
-        // Add new recipe
         const { data, error: recipeError } = await supabase
           .from('recipes')
           .insert(recipe)
@@ -47,90 +85,34 @@ export const useRecipeHandler = (recipeId?: number) => {
         recipeResult = data as RecipeResult;
       }
 
-      // Handle ingredients
       const updatedIngredients = await Promise.all(ingredients.map(async (ing) => {
         if (!ing.ingredient.id) {
-          const { data, error } = await supabase
-            .from('ingredients')
-            .insert({ name: ing.ingredient.name })
-            .select()
-            .single();
-          
-          if (error) throw error;
+          const data = await createIngredientIfNotExists(ing.ingredient);
           return { ...ing, ingredient: { ...ing.ingredient, id: data.id } };
         }
         return ing;
       }));
 
-      if (recipeId) {
-        await supabase
-          .from('recipe_ingredients')
-          .delete()
-          .eq('recipe_id', recipeId);
-      }
-
-      const newRecipeIngredients = updatedIngredients.map(ing => ({
-        recipe_id: recipeResult.id,
-        ingredient_id: ing.ingredient.id,
-        amount: ing.amount,
-        unit: ing.unit
-      }));
-
-      const { error: ingredientsError } = await supabase
+      await supabase
         .from('recipe_ingredients')
-        .insert(newRecipeIngredients);
-
-      if (ingredientsError) throw ingredientsError;
-
-      // Handle tags
-      const allTagNames = [...existingTags.map(t => t.name), ...newTags];
-      const allTagObjects = await Promise.all(allTagNames.map(async (tagName) => {
-        const { data, error } = await supabase
-          .from('tags')
-          .select()
-          .eq('name', tagName)
-          .single();
-        
-        if (error) {
-          const { data: newData, error: insertError } = await supabase
-            .from('tags')
-            .insert({ name: tagName })
-            .select()
-            .single();
-          
-          if (insertError) throw insertError;
-          return newData;
-        }
-        return data;
-      }));
-
-      if (recipeId) {
-        await supabase
-          .from('recipe_tags')
-          .delete()
-          .eq('recipe_id', recipeId);
-      }
-
-      const newRecipeTags = Array.from(new Set(allTagObjects
-        .filter((tag): tag is { id: number } => tag !== null && tag !== undefined && typeof tag.id === 'number')
-        .map(tag => JSON.stringify({
+        .upsert(updatedIngredients.map(ing => ({
           recipe_id: recipeResult.id,
-          tag_id: tag.id
-        }))))
-        .map(str => JSON.parse(str));
+          ingredient_id: ing.ingredient.id,
+          amount: ing.amount,
+          unit: ing.unit
+        })));
 
-      if (newRecipeTags.length > 0) {
-        const { error: tagsError } = await supabase
-          .from('recipe_tags')
-          .insert(newRecipeTags);
-
-        if (tagsError) throw tagsError;
-      }
+      const allTagNames = [...existingTags.map(tag => tag.name), ...newTags];
+      const allTagObjects = await Promise.all(allTagNames.map(createTagIfNotExists));
+      
+      await supabase
+        .from('recipe_tags')
+        .upsert(allTagObjects.map(tag => ({ recipe_id: recipeResult.id, tag_id: tag.id })));
 
       setLoading(false);
-      return recipeId ? true : recipeResult.id;
+      return recipeResult.id;
     } catch (err) {
-      setError((err as Error).message || 'An error occurred while handling the recipe');
+      setError((err as Error).message);
       setLoading(false);
       return false;
     }
