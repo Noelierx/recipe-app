@@ -6,37 +6,30 @@ const Header: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     
-    const isRecipeDetailPage = location.pathname.includes('/recipe/');
-    const isAddRecipePage = location.pathname === '/add-recipe';
-
-    const handleBack = () => {
-        if (window.history.length > 2) {
-            navigate(-1);
-        } else {
-            navigate('/');
-        }
-    };
+    const isHomePage = location.pathname === '/';
 
     return (
         <header className="bg-gray-800 text-white p-4">
             <div className="container mx-auto flex justify-between items-center">
                 <div>
-                    {(isRecipeDetailPage || isAddRecipePage) && (
+                    {!isHomePage && (
                         <Button
-                            onClick={handleBack}
+                            onClick={() => navigate('/')}
                             variant="outline"
                             className="text-white"
-                            aria-label={isAddRecipePage ? "Go back to home" : "Go back to the previous page"}
+                            aria-label="Go to home page"
                         >
-                            {isAddRecipePage ? "Home" : "Back"}
+                            Home
                         </Button>
                     )}
                 </div>
                 <h1 className="text-2xl font-bold">
-                    {isRecipeDetailPage ? 'Recipe Detail' : isAddRecipePage ? 'Add Recipe' : 'Recipe List'}
+                    {location.pathname.includes('/recipe/') ? 'Recipe Detail' : 
+                     location.pathname === '/add-recipe' ? 'Add Recipe' : 
+                     location.pathname === '/edit-recipe' ? 'Edit Recipe' : 'Recipe List'}
                 </h1>
                 <div>
-                    {!isAddRecipePage && (
+                    {isHomePage && (
                         <Button
                             onClick={() => navigate('/add-recipe')}
                             variant="outline"

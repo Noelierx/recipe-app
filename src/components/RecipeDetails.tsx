@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
-import { RecipeWithDetails } from '@/types/types'; // Assurez-vous que vous avez importé le bon type
+import { Button } from "@/components/ui/button";
+import { RecipeWithDetails } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 
 const RecipeDetails: React.FC = () => {
+    const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const recipeId = id ? parseInt(id, 10) : 0;
     const { recipe, loading, error } = useRecipeDetails(recipeId);
@@ -57,6 +59,7 @@ const RecipeDetails: React.FC = () => {
             </ul>
             <h3 className="text-xl font-semibold mb-2">Instructions:</h3>
             <p>{recipe.instructions}</p>
+            <Button onClick={() => navigate(`/recipe/${recipe.id}/edit`)}>Edit Recipe</Button>
         </div>
     );
 };
