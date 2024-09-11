@@ -8,7 +8,7 @@ export interface Recipe {
 export interface Ingredient {
   amount: number;
   unit: string;
-  id: number;
+  id?: number;
   name: string;
 }
 
@@ -24,14 +24,10 @@ export interface Tag {
 }
 
 export interface SubRecipe {
-  id: number;
+  id?: number;
   title: string;
   instructions: string;
-  ingredients: SubRecipeIngredient[];
-}
-
-export interface SubRecipeIngredient extends RecipeIngredient {
-  id: string;
+  ingredients: RecipeIngredient[];
 }
 
 export interface RecipeWithDetails extends Recipe {

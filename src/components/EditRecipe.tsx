@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,10 +59,6 @@ const EditRecipe: React.FC = () => {
         }
     };
 
-    const handleSubRecipeChange = useCallback((updatedSubRecipes: SubRecipe[]) => {
-        setSubRecipes(updatedSubRecipes);
-    }, []);
-
     if (loadingRecipe) return <div>Loading recipe details...</div>;
     if (loadError) return <div>Error loading recipe: {loadError}</div>;
     if (!recipe) return <div>Recipe not found</div>;
@@ -97,8 +93,7 @@ const EditRecipe: React.FC = () => {
             <IngredientHandler ingredients={ingredients} setIngredients={setIngredients} />
 
             <SubRecipeHandler 
-                subRecipes={subRecipes} 
-                onSubRecipesChange={handleSubRecipeChange}
+                subRecipes={subRecipes}
                 setSubRecipes={setSubRecipes}
                 recipeId={recipeId}
             />

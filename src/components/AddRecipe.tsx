@@ -7,10 +7,10 @@ import { Label } from "@/components/ui/label";
 import IngredientHandler from 'components/IngredientHandler';
 import TagHandler from 'components/TagHandler';
 import SubRecipeHandler from 'components/SubRecipeHandler';
-import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/types';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
+import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/types';
 
-const AddRecipe: React.FC = () => {
+function AddRecipe() {
     const navigate = useNavigate();
     const { handleRecipe, loading, error } = useRecipeHandler();
     const [recipe, setRecipe] = useState<Partial<Recipe>>({
@@ -25,11 +25,12 @@ const AddRecipe: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (recipe.title && (ingredients.length || subRecipes.length) && (recipe.instructions || subRecipes.length)) {
+        if (recipe.title && (ingredients.length > 0 || subRecipes.length > 0) && recipe.instructions) {
+            const subRecipesAny = subRecipes as any[];
             const result = await handleRecipe(
                 recipe,
                 ingredients,
-                subRecipes,
+                subRecipesAny,
                 selectedTags,
                 newTags
             );
@@ -39,7 +40,7 @@ const AddRecipe: React.FC = () => {
                 alert('Failed to add recipe. Please try again.');
             }
         } else {
-            alert('Please fill in all required fields (title, ingredients, and instructions).');
+            alert('Please fill in all required fields (title, ingredients or subrecipes, and instructions).');
         }
     };
 
@@ -83,18 +84,16 @@ const AddRecipe: React.FC = () => {
                 setIngredients={setIngredients} 
             />
 
+            <SubRecipeHandler 
+                subRecipes={subRecipes}
+                setSubRecipes={setSubRecipes}
+            />
+
             <TagHandler 
                 selectedTags={selectedTags} 
                 setSelectedTags={setSelectedTags}
                 newTags={newTags}
                 setNewTags={setNewTags}
-            />
-
-            <SubRecipeHandler 
-                subRecipes={subRecipes}
-                setSubRecipes={setSubRecipes}
-                onSubRecipesChange={setSubRecipes}
-                recipeId={undefined}
             />
 
             <div>
@@ -113,6 +112,6 @@ const AddRecipe: React.FC = () => {
             {error && <p className="text-red-500">{error}</p>}
         </form>
     );
-};
+}
 
 export default AddRecipe;
