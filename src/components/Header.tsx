@@ -21,14 +21,14 @@ const Header: React.FC = () => {
         <header className="bg-gray-800 text-white p-4">
             <div className="container mx-auto flex justify-between items-center">
                 <div>
-                    {isRecipeDetailPage && (
+                    {(isRecipeDetailPage || isAddRecipePage) && (
                         <Button
                             onClick={handleBack}
                             variant="outline"
                             className="text-white"
-                            aria-label="Go back to the previous page"
+                            aria-label={isAddRecipePage ? "Go back to home" : "Go back to the previous page"}
                         >
-                            Back
+                            {isAddRecipePage ? "Home" : "Back"}
                         </Button>
                     )}
                 </div>
