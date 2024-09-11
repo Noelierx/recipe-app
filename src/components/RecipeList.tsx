@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from 'react-router-dom';
 import { RecipeWithDetails, Tag } from '@/types/types';
 import { useGetTags } from '@/hooks/useGetTags';
+import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
+
 
 interface RecipeListProps {
     recipes: RecipeWithDetails[];
@@ -17,6 +20,7 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
     const navigate = useNavigate();
     const { getTags, loading, error } = useGetTags();
     const [allTags, setAllTags] = useState<Tag[]>([]);
+    const { deleteRecipe, isDeleting, error: deleteError } = useDeleteRecipe();
 
     useEffect(() => {
         const fetchTags = async () => {
@@ -66,6 +70,13 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
         });
     };
 
+    const handleDeleteRecipe = async (recipeId: number) => {
+        const success = await deleteRecipe(recipeId);
+        if (success) {
+            window.location.reload();
+        }
+    };
+
     return (
         <div>
             <div className="mb-4">
@@ -108,12 +119,33 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                             </div>
                         </CardHeader>
                         <CardContent>{recipe.instructions}</CardContent>
-                        <CardFooter>
+                        <CardFooter className="flex justify-between">
                             <Button onClick={() => viewRecipeDetail(recipe)}>View Recipe</Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" disabled={isDeleting}>Delete</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action cannot be undone. This will permanently delete the recipe
+                                            and remove the data from our servers.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDeleteRecipe(recipe.id)}>
+                                            {isDeleting ? 'Deleting...' : 'Delete'}
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </CardFooter>
                     </Card>
                 ))}
             </div>
+            {deleteError && <div className="text-red-500 mt-4">Error deleting recipe: {deleteError}</div>}
         </div>
     );
 };
