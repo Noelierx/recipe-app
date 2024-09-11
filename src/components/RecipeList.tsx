@@ -119,10 +119,7 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                             <CardTitle>{recipe.title}</CardTitle>
                             <div className="flex flex-wrap gap-1 mt-2">
                                 {recipe.tags.map((tag, index) => (
-                                    <Badge 
-                                        key={`${recipe.id}-${tag.id ?? index}-${tag.name}`} 
-                                        variant="secondary"
-                                    >
+                                    <Badge key={`${recipe.id}-${tag.id ?? index}-${tag.name}`}>
                                         {tag.name}
                                     </Badge>
                                 ))}
