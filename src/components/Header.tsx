@@ -16,7 +16,7 @@ const Header: React.FC = () => {
                         <Button
                             onClick={() => navigate('/')}
                             variant="outline"
-                            className="text-white"
+                            className="text-black"
                             aria-label="Go to home page"
                         >
                             Home
