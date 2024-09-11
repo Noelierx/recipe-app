@@ -2,10 +2,6 @@ import { useState } from 'react';
 import { supabase } from '@/utils/supabaseClient';
 import { Recipe, RecipeIngredient, Tag } from '@/types/types';
 
-const deduplicate = <T, K extends keyof T>(array: T[], key: K) => {
-  return Array.from(new Map(array.map(item => [item[key], item])).values());
-};
-
 export const useAddRecipe = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
