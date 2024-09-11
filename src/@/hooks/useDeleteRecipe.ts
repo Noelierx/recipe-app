@@ -5,6 +5,38 @@ export const useDeleteRecipe = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const deleteSubRecipeAndIngredients = async (subRecipeId: number): Promise<void> => {
+    const { data: subRecipeIngredients, error: subRecipeIngredientsError } = await supabase
+      .from('sub_recipe_ingredients')
+      .select('ingredient_id')
+      .eq('sub_recipe_id', subRecipeId);
+
+    if (subRecipeIngredientsError) throw subRecipeIngredientsError;
+
+    const { error: deleteSubRecipeIngredientsError } = await supabase
+      .from('sub_recipe_ingredients')
+      .delete()
+      .eq('sub_recipe_id', subRecipeId);
+
+    if (deleteSubRecipeIngredientsError) throw deleteSubRecipeIngredientsError;
+
+    for (const { ingredient_id } of subRecipeIngredients) {
+      const { error: deleteIngredientError } = await supabase
+        .from('ingredients')
+        .delete()
+        .eq('id', ingredient_id);
+
+      if (deleteIngredientError) throw deleteIngredientError;
+    }
+
+    const { error: deleteSubRecipeError } = await supabase
+      .from('sub_recipes')
+      .delete()
+      .eq('id', subRecipeId);
+
+    if (deleteSubRecipeError) throw deleteSubRecipeError;
+  };
+
   const deleteRecipe = async (recipeId: number): Promise<boolean> => {
     setIsDeleting(true);
     setError(null);
@@ -18,43 +50,12 @@ export const useDeleteRecipe = () => {
 
       if (subRecipesError) throw subRecipesError;
 
-      // Delete sub_recipe_ingredients and their corresponding ingredients
+      // Use deleteSubRecipeAndIngredients for each sub-recipe
       for (const { id: subRecipeId } of subRecipes) {
-        const { data: subRecipeIngredients, error: subRecipeIngredientsError } = await supabase
-          .from('sub_recipe_ingredients')
-          .select('ingredient_id')
-          .eq('sub_recipe_id', subRecipeId);
-
-        if (subRecipeIngredientsError) throw subRecipeIngredientsError;
-
-        // Delete sub_recipe_ingredients
-        const { error: deleteSubRecipeIngredientsError } = await supabase
-          .from('sub_recipe_ingredients')
-          .delete()
-          .eq('sub_recipe_id', subRecipeId);
-
-        if (deleteSubRecipeIngredientsError) throw deleteSubRecipeIngredientsError;
-
-        // Delete ingredients
-        for (const { ingredient_id } of subRecipeIngredients) {
-          const { error: deleteIngredientError } = await supabase
-            .from('ingredients')
-            .delete()
-            .eq('id', ingredient_id);
-
-          if (deleteIngredientError) throw deleteIngredientError;
-        }
+        await deleteSubRecipeAndIngredients(subRecipeId);
       }
 
-      // Delete sub_recipes
-      const { error: deleteSubRecipesError } = await supabase
-        .from('sub_recipes')
-        .delete()
-        .eq('recipe_id', recipeId);
-
-      if (deleteSubRecipesError) throw deleteSubRecipesError;
-
-      // Delete recipe_ingredients and their corresponding ingredients
+      // Delete sub_recipe_ingredients and their corresponding ingredients
       const { data: recipeIngredients, error: recipeIngredientsError } = await supabase
         .from('recipe_ingredients')
         .select('ingredient_id')
@@ -132,5 +133,24 @@ export const useDeleteRecipe = () => {
     }
   };
 
-  return { deleteRecipe, isDeleting, error };
+  const deleteSubRecipe = async (subRecipeId: number): Promise<boolean> => {
+    setIsDeleting(true);
+    setError(null);
+
+    try {
+      await deleteSubRecipeAndIngredients(subRecipeId);
+      return true;
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+      return false;
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return { deleteRecipe, deleteSubRecipe, isDeleting, error };
 };
