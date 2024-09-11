@@ -1,30 +1,33 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
-import { Recipe, Ingredient } from '@/types/types';
+import { RecipeWithDetails } from '@/types/types'; // Assurez-vous que vous avez importé le bon type
+import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 
-interface RecipeDetailsProps {
-  recipes: Recipe[];
-}
-
-const RecipeDetails: React.FC<RecipeDetailsProps> = ({ recipes }) => {
+const RecipeDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const recipeId = useMemo(() => parseInt(id || '0', 10), [id]);
-    const recipe = useMemo(() => recipes.find(r => r.id === recipeId), [recipes, recipeId]);
+    const recipeId = id ? parseInt(id, 10) : 0;
+    const { recipe, loading, error } = useRecipeDetails(recipeId);
     const [servings, setServings] = useState<number>(recipe?.servings || 0);
 
-    if (!recipe) {
-        return <div>Recipe not found</div>;
-    }
+    useEffect(() => {
+        if (recipe) {
+            setServings(recipe.servings);
+        }
+    }, [recipe]);
 
-    const adjustIngredients = (ingredients: Ingredient[], originalServings: number, newServings: number): Ingredient[] => {
+    if (loading) return <div>Loading recipe details...</div>;
+    if (error) return <div>Error loading recipe: {error}</div>;
+    if (!recipe) return <div>Recipe not found</div>;
+
+    const adjustIngredients = (ingredients: RecipeWithDetails['recipe_ingredients'], originalServings: number, newServings: number) => {
         return ingredients.map(ing => ({
             ...ing,
             amount: (ing.amount / originalServings) * newServings
         }));
     };
 
-    const adjustedIngredients = adjustIngredients(recipe.ingredients, recipe.servings, servings);
+    const adjustedIngredients = adjustIngredients(recipe.recipe_ingredients, recipe.servings, servings);
 
     return (
         <div className="max-w-2xl mx-auto">
@@ -45,7 +48,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({ recipes }) => {
                 {adjustedIngredients.length > 0 ? (
                     adjustedIngredients.map((ing, index) => (
                         <li key={index}>
-                            {ing.name}: {ing.amount.toFixed(2)} {ing.unit}
+                            {ing.ingredient.name}: {ing.amount.toFixed(2)} {ing.unit}
                         </li>
                     ))
                 ) : (
