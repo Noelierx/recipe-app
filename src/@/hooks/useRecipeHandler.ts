@@ -110,33 +110,70 @@ export const useRecipeHandler = (recipeId?: number) => {
         .from('recipe_ingredients')
         .insert(updatedIngredients);
 
-      // Handle sub-recipes
-      for (const subRecipe of subRecipes) {
-        const { data: subRecipeData, error: subRecipeError } = await supabase
+      if (recipeId) {
+        const { data: existingSubRecipes, error: fetchError } = await supabase
           .from('sub_recipes')
-          .insert({
-            recipe_id: recipeResult.id,
-            title: subRecipe.title,
-            instructions: subRecipe.instructions
-          })
           .select('id')
-          .single();
+          .eq('recipe_id', recipeId);
+        
+        if (fetchError) throw fetchError;
 
-        if (subRecipeError) throw subRecipeError;
+        const existingSubRecipeIds = new Set(existingSubRecipes.map(sr => sr.id));
 
-        const updatedSubIngredients = await Promise.all(subRecipe.ingredients.map(async (ing) => {
-          const ingredientData = await createIngredientIfNotExists(ing.ingredient);
-          return {
-            sub_recipe_id: subRecipeData.id,
-            ingredient_id: ingredientData.id,
-            amount: ing.amount,
-            unit: ing.unit
-          };
-        }));
+        for (const subRecipe of subRecipes) {
+          if (subRecipe.id && existingSubRecipeIds.has(subRecipe.id)) {
+            const { error: updateError } = await supabase
+              .from('sub_recipes')
+              .update({
+                title: subRecipe.title,
+                instructions: subRecipe.instructions
+              })
+              .eq('id', subRecipe.id);
 
-        await supabase
-          .from('sub_recipe_ingredients')
-          .insert(updatedSubIngredients);
+            if (updateError) throw updateError;
+
+            existingSubRecipeIds.delete(subRecipe.id);
+          } else {
+            const { data: subRecipeData, error: insertError } = await supabase
+              .from('sub_recipes')
+              .insert({
+                recipe_id: recipeResult.id,
+                title: subRecipe.title,
+                instructions: subRecipe.instructions
+              })
+              .select('id')
+              .single();
+
+            if (insertError) throw insertError;
+            subRecipe.id = subRecipeData.id;
+          }
+
+          await supabase
+            .from('sub_recipe_ingredients')
+            .delete()
+            .eq('sub_recipe_id', subRecipe.id);
+
+          const updatedSubIngredients = await Promise.all(subRecipe.ingredients.map(async (ing) => {
+            const ingredientData = await createIngredientIfNotExists(ing.ingredient);
+            return {
+              sub_recipe_id: subRecipe.id,
+              ingredient_id: ingredientData.id,
+              amount: ing.amount,
+              unit: ing.unit
+            };
+          }));
+
+          await supabase
+            .from('sub_recipe_ingredients')
+            .insert(updatedSubIngredients);
+        }
+
+        if (existingSubRecipeIds.size > 0) {
+          await supabase
+            .from('sub_recipes')
+            .delete()
+            .in('id', Array.from(existingSubRecipeIds));
+        }
       }
 
       // Handle tags
