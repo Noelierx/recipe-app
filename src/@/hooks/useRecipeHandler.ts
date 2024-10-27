@@ -65,14 +65,14 @@ export const useRecipeHandler = (recipeId?: number) => {
     setError(null);
 
     try {
-      const { title, instructions, servings, prep_time, cook_time } = recipe; // Destructure prep_time and cook_time
+      const { title, instructions, servings, prep_time, cook_time } = recipe;
       let recipeResult: RecipeResult;
 
       // Create or update the main recipe
       if (recipeId) {
         const { data, error } = await supabase
           .from('recipes')
-          .update({ title, instructions, servings, prep_time, cook_time }) // Include prep_time and cook_time
+          .update({ title, instructions, servings, prep_time, cook_time })
           .eq('id', recipeId)
           .select()
           .single();
@@ -81,7 +81,7 @@ export const useRecipeHandler = (recipeId?: number) => {
       } else {
         const { data, error } = await supabase
           .from('recipes')
-          .insert({ title, instructions, servings, prep_time, cook_time }) // Include prep_time and cook_time
+          .insert({ title, instructions, servings, prep_time, cook_time })
           .select()
           .single();
         if (error) throw error;

@@ -54,15 +54,15 @@ const RecipeDetails: React.FC = () => {
                         className="w-20 inline-block"
                     />
                 </div>
-                {recipe.prep_time != null && (
+                {recipe.prep_time && (
                     <div className="flex items-center mb-4">
-                        <Clock className="mr-2" />
+                        <Clock className="mr-2" aria-hidden="true" />
                         <span>Temps de préparation: {recipe.prep_time} minutes</span>
                     </div>
                 )}
-                {recipe.cook_time != null && (
+                {recipe.cook_time && (
                     <div className="flex items-center mb-4">
-                        <Flame className="mr-2" />
+                        <Flame className="mr-2" aria-hidden="true" />
                         <span>Temps de cuisson: {recipe.cook_time} minutes</span>
                     </div>
                 )}

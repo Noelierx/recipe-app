@@ -129,13 +129,13 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                         <CardContent>
                             {recipe.prep_time && (
                                 <div className="flex items-center mb-2">
-                                    <Clock className="mr-2" />
+                                    <Clock className="mr-2" aria-hidden="true" />
                                     <span>{recipe.prep_time} min prep</span>
                                 </div>
                             )}
                             {recipe.cook_time && (
                                 <div className="flex items-center mb-2">
-                                    <Flame className="mr-2" />
+                                    <Flame className="mr-2" aria-hidden="true" />
                                     <span>{recipe.cook_time} min cook</span>
                                 </div>
                             )}

@@ -14,12 +14,12 @@ import { Clock, Flame } from 'lucide-react';
 function AddRecipe() {
     const navigate = useNavigate();
     const { handleRecipe, loading, error } = useRecipeHandler();
-    const [recipe, setRecipe] = useState<Partial<Recipe & { prepTime?: number; cookTime?: number }>>({
+    const [recipe, setRecipe] = useState<Partial<Recipe & { prep_time?: number; cook_time?: number }>>({
         title: '',
         instructions: '',
         servings: 1,
-        prepTime: 0,
-        cookTime: 0,
+        prep_time: undefined,
+        cook_time: undefined,
     });
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
     const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -49,12 +49,12 @@ function AddRecipe() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
+        const numberFields = ['servings', 'prep_time', 'cook_time'];
+        
         setRecipe(prev => ({
             ...prev,
-            [name]: name === 'servings' ? parseInt(value, 10) : value
+            [name]: numberFields.includes(name) ? Math.max(0, parseInt(value, 10) || 0) : value
         }));
-        if (name === 'prepTime') setRecipe(prev => ({ ...prev, prepTime: parseInt(value, 10) }));
-        if (name === 'cookTime') setRecipe(prev => ({ ...prev, cookTime: parseInt(value, 10) }));
     };
 
     return (
@@ -116,12 +116,12 @@ function AddRecipe() {
             <div>
                 <Label htmlFor="prepTime">Temps de préparation (minutes)</Label>
                 <div className="flex items-center">
-                    <Clock className="mr-2" />
+                    <Clock className="mr-2" aria-hidden="true" />
                     <Input
                         id="prepTime"
                         name="prepTime"
                         type="number"
-                        value={recipe.prepTime}
+                        value={recipe.prep_time}
                         onChange={handleInputChange}
                         min="0"
                         required
@@ -132,12 +132,12 @@ function AddRecipe() {
             <div>
                 <Label htmlFor="cookTime">Temps de cuisson (minutes)</Label>
                 <div className="flex items-center">
-                    <Flame className="mr-2" />
+                    <Flame className="mr-2" aria-hidden="true" />
                     <Input
                         id="cookTime"
                         name="cookTime"
                         type="number"
-                        value={recipe.cookTime}
+                        value={recipe.cook_time}
                         onChange={handleInputChange}
                         min="0"
                         required

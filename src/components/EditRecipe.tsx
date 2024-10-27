@@ -137,7 +137,7 @@ const EditRecipe: React.FC = () => {
             <div>
                 <Label htmlFor="prepTime">Temps de préparation (minutes)</Label>
                 <div className="flex items-center">
-                    <Clock className="mr-2" />
+                    <Clock className="mr-2" aria-hidden="true" />
                     <Input
                         id="prepTime"
                         name="prepTime"
@@ -153,7 +153,7 @@ const EditRecipe: React.FC = () => {
             <div>
                 <Label htmlFor="cookTime">Temps de cuisson (minutes)</Label>
                 <div className="flex items-center">
-                    <Flame className="mr-2" />
+                    <Flame className="mr-2" aria-hidden="true" />
                     <Input
                         id="cookTime"
                         name="cookTime"

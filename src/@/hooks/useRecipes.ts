@@ -24,7 +24,7 @@ export const useRecipes = () => {
                         recipe_id,
                         tag:tags (name)
                     )
-                `); // Include prep_time and cook_time in the select
+                `);
 
             if (recipesError) throw new Error(recipesError.message);
             if (!recipesData) throw new Error('No recipes found');
