@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RecipeIngredient } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
+import { Clock, Flame } from 'lucide-react';
 
 const RecipeDetails: React.FC = () => {
     const navigate = useNavigate();
@@ -53,6 +54,18 @@ const RecipeDetails: React.FC = () => {
                         className="w-20 inline-block"
                     />
                 </div>
+                {recipe.prep_time != null && (
+                    <div className="flex items-center mb-4">
+                        <Clock className="mr-2" />
+                        <span>Temps de préparation: {recipe.prep_time} minutes</span>
+                    </div>
+                )}
+                {recipe.cook_time != null && (
+                    <div className="flex items-center mb-4">
+                        <Flame className="mr-2" />
+                        <span>Temps de cuisson: {recipe.cook_time} minutes</span>
+                    </div>
+                )}
             </div>
             
             <div className="flex flex-col md:flex-row">

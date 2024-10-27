@@ -67,7 +67,9 @@ export const useRecipeDetails = (recipeId: number) => {
               unit: sri.unit,
               ingredient: sri.ingredient
             }))
-          })) : []
+          })) : [],
+          prep_time: recipeData.prep_time,
+          cook_time: recipeData.cook_time,
         };
 
         setRecipe(recipeWithDetails);

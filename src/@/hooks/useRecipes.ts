@@ -12,43 +12,31 @@ export const useRecipes = () => {
             setLoading(true);
             const { data: recipesData, error: recipesError } = await supabase
                 .from('recipes')
-                .select('*');
+                .select(`
+                    *,
+                    recipe_ingredients (
+                        recipe_id,
+                        amount,
+                        unit,
+                        ingredient:ingredients (name)
+                    ),
+                    recipe_tags (
+                        recipe_id,
+                        tag:tags (name)
+                    )
+                `); // Include prep_time and cook_time in the select
 
             if (recipesError) throw new Error(recipesError.message);
             if (!recipesData) throw new Error('No recipes found');
 
-            const { data: ingredientsData, error: ingredientsError } = await supabase
-                .from('recipe_ingredients')
-                .select(`
-                    recipe_id,
-                    amount,
-                    unit,
-                    ingredient:ingredients (name)
-                `);
-
-            if (ingredientsError) throw new Error(ingredientsError.message);
-
-            const { data: tagsData, error: tagsError } = await supabase
-                .from('recipe_tags')
-                .select(`
-                    recipe_id,
-                    tag:tags (name)
-                `);
-
-            if (tagsError) throw new Error(tagsError.message);
-
             const transformedRecipes: RecipeWithDetails[] = recipesData.map(recipe => {
-                const recipeIngredients = ingredientsData
-                    ? ingredientsData.filter(ri => ri.recipe_id === recipe.id)
-                    : [];
-                const recipeTags = tagsData
-                    ? tagsData.filter(rt => rt.recipe_id === recipe.id)
-                    : [];
+                const recipeIngredients = recipe.recipe_ingredients || [];
+                const recipeTags = recipe.recipe_tags ? recipe.recipe_tags.map((rt: { tag: { name: string } }) => rt.tag) : [];
 
                 return {
                     ...recipe,
                     recipe_ingredients: recipeIngredients,
-                    tags: recipeTags.map(rt => rt.tag)
+                    tags: recipeTags,
                 };
             });
 

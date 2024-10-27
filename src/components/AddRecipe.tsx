@@ -9,14 +9,17 @@ import TagHandler from 'components/TagHandler';
 import SubRecipeHandler from 'components/SubRecipeHandler';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/types';
+import { Clock, Flame } from 'lucide-react';
 
 function AddRecipe() {
     const navigate = useNavigate();
     const { handleRecipe, loading, error } = useRecipeHandler();
-    const [recipe, setRecipe] = useState<Partial<Recipe>>({
+    const [recipe, setRecipe] = useState<Partial<Recipe & { prepTime?: number; cookTime?: number }>>({
         title: '',
         instructions: '',
         servings: 1,
+        prepTime: 0,
+        cookTime: 0,
     });
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
     const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -50,6 +53,8 @@ function AddRecipe() {
             ...prev,
             [name]: name === 'servings' ? parseInt(value, 10) : value
         }));
+        if (name === 'prepTime') setRecipe(prev => ({ ...prev, prepTime: parseInt(value, 10) }));
+        if (name === 'cookTime') setRecipe(prev => ({ ...prev, cookTime: parseInt(value, 10) }));
     };
 
     return (
@@ -106,6 +111,38 @@ function AddRecipe() {
                     placeholder="Enter cooking instructions"
                     required
                 />
+            </div>
+
+            <div>
+                <Label htmlFor="prepTime">Temps de préparation (minutes)</Label>
+                <div className="flex items-center">
+                    <Clock className="mr-2" />
+                    <Input
+                        id="prepTime"
+                        name="prepTime"
+                        type="number"
+                        value={recipe.prepTime}
+                        onChange={handleInputChange}
+                        min="0"
+                        required
+                    />
+                </div>
+            </div>
+
+            <div>
+                <Label htmlFor="cookTime">Temps de cuisson (minutes)</Label>
+                <div className="flex items-center">
+                    <Flame className="mr-2" />
+                    <Input
+                        id="cookTime"
+                        name="cookTime"
+                        type="number"
+                        value={recipe.cookTime}
+                        onChange={handleInputChange}
+                        min="0"
+                        required
+                    />
+                </div>
             </div>
 
             <Button type="submit" disabled={loading}>Submit Recipe</Button>

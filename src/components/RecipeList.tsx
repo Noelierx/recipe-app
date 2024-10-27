@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { RecipeWithDetails, Tag } from '@/types/types';
 import { useGetTags } from '@/hooks/useGetTags';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
+import { Clock, Flame } from 'lucide-react';
 
 
 interface RecipeListProps {
@@ -125,7 +126,21 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                                 ))}
                             </div>
                         </CardHeader>
-                        <CardContent>{recipe.instructions}</CardContent>
+                        <CardContent>
+                            {recipe.prep_time && (
+                                <div className="flex items-center mb-2">
+                                    <Clock className="mr-2" />
+                                    <span>{recipe.prep_time} min prep</span>
+                                </div>
+                            )}
+                            {recipe.cook_time && (
+                                <div className="flex items-center mb-2">
+                                    <Flame className="mr-2" />
+                                    <span>{recipe.cook_time} min cook</span>
+                                </div>
+                            )}
+                            {recipe.instructions}
+                        </CardContent>
                         <CardFooter className="flex justify-between">
                             <Button onClick={() => viewRecipeDetail(recipe)}>View Recipe</Button>
                             <AlertDialog>
