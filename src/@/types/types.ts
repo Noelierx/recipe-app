@@ -3,6 +3,8 @@ export interface Recipe {
   title: string;
   instructions: string;
   servings: number;
+  prep_time?: number;
+  cook_time?: number;
 }
 
 export interface Ingredient {
