@@ -1,41 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RecipeIngredient, Ingredient } from '@/types/types';
-import { supabase } from '@/utils/supabaseClient';
+import { RecipeIngredient, Ingredient } from "@/types/types";
+import { supabase } from "@/utils/supabaseClient";
 
 interface IngredientHandlerProps {
   ingredients: RecipeIngredient[];
   setIngredients: React.Dispatch<React.SetStateAction<RecipeIngredient[]>>;
 }
 
-const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setIngredients }) => {
-  const [newIngredient, setNewIngredient] = useState<Partial<Ingredient & { amount: number }>>({ name: '', amount: 0, unit: '' });
+const IngredientHandler: React.FC<IngredientHandlerProps> = ({
+  ingredients,
+  setIngredients,
+}) => {
+  const [newIngredient, setNewIngredient] = useState<
+    Partial<Ingredient & { amount: number }>
+  >({ name: "", amount: 0, unit: "" });
 
   const handleIngredientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewIngredient(prev => ({
+    setNewIngredient((prev) => ({
       ...prev,
-      [name]: name === 'amount' ? (value === '' ? 0 : Number(value)) : value
+      [name]: name === "amount" ? (value === "" ? 0 : Number(value)) : value,
     }));
   };
 
   const addIngredient = async () => {
-    if (newIngredient.name && newIngredient.amount !== undefined && newIngredient.unit) {
+    if (
+      newIngredient.name &&
+      newIngredient.amount !== undefined &&
+      newIngredient.unit
+    ) {
       try {
         const { data, error } = await supabase
-          .from('ingredients')
-          .select('id')
-          .eq('name', newIngredient.name)
+          .from("ingredients")
+          .select("id")
+          .eq("name", newIngredient.name)
           .single();
 
         let ingredientId: number;
         if (error || !data) {
           const { data: newData, error: insertError } = await supabase
-            .from('ingredients')
+            .from("ingredients")
             .insert({ name: newIngredient.name })
-            .select('id')
+            .select("id")
             .single();
 
           if (insertError) throw insertError;
@@ -44,7 +53,7 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
           ingredientId = data.id;
         }
 
-        setIngredients(prev => [
+        setIngredients((prev) => [
           ...prev,
           {
             amount: newIngredient.amount!,
@@ -54,26 +63,34 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
               name: newIngredient.name!,
               amount: newIngredient.amount!,
               unit: newIngredient.unit!,
-            }
-          }
+            },
+          },
         ]);
-        setNewIngredient({ name: '', amount: 0, unit: '' });
+        setNewIngredient({ name: "", amount: 0, unit: "" });
       } catch (error) {
-        alert('Failed to add ingredient. Please try again.');
+        alert("Failed to add ingredient. Please try again.");
       }
     } else {
-      alert('Please fill in all ingredient fields.');
+      alert("Please fill in all ingredient fields.");
     }
   };
 
   const removeIngredient = (index: number) => {
-    setIngredients(prev => prev.filter((_, i) => i !== index));
+    setIngredients((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateIngredient = (index: number, field: string, value: string | number) => {
-    setIngredients(prev => prev.map((ing, i) => 
-      i === index ? { ...ing, [field]: field === 'amount' ? Number(value) : value } : ing
-    ));
+  const updateIngredient = (
+    index: number,
+    field: string,
+    value: string | number,
+  ) => {
+    setIngredients((prev) =>
+      prev.map((ing, i) =>
+        i === index
+          ? { ...ing, [field]: field === "amount" ? Number(value) : value }
+          : ing,
+      ),
+    );
   };
 
   return (
@@ -84,21 +101,30 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
           <div key={index} className="flex items-center space-x-2 mb-2">
             <Input
               value={ing.amount}
-              onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
+              onChange={(e) =>
+                updateIngredient(index, "amount", e.target.value)
+              }
               type="number"
               className="w-20"
             />
             <Input
               value={ing.unit}
-              onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
+              onChange={(e) => updateIngredient(index, "unit", e.target.value)}
               className="w-20"
             />
             <Input
               value={ing.ingredient.name}
-              onChange={(e) => updateIngredient(index, 'name', e.target.value)}
+              onChange={(e) => updateIngredient(index, "name", e.target.value)}
               className="flex-grow"
             />
-            <Button type="button" onClick={() => removeIngredient(index)} variant="destructive" size="sm">Remove</Button>
+            <Button
+              type="button"
+              onClick={() => removeIngredient(index)}
+              variant="destructive"
+              size="sm"
+            >
+              Remove
+            </Button>
           </div>
         ))
       ) : (
@@ -124,10 +150,12 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
           onChange={handleIngredientChange}
           placeholder="Unit"
         />
-        <Button type="button" onClick={addIngredient}>Add Ingredient</Button>
+        <Button type="button" onClick={addIngredient}>
+          Add Ingredient
+        </Button>
       </div>
     </div>
   );
-}
+};
 
 export default IngredientHandler;

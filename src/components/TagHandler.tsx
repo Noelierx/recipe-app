@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tag } from '@/types/types';
-import { useGetTags } from '@/hooks/useGetTags';
+import { Tag } from "@/types/types";
+import { useGetTags } from "@/hooks/useGetTags";
 
 interface TagHandlerProps {
   selectedTags: Tag[];
@@ -11,9 +11,14 @@ interface TagHandlerProps {
   setNewTags?: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const TagHandler: React.FC<TagHandlerProps> = ({ selectedTags, setSelectedTags, newTags, setNewTags }) => {
+const TagHandler: React.FC<TagHandlerProps> = ({
+  selectedTags,
+  setSelectedTags,
+  newTags,
+  setNewTags,
+}) => {
   const [allTags, setAllTags] = useState<Tag[]>([]);
-  const [newTag, setNewTag] = useState('');
+  const [newTag, setNewTag] = useState("");
   const { getTags } = useGetTags();
 
   useEffect(() => {
@@ -25,41 +30,49 @@ const TagHandler: React.FC<TagHandlerProps> = ({ selectedTags, setSelectedTags, 
   }, [getTags]);
 
   const handleTagSelect = (tag: Tag) => {
-    setSelectedTags(prev => 
-      prev.some(t => t.id === tag.id)
-        ? prev.filter(t => t.id !== tag.id)
-        : [...prev, tag]
+    setSelectedTags((prev) =>
+      prev.some((t) => t.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag],
     );
   };
 
   const handleNewTagAdd = () => {
-    if (newTag && !newTags?.includes(newTag) && !selectedTags.some(t => t.name.toLowerCase() === newTag.toLowerCase())) {
+    if (
+      newTag &&
+      !newTags?.includes(newTag) &&
+      !selectedTags.some((t) => t.name.toLowerCase() === newTag.toLowerCase())
+    ) {
       if (setNewTags) {
-        setNewTags(prev => [...prev, newTag]);
+        setNewTags((prev) => [...prev, newTag]);
       } else {
-        setSelectedTags(prev => [...prev, { name: newTag } as Tag]);
+        setSelectedTags((prev) => [...prev, { name: newTag } as Tag]);
       }
-      setNewTag('');
+      setNewTag("");
     }
   };
 
   const removeNewTag = (tagToRemove: string) => {
     if (setNewTags) {
-      setNewTags(prev => prev.filter(tag => tag !== tagToRemove));
+      setNewTags((prev) => prev.filter((tag) => tag !== tagToRemove));
     } else {
-      setSelectedTags(prev => prev.filter(tag => tag.name !== tagToRemove));
+      setSelectedTags((prev) => prev.filter((tag) => tag.name !== tagToRemove));
     }
   };
 
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-2">
-        {allTags.map(tag => (
+        {allTags.map((tag) => (
           <Button
             key={tag.id}
             type="button"
             onClick={() => handleTagSelect(tag)}
-            variant={selectedTags.some(t => t.id === tag.id) ? "secondary" : "outline"}
+            variant={
+              selectedTags.some((t) => t.id === tag.id)
+                ? "secondary"
+                : "outline"
+            }
           >
             {tag.name}
           </Button>
@@ -82,7 +95,9 @@ const TagHandler: React.FC<TagHandlerProps> = ({ selectedTags, setSelectedTags, 
           onChange={(e) => setNewTag(e.target.value)}
           placeholder="New tag"
         />
-        <Button type="button" onClick={handleNewTagAdd}>Add Tag</Button>
+        <Button type="button" onClick={handleNewTagAdd}>
+          Add Tag
+        </Button>
       </div>
     </div>
   );

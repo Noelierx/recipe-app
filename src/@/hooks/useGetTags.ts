@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
-import { supabase } from '@/utils/supabaseClient';
-import { Tag } from '@/types/types';
+import { useState, useCallback } from "react";
+import { supabase } from "@/utils/supabaseClient";
+import { Tag } from "@/types/types";
 
 export const useGetTags = () => {
   const [loading, setLoading] = useState(false);
@@ -12,15 +12,17 @@ export const useGetTags = () => {
       setError(null);
 
       const { data, error } = await supabase
-        .from('tags')
-        .select('*')
-        .order('name');
+        .from("tags")
+        .select("*")
+        .order("name");
 
       if (error) throw new Error(`Error fetching tags: ${error.message}`);
       return data as Tag[];
     } catch (err) {
-      console.error('Error in getTags:', err);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      console.error("Error in getTags:", err);
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred",
+      );
       return [];
     } finally {
       setLoading(false);
