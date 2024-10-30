@@ -50,9 +50,9 @@ export const useDeleteRecipe = () => {
       .delete()
       .eq('recipe_id', recipeId);
 
-    for (const { ingredient_id } of recipeIngredients) {
-      await deleteIngredient(ingredient_id);
-    }
+    await Promise.all(
+      recipeIngredients.map(({ ingredient_id }) => deleteIngredient(ingredient_id))
+    );
   };
 
   const deleteTags = async (recipeId: number): Promise<void> => {
