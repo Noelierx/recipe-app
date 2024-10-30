@@ -26,7 +26,9 @@ export const useDeleteRecipe = () => {
       .eq('sub_recipe_id', subRecipeId);
 
     for (const { ingredient_id } of subRecipeIngredients) {
-      await deleteIngredient(ingredient_id);
+      await Promise.all(
+        subRecipeIngredients.map(({ ingredient_id }) => deleteIngredient(ingredient_id))
+      );
     }
 
     const { error: deleteSubRecipeError } = await supabase
