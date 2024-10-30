@@ -9,12 +9,15 @@ const Header: React.FC = () => {
     const isHomePage = location.pathname === '/';
     const isAddRecipePage = location.pathname === '/add-recipe';
 
-    const pageTitle = (() => {
-        if (location.pathname.includes('/recipe/')) return 'Recipe Detail';
-        if (location.pathname === '/add-recipe') return 'Add Recipe';
-        if (location.pathname === '/edit-recipe') return 'Edit Recipe';
-        return 'Recipe List';
-    })();
+    const ROUTE_TITLES: Record<string, string> = {
+        '/': 'Recipe List',
+        '/add-recipe': 'Add Recipe',
+        '/edit-recipe': 'Edit Recipe'
+    };
+    
+    const pageTitle = location.pathname.match(/^\/recipe\//)
+        ? 'Recipe Detail'
+        : ROUTE_TITLES[location.pathname] ?? 'Recipe List';
 
     return (
         <header className="bg-gray-800 text-white p-4">
