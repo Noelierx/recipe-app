@@ -109,26 +109,28 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                 onSearchChange={setSearchQuery}
             />
             <div className="mb-4">
-                {(() => {
-                    if (loading) {
-                        return <div>Loading tags...</div>;
-                    } else if (error) {
-                        return <div>Error loading tags: {error}</div>;
-                    } else if (allTags.length === 0) {
-                        return <div>No tags available</div>;
-                    } else {
-                        return allTags.map((tag, index) => (
-                            <Button 
-                                key={tag.id ?? `tag-${index}-${tag.name}`}
-                                onClick={() => handleTagSelect(tag)}
-                                variant={selectedTags.some(t => t.id === tag.id || (t.id === undefined && t.name === tag.name)) ? "secondary" : "outline"}
-                                className="mr-2 mb-2"
-                            >
-                                {tag.name}
-                            </Button>
-                        ));
-                    }
-                })()}
+                {loading && <div>Loading tags...</div>}
+                {error && <div>Error loading tags: {error}</div>}
+                {!loading && !error && allTags.length === 0 && <div>No tags available</div>}
+                {!loading && !error && allTags.length > 0 && (
+                    <>
+                        {allTags.map((tag, index) => {
+                            const isSelected = selectedTags.some(t => 
+                                t.id === tag.id || (t.id === undefined && t.name === tag.name)
+                            );
+                            return (
+                                <Button 
+                                    key={`tag-${tag.id ?? index}`}
+                                    onClick={() => handleTagSelect(tag)}
+                                    variant={isSelected ? "secondary" : "outline"}
+                                    className="mr-2 mb-2"
+                                >
+                                    {tag.name}
+                                </Button>
+                            );
+                        })}
+                    </>
+                )}
             </div>
             <Button onClick={sortRecipes} className="mb-4">
                 Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
