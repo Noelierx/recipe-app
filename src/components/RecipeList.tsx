@@ -102,12 +102,12 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                 onSearchChange={setSearchQuery}
             />
             <div className="mb-4">
-                {loading ? (
-                    <div>Loading tags...</div>
+            {loading ? (
+                    <div>Chargement des tags...</div>
                 ) : error ? (
-                    <div>Error loading tags: {error}</div>
+                    <div>Erreur lors du chargement des tags : {error}</div>
                 ) : allTags.length === 0 ? (
-                    <div>No tags available</div>
+                    <div>Aucun tag disponible</div>
                 ) : (
                     allTags.map((tag, index) => (
                         <Button 
@@ -141,35 +141,35 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                             {recipe.prep_time && (
                                 <div className="flex items-center mb-2">
                                     <Clock className="mr-2" aria-hidden="true" />
-                                    <span>{recipe.prep_time} min prep</span>
+                                    <span>{recipe.prep_time} min préparation</span>
                                 </div>
                             )}
                             {recipe.cook_time && (
                                 <div className="flex items-center mb-2">
                                     <Flame className="mr-2" aria-hidden="true" />
-                                    <span>{recipe.cook_time} min cook</span>
+                                    <span>{recipe.cook_time} min cuisson</span>
                                 </div>
                             )}
                             {recipe.instructions}
                         </CardContent>
                         <CardFooter className="flex justify-between">
-                            <Button onClick={() => viewRecipeDetail(recipe)}>View Recipe</Button>
+                            <Button onClick={() => viewRecipeDetail(recipe)}>Voir la recette</Button>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" disabled={isDeleting}>Delete</Button>
+                                    <Button variant="destructive" disabled={isDeleting}>Supprimer la recette</Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
                                         <AlertDialogDescription>
-                                            This action cannot be undone. This will permanently delete the recipe
-                                            and remove the data from our servers.
+                                            Cette action ne peut pas être annulée. Cela supprimera définitivement la recette
+                                            et retirera les données de nos serveurs.
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
                                         <AlertDialogAction onClick={() => handleDeleteRecipe(recipe.id)}>
-                                            {isDeleting ? 'Deleting...' : 'Delete'}
+                                            {isDeleting ? 'Supression...' : 'Supprimer'}
                                         </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
@@ -178,7 +178,7 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                     </Card>
                 ))}
             </div>
-            {deleteError && <div className="text-red-500 mt-4">Error deleting recipe: {deleteError}</div>}
+            {deleteError && <div className="text-red-500 mt-4">Erreur en supprimant la recette: {deleteError}</div>}
         </div>
     );
 };

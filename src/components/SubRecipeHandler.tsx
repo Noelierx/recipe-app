@@ -44,7 +44,7 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
       if (success) {
         setSubRecipes(prev => prev.filter((_, i) => i !== index));
       } else {
-        console.error('Failed to delete sub-recipe:', error);
+        console.error('Échec de la suppression de la sous-recette :', error);
       }
     } else {
       setSubRecipes(prev => prev.filter((_, i) => i !== index));
@@ -53,22 +53,22 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
 
   return (
     <div>
-      <h3>Sub Recipes</h3>
+      <h3>Sous-recette</h3>
       {subRecipes.map((subRecipe, index) => (
         <div key={index} className="space-y-2 mb-4">
-          <Label htmlFor={`subrecipe-title-${index}`}>Title</Label>
+          <Label htmlFor={`subrecipe-title-${index}`}>Titre</Label>
           <Input
             id={`subrecipe-title-${index}`}
             value={subRecipe.title}
             onChange={(e) => handleSubRecipeChange(index, 'title', e.target.value)}
-            placeholder="Sub-recipe title"
+            placeholder="titre de la sous-recette"
           />
           <Label htmlFor={`subrecipe-instructions-${index}`}>Instructions</Label>
           <Textarea
             id={`subrecipe-instructions-${index}`}
             value={subRecipe.instructions}
             onChange={(e) => handleSubRecipeChange(index, 'instructions', e.target.value)}
-            placeholder="Sub-recipe instructions"
+            placeholder="Instructions de la sous-recette"
           />
           <IngredientHandler
             ingredients={subRecipe.ingredients || []}
@@ -80,11 +80,11 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
             variant="destructive"
             disabled={isDeleting}
           >
-            Remove Sub-Recipe
+            Retirer la sous-recette
           </Button>
         </div>
       ))}
-      <Button onClick={addSubRecipe}>Add Sub-recipe</Button>
+      <Button onClick={addSubRecipe}>Ajouter une sous-recette</Button>
     </div>
   );
 };

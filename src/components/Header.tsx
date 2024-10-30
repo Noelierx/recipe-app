@@ -18,16 +18,16 @@ const Header: React.FC = () => {
                             onClick={() => navigate('/')}
                             variant="outline"
                             className="text-black"
-                            aria-label="Go to home page"
+                            aria-label="Aller à l'accueil"
                         >
-                            Home
+                            Accueil
                         </Button>
                     )}
                 </div>
                 <h1 className="text-2xl font-bold">
-                    {location.pathname.includes('/recipe/') ? 'Recipe Detail' : 
-                     location.pathname === '/add-recipe' ? 'Add Recipe' : 
-                     location.pathname === '/edit-recipe' ? 'Edit Recipe' : 'Recipe List'}
+                    {location.pathname.includes('/recipe/') ? 'Détails de la recette' : 
+                     location.pathname === '/add-recipe' ? 'Ajouter une recette' : 
+                     location.pathname === '/edit-recipe' ? 'Modifier la recette' : 'Liste des recettes'}
                 </h1>
                 <div>
                     {!isAddRecipePage && (
@@ -35,9 +35,9 @@ const Header: React.FC = () => {
                             onClick={() => navigate('/add-recipe')}
                             variant="outline"
                             className="text-black"
-                            aria-label="Go to Add Recipe page"
+                            aria-label="Ajouter une recette"
                         >
-                            Add Recipe
+                            Ajouter une recette
                         </Button>
                     )}
                 </div>

@@ -10,11 +10,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, onSearchChange }) =>
     return (
         <Input 
             type="text" 
-            placeholder="Search recipes..." 
+            placeholder="Chercher une recette" 
             value={searchQuery} 
             onChange={(e) => onSearchChange(e.target.value)} 
             className="mb-4 w-full"
-            aria-label="Search recipes by ingredients, tags, or title"
+            aria-label="Chercher une recette"
             role="searchbox"
             onKeyDown={(e) => {
                 if (e.key === 'Escape') {

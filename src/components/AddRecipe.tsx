@@ -60,19 +60,19 @@ function AddRecipe() {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-                <Label htmlFor="title">Recipe Title</Label>
+                <Label htmlFor="title">Titre de la recette</Label>
                 <Input
                     id="title"
                     name="title"
                     value={recipe.title}
                     onChange={handleInputChange}
-                    placeholder="Enter recipe title"
+                    placeholder="Ajouter le titre de la recette"
                     required
                 />
             </div>
 
             <div>
-                <Label htmlFor="servings">Servings</Label>
+                <Label htmlFor="servings">Portions</Label>
                 <Input
                     id="servings"
                     name="servings"
@@ -108,7 +108,7 @@ function AddRecipe() {
                     name="instructions"
                     value={recipe.instructions}
                     onChange={handleInputChange}
-                    placeholder="Enter cooking instructions"
+                    placeholder="Ajouter les instructions pour réaliser la recette"
                     required
                 />
             </div>
@@ -145,7 +145,7 @@ function AddRecipe() {
                 </div>
             </div>
 
-            <Button type="submit" disabled={loading}>Submit Recipe</Button>
+            <Button type="submit" disabled={loading}>Ajouter la recette</Button>
             {error && <p className="text-red-500">{error}</p>}
         </form>
     );

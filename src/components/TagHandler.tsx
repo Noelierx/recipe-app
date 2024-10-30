@@ -80,9 +80,9 @@ const TagHandler: React.FC<TagHandlerProps> = ({ selectedTags, setSelectedTags, 
           type="text"
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
-          placeholder="New tag"
+          placeholder="Nouveau tag"
         />
-        <Button type="button" onClick={handleNewTagAdd}>Add Tag</Button>
+        <Button type="button" onClick={handleNewTagAdd}>Ajouter un tag</Button>
       </div>
     </div>
   );
