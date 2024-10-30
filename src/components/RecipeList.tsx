@@ -18,7 +18,7 @@ import { RecipeWithDetails, Tag } from '@/types/types';
 import { useGetTags } from '@/hooks/useGetTags';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 import { Clock, Flame } from 'lucide-react';
-
+import SearchBar from './SearchBar';
 
 interface RecipeListProps {
     recipes: RecipeWithDetails[];
@@ -28,6 +28,7 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
     const [filteredRecipes, setFilteredRecipes] = useState<RecipeWithDetails[]>(recipes);
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+    const [searchQuery, setSearchQuery] = useState<string>('');
     const navigate = useNavigate();
     const { getTags, loading, error } = useGetTags();
     const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -43,16 +44,22 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
 
     useEffect(() => {
         const filtered = recipes.filter(recipe => {
-            if (selectedTags.length === 0) return true;
-            return selectedTags.every(selectedTag => 
+            const matchesTags = selectedTags.length === 0 || selectedTags.every(selectedTag => 
                 recipe.tags.some(recipeTag => 
                     recipeTag.id === selectedTag.id || 
                     (recipeTag.id === undefined && recipeTag.name === selectedTag.name)
                 )
             );
+
+            const matchesSearch = recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                  recipe.recipe_ingredients.some(recipeIngredient => 
+                                      recipeIngredient.ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
+                                  );
+
+            return matchesTags && matchesSearch;
         });
         setFilteredRecipes(filtered);
-    }, [recipes, selectedTags]);
+    }, [recipes, selectedTags, searchQuery]);
 
     const sortRecipes = () => {
         const sorted = [...filteredRecipes].sort((a, b) => {
@@ -90,6 +97,10 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
 
     return (
         <div>
+            <SearchBar 
+                searchQuery={searchQuery} 
+                onSearchChange={setSearchQuery}
+            />
             <div className="mb-4">
                 {loading ? (
                     <div>Loading tags...</div>
