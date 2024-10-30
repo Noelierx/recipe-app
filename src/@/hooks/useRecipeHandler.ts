@@ -89,49 +89,75 @@ const handleIngredients = async (recipeId: number | undefined, mainIngredients: 
 };
 
 const handleSubRecipes = async (recipeId: number | undefined, subRecipes: SubRecipe[], recipeResult: RecipeResult) => {
-  if (recipeId) {
-    const { data: existingSubRecipes, error: fetchError } = await supabase
-      .from('sub_recipes')
-      .select('id')
-      .eq('recipe_id', recipeId);
-    if (fetchError) throw fetchError;
+  if (!recipeId) return;
 
-    const existingSubRecipeIds = new Set(existingSubRecipes.map(sr => sr.id));
+  const existingSubRecipeIds = await fetchExistingSubRecipeIds(recipeId);
 
-    for (const subRecipe of subRecipes) {
-      if (subRecipe.id && existingSubRecipeIds.has(subRecipe.id)) {
-        const { error: updateError } = await supabase
-          .from('sub_recipes')
-          .update({ title: subRecipe.title, instructions: subRecipe.instructions })
-          .eq('id', subRecipe.id);
-        if (updateError) throw updateError;
-        existingSubRecipeIds.delete(subRecipe.id);
-      } else {
-        const { data: subRecipeData, error: insertError } = await supabase
-          .from('sub_recipes')
-          .insert({ recipe_id: recipeResult.id, title: subRecipe.title, instructions: subRecipe.instructions })
-          .select('id')
-          .single();
-        if (insertError) throw insertError;
-        subRecipe.id = subRecipeData.id;
-      }
+  for (const subRecipe of subRecipes) {
+    await processSubRecipe(subRecipe, existingSubRecipeIds, recipeResult);
+  }
 
-      await supabase.from('sub_recipe_ingredients').delete().eq('sub_recipe_id', subRecipe.id);
-      const updatedSubIngredients = await Promise.all(subRecipe.ingredients.map(async (ing) => {
-        const ingredientData = await createIngredientIfNotExists(ing.ingredient);
-        return {
-          sub_recipe_id: subRecipe.id,
-          ingredient_id: ingredientData.id,
-          amount: ing.amount,
-          unit: ing.unit
-        };
-      }));
-      await supabase.from('sub_recipe_ingredients').insert(updatedSubIngredients);
-    }
+  await deleteRemainingSubRecipes(existingSubRecipeIds);
+};
 
-    if (existingSubRecipeIds.size > 0) {
-      await supabase.from('sub_recipes').delete().in('id', Array.from(existingSubRecipeIds));
-    }
+const fetchExistingSubRecipeIds = async (recipeId: number) => {
+  const { data: existingSubRecipes, error: fetchError } = await supabase
+    .from('sub_recipes')
+    .select('id')
+    .eq('recipe_id', recipeId);
+
+  if (fetchError) throw fetchError;
+  return new Set(existingSubRecipes.map(sr => sr.id));
+};
+
+const processSubRecipe = async (subRecipe: SubRecipe, existingSubRecipeIds: Set<number>, recipeResult: RecipeResult) => {
+  if (subRecipe.id && existingSubRecipeIds.has(subRecipe.id)) {
+    await updateSubRecipe(subRecipe);
+    existingSubRecipeIds.delete(subRecipe.id);
+  } else {
+    await insertSubRecipe(subRecipe, recipeResult);
+  }
+
+  await handleSubRecipeIngredients(subRecipe);
+};
+
+const updateSubRecipe = async (subRecipe: SubRecipe) => {
+  const { error: updateError } = await supabase
+    .from('sub_recipes')
+    .update({ title: subRecipe.title, instructions: subRecipe.instructions })
+    .eq('id', subRecipe.id);
+
+  if (updateError) throw updateError;
+};
+
+const insertSubRecipe = async (subRecipe: SubRecipe, recipeResult: RecipeResult) => {
+  const { data: subRecipeData, error: insertError } = await supabase
+    .from('sub_recipes')
+    .insert({ recipe_id: recipeResult.id, title: subRecipe.title, instructions: subRecipe.instructions })
+    .select('id')
+    .single();
+
+  if (insertError) throw insertError;
+  subRecipe.id = subRecipeData.id;
+};
+
+const handleSubRecipeIngredients = async (subRecipe: SubRecipe) => {
+  await supabase.from('sub_recipe_ingredients').delete().eq('sub_recipe_id', subRecipe.id);
+  const updatedSubIngredients = await Promise.all(subRecipe.ingredients.map(async (ing) => {
+    const ingredientData = await createIngredientIfNotExists(ing.ingredient);
+    return {
+      sub_recipe_id: subRecipe.id,
+      ingredient_id: ingredientData.id,
+      amount: ing.amount,
+      unit: ing.unit
+    };
+  }));
+  await supabase.from('sub_recipe_ingredients').insert(updatedSubIngredients);
+};
+
+const deleteRemainingSubRecipes = async (existingSubRecipeIds: Set<number>) => {
+  if (existingSubRecipeIds.size > 0) {
+    await supabase.from('sub_recipes').delete().in('id', Array.from(existingSubRecipeIds));
   }
 };
 

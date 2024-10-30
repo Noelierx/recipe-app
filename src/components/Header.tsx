@@ -9,9 +9,12 @@ const Header: React.FC = () => {
     const isHomePage = location.pathname === '/';
     const isAddRecipePage = location.pathname === '/add-recipe';
 
-    const pageTitle = location.pathname.includes('/recipe/') ? 'Recipe Detail' : 
-                      location.pathname === '/add-recipe' ? 'Add Recipe' : 
-                      location.pathname === '/edit-recipe' ? 'Edit Recipe' : 'Recipe List';
+    const pageTitle = (() => {
+        if (location.pathname.includes('/recipe/')) return 'Recipe Detail';
+        if (location.pathname === '/add-recipe') return 'Add Recipe';
+        if (location.pathname === '/edit-recipe') return 'Edit Recipe';
+        return 'Recipe List';
+    })();
 
     return (
         <header className="bg-gray-800 text-white p-4">
