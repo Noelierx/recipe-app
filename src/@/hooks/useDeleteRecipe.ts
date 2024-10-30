@@ -63,10 +63,11 @@ export const useDeleteRecipe = () => {
       .eq('recipe_id', recipeId);
     if (recipeTagsError) throw recipeTagsError;
 
-    await supabase
+    const { error: deleteRecipeTagsError } = await supabase
       .from('recipe_tags')
       .delete()
       .eq('recipe_id', recipeId);
+    if (deleteRecipeTagsError) throw deleteRecipeTagsError;
 
     for (const { tag_id } of recipeTags) {
       const { count, error: countError } = await supabase
