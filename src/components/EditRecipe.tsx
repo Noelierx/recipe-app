@@ -10,7 +10,7 @@ import SubRecipeHandler from 'components/SubRecipeHandler';
 import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
-import { Clock, Flame } from 'lucide-react'; // Import icons
+import { Clock, Flame } from 'lucide-react';
 
 const EditRecipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -72,30 +72,30 @@ const EditRecipe: React.FC = () => {
                 navigate(`/recipe/${recipeId}`);
             }
         } else {
-            alert('Please fill in all required fields: title, at least one ingredient or subrecipe, and instructions.');
+            alert('Veuillez remplir tous les champs obligatoires : titre, au moins un ingrédient ou une sous-recette, et instructions.');
         }
     };
 
-    if (loadingRecipe) return <div>Loading recipe details...</div>;
-    if (loadError) return <div>Error loading recipe: {loadError}</div>;
-    if (!recipe) return <div>Recipe not found</div>;
+    if (loadingRecipe) return <div>Chargement des détails de la recette...</div>;
+    if (loadError) return <div>Erreur lors du chargement de la recette : {loadError}</div>;
+    if (!recipe) return <div>Recette non trouvée</div>;
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-                <Label htmlFor="title">Recipe Title</Label>
+                <Label htmlFor="title">Titre de la recette</Label>
                 <Input
                     id="title"
                     name="title"
                     value={recipe.title}
                     onChange={handleInputChange}
-                    placeholder="Enter recipe title"
+                    placeholder="Entrer le titre de la recette"
                     required
                 />
             </div>
 
             <div>
-                <Label htmlFor="servings">Servings</Label>
+                <Label htmlFor="servings">Portions</Label>
                 <Input
                     id="servings"
                     name="servings"
@@ -169,7 +169,7 @@ const EditRecipe: React.FC = () => {
             {updateError && <div className="text-red-500">{updateError}</div>}
 
             <Button type="submit" disabled={updating}>
-                {updating ? 'Updating...' : 'Update Recipe'}
+                {updating ? 'Mise à jour...' : 'Mettre à jour la recette'}
             </Button>
         </form>
     );

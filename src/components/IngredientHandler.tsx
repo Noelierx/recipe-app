@@ -59,10 +59,10 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
         ]);
         setNewIngredient({ name: '', amount: 0, unit: '' });
       } catch (error) {
-        alert('Failed to add ingredient. Please try again.');
+        alert('Échec de l\'ajout de l\'ingrédient. Veuillez réessayer.');
       }
     } else {
-      alert('Please fill in all ingredient fields.');
+      alert('Veuillez remplir tous les champs de l\'ingrédient.');
     }
   };
 
@@ -78,7 +78,7 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
 
   return (
     <div>
-      <Label htmlFor="ingredients">Ingredients</Label>
+      <Label htmlFor="ingredients">Ingrédients</Label>
       {ingredients && ingredients.length > 0 ? (
         ingredients.map((ing, index) => (
           <div key={index} className="flex items-center space-x-2 mb-2">
@@ -98,33 +98,33 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
               onChange={(e) => updateIngredient(index, 'name', e.target.value)}
               className="flex-grow"
             />
-            <Button type="button" onClick={() => removeIngredient(index)} variant="destructive" size="sm">Remove</Button>
+            <Button type="button" onClick={() => removeIngredient(index)} variant="destructive" size="sm">Retirer l'ingrédient</Button>
           </div>
         ))
       ) : (
-        <p>No ingredients added yet.</p>
+        <p>Aucun ingrédient ajouté pour le moment.</p>
       )}
       <div className="flex space-x-2">
         <Input
           name="name"
           value={newIngredient.name}
           onChange={handleIngredientChange}
-          placeholder="Ingredient name"
+          placeholder="Ingrédient"
         />
         <Input
           name="amount"
           type="number"
           value={newIngredient.amount ?? 0}
           onChange={handleIngredientChange}
-          placeholder="Amount"
+          placeholder="Quantité"
         />
         <Input
           name="unit"
           value={newIngredient.unit}
           onChange={handleIngredientChange}
-          placeholder="Unit"
+          placeholder="Unité"
         />
-        <Button type="button" onClick={addIngredient}>Add Ingredient</Button>
+        <Button type="button" onClick={addIngredient}>Ajouter l'ingrédient</Button>
       </div>
     </div>
   );

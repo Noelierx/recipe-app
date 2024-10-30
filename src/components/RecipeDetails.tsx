@@ -19,9 +19,9 @@ const RecipeDetails: React.FC = () => {
         }
     }, [recipe]);
 
-    if (loading) return <div>Loading recipe details...</div>;
-    if (error) return <div>Error loading recipe: {error}</div>;
-    if (!recipe) return <div>Recipe not found</div>;
+    if (loading) return <div>Chargement des détails de la recette...</div>;
+    if (error) return <div>Erreur lors du chargement de la recette : {error}</div>;
+    if (!recipe) return <div>Recette non trouvée</div>;
 
     const adjustIngredients = (ingredients: RecipeIngredient[] | undefined, originalServings: number, newServings: number) => {
         return ingredients?.map(ing => ({
@@ -70,7 +70,7 @@ const RecipeDetails: React.FC = () => {
             
             <div className="flex flex-col md:flex-row">
                 <div className="w-full md:w-1/2 md:pr-8 mb-8 md:mb-0">
-                    <h2 className="text-2xl font-semibold mb-4">Ingredients:</h2>
+                    <h2 className="text-2xl font-semibold mb-4">Ingrédients:</h2>
                     <ul className="list-disc pl-5 mb-6">
                         {adjustedMainIngredients.map((ing, index) => (
                             <li key={index}>
@@ -106,7 +106,7 @@ const RecipeDetails: React.FC = () => {
                     ))}
                     {hasSubRecipes && (<h3 className="text-xl font-semibold mb-2">La suite</h3>)}
                     <p className="mb-6">{recipe.instructions}</p>
-                    <Button onClick={() => navigate(`/recipe/${recipe.id}/edit`)}>Edit Recipe</Button>
+                    <Button onClick={() => navigate(`/recipe/${recipe.id}/edit`)}>Modifier la recette</Button>
                 </div>
             </div>
         </div>
