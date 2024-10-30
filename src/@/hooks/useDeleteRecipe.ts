@@ -45,10 +45,11 @@ export const useDeleteRecipe = () => {
       .eq('recipe_id', recipeId);
     if (recipeIngredientsError) throw recipeIngredientsError;
 
-    await supabase
+    const { error: deleteRecipeIngredientsError } = await supabase
       .from('recipe_ingredients')
       .delete()
       .eq('recipe_id', recipeId);
+    if (deleteRecipeIngredientsError) throw deleteRecipeIngredientsError;
 
     await Promise.all(
       recipeIngredients.map(({ ingredient_id }) => deleteIngredient(ingredient_id))
