@@ -50,24 +50,13 @@ const createTagIfNotExists = async (tagName: string) => {
 };
 
 const handleMainRecipe = async (recipeId: number | undefined, recipe: Partial<Recipe>): Promise<RecipeResult> => {
-  if (recipeId) {
-    const { data, error } = await supabase
-      .from('recipes')
-      .update(recipe)
-      .eq('id', recipeId)
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
-  } else {
-    const { data, error } = await supabase
-      .from('recipes')
-      .insert(recipe)
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
-  }
+  const { data, error } = await supabase
+    .from('recipes')
+    .upsert({ id: recipeId, ...recipe })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
 };
 
 const handleIngredients = async (recipeId: number | undefined, mainIngredients: RecipeIngredient[], recipeResult: RecipeResult) => {
