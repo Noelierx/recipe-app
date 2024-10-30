@@ -72,7 +72,8 @@ const handleMainRecipe = async (recipeId: number | undefined, recipe: Partial<Re
 
 const handleIngredients = async (recipeId: number | undefined, mainIngredients: RecipeIngredient[], recipeResult: RecipeResult) => {
   if (recipeId) {
-    await supabase.from('recipe_ingredients').delete().eq('recipe_id', recipeId);
+    const { error: deleteError } = await supabase.from('recipe_ingredients').delete().eq('recipe_id', recipeId);
+    if (deleteError) throw deleteError;
   }
   
   const updatedIngredients = await Promise.all(mainIngredients.map(async (ing) => {
@@ -85,7 +86,8 @@ const handleIngredients = async (recipeId: number | undefined, mainIngredients: 
     };
   }));
   
-  await supabase.from('recipe_ingredients').insert(updatedIngredients);
+  const { error: insertError } = await supabase.from('recipe_ingredients').insert(updatedIngredients);
+  if (insertError) throw insertError;
 };
 
 const handleSubRecipes = async (recipeId: number | undefined, subRecipes: SubRecipe[], recipeResult: RecipeResult) => {
