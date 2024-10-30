@@ -69,21 +69,23 @@ export const useDeleteRecipe = () => {
       .eq('recipe_id', recipeId);
     if (deleteRecipeTagsError) throw deleteRecipeTagsError;
 
-    for (const { tag_id } of recipeTags) {
-      const { count, error: countError } = await supabase
-        .from('recipe_tags')
-        .select('*', { count: 'exact', head: true })
-        .eq('tag_id', tag_id);
-      if (countError) throw countError;
+    await Promise.all(
+      recipeTags.map(async ({ tag_id }) => {
+        const { count, error: countError } = await supabase
+          .from('recipe_tags')
+          .select('*', { count: 'exact', head: true })
+          .eq('tag_id', tag_id);
+        if (countError) throw countError;
 
-      if (count === 0) {
-        const { error: deleteTagError } = await supabase
-          .from('tags')
-          .delete()
-          .eq('id', tag_id);
-        if (deleteTagError) throw deleteTagError;
-      }
-    }
+        if (count === 0) {
+          const { error: deleteTagError } = await supabase
+            .from('tags')
+            .delete()
+            .eq('id', tag_id);
+          if (deleteTagError) throw deleteTagError;
+        }
+      })
+    );
   };
 
   const deleteRecipe = async (recipeId: number): Promise<boolean> => {
