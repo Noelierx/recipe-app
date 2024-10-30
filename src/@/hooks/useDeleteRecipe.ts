@@ -6,11 +6,11 @@ export const useDeleteRecipe = () => {
   const [error, setError] = useState<string | null>(null);
 
   const deleteIngredient = async (ingredientId: number): Promise<void> => {
-    const { error } = await supabase
+    const { error: deleteIngredientError } = await supabase
       .from('ingredients')
       .delete()
       .eq('id', ingredientId);
-    if (error) throw error;
+    if (deleteIngredientError) throw deleteIngredientError;
   };
 
   const deleteSubRecipe = async (subRecipeId: number): Promise<void> => {
