@@ -43,21 +43,28 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
     }, [getTags]);
 
     useEffect(() => {
-        const filtered = recipes.filter(recipe => {
-            const matchesTags = selectedTags.length === 0 || selectedTags.every(selectedTag => 
+        const matchesTags = (recipe: RecipeWithDetails): boolean => {
+            if (selectedTags.length === 0) return true;
+            return selectedTags.every(selectedTag => 
                 recipe.tags.some(recipeTag => 
                     recipeTag.id === selectedTag.id || 
                     (recipeTag.id === undefined && recipeTag.name === selectedTag.name)
                 )
             );
+        };
 
-            const matchesSearch = recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                  recipe.recipe_ingredients.some(recipeIngredient => 
-                                      recipeIngredient.ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
-                                  );
+        const matchesSearch = (recipe: RecipeWithDetails): boolean => {
+            const searchLower = searchQuery.toLowerCase();
+            return recipe.title.toLowerCase().includes(searchLower) ||
+                recipe.recipe_ingredients.some(recipeIngredient => 
+                    recipeIngredient.ingredient.name.toLowerCase().includes(searchLower)
+                );
+        };
 
-            return matchesTags && matchesSearch;
-        });
+        const filtered = recipes.filter(recipe => 
+            matchesTags(recipe) && matchesSearch(recipe)
+        );
+
         setFilteredRecipes(filtered);
     }, [recipes, selectedTags, searchQuery]);
 
@@ -102,24 +109,26 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                 onSearchChange={setSearchQuery}
             />
             <div className="mb-4">
-                {loading ? (
-                    <div>Loading tags...</div>
-                ) : error ? (
-                    <div>Error loading tags: {error}</div>
-                ) : allTags.length === 0 ? (
-                    <div>No tags available</div>
-                ) : (
-                    allTags.map((tag, index) => (
-                        <Button 
-                            key={tag.id ?? `tag-${index}-${tag.name}`}
-                            onClick={() => handleTagSelect(tag)}
-                            variant={selectedTags.some(t => t.id === tag.id || (t.id === undefined && t.name === tag.name)) ? "secondary" : "outline"}
-                            className="mr-2 mb-2"
-                        >
-                            {tag.name}
-                        </Button>
-                    ))
-                )}
+                {(() => {
+                    if (loading) {
+                        return <div>Loading tags...</div>;
+                    } else if (error) {
+                        return <div>Error loading tags: {error}</div>;
+                    } else if (allTags.length === 0) {
+                        return <div>No tags available</div>;
+                    } else {
+                        return allTags.map((tag, index) => (
+                            <Button 
+                                key={tag.id ?? `tag-${index}-${tag.name}`}
+                                onClick={() => handleTagSelect(tag)}
+                                variant={selectedTags.some(t => t.id === tag.id || (t.id === undefined && t.name === tag.name)) ? "secondary" : "outline"}
+                                className="mr-2 mb-2"
+                            >
+                                {tag.name}
+                            </Button>
+                        ));
+                    }
+                })()}
             </div>
             <Button onClick={sortRecipes} className="mb-4">
                 Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}

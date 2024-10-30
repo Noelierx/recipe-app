@@ -15,10 +15,10 @@ interface SubRecipeHandlerProps {
 
 
 const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({ 
-  subRecipes, 
+  subRecipes,
   setSubRecipes 
 }) => {
-  const { deleteSubRecipe, isDeleting, error } = useDeleteRecipe();
+  const { deleteRecipe: deleteSubRecipe, isDeleting, error } = useDeleteRecipe();
 
   const handleSubRecipeChange = useCallback((index: number, field: keyof SubRecipe, value: string | RecipeIngredient[] | ((prev: RecipeIngredient[]) => RecipeIngredient[])) => {
     setSubRecipes(prevSubRecipes => 

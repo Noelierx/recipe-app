@@ -10,23 +10,27 @@ import { useRecipes } from '@/hooks/useRecipes';
 
 const App: React.FC = () => {
   const { recipes, loading, error } = useRecipes();
+  let content;
+  if (loading) {
+    content = <div>Loading...</div>;
+  } else if (error) {
+    content = <div>Error: {error}</div>;
+  } else {
+    content = (
+      <Routes>
+        <Route path="/" element={<RecipeList recipes={recipes || []} />} />
+        <Route path="/recipe/:id" element={<RecipeDetails />} />
+        <Route path="/add-recipe" element={<AddRecipe />} />
+        <Route path="/recipe/:id/edit" element={<EditRecipe />} />
+      </Routes>
+    );
+  }
 
   return (
     <Router>
       <Header />
       <main className="container mx-auto p-4">
-        {loading ? (
-          <div>Loading...</div>
-        ) : error ? (
-          <div>Error: {error}</div>
-        ) : (
-          <Routes>
-            <Route path="/" element={<RecipeList recipes={recipes || []} />} />
-            <Route path="/recipe/:id" element={<RecipeDetails />} />
-            <Route path="/add-recipe" element={<AddRecipe />} />
-            <Route path="/recipe/:id/edit" element={<EditRecipe />} />
-          </Routes>
-        )}
+        {content}
       </main>
       <Footer />
     </Router>

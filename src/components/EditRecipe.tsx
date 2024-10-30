@@ -10,7 +10,7 @@ import SubRecipeHandler from 'components/SubRecipeHandler';
 import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
-import { Clock, Flame } from 'lucide-react'; // Import icons
+import { Clock, Flame } from 'lucide-react';
 
 const EditRecipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();

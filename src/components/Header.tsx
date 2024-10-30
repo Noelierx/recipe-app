@@ -9,6 +9,10 @@ const Header: React.FC = () => {
     const isHomePage = location.pathname === '/';
     const isAddRecipePage = location.pathname === '/add-recipe';
 
+    const pageTitle = location.pathname.includes('/recipe/') ? 'Recipe Detail' : 
+                      location.pathname === '/add-recipe' ? 'Add Recipe' : 
+                      location.pathname === '/edit-recipe' ? 'Edit Recipe' : 'Recipe List';
+
     return (
         <header className="bg-gray-800 text-white p-4">
             <div className="container mx-auto flex justify-between items-center">
@@ -25,9 +29,7 @@ const Header: React.FC = () => {
                     )}
                 </div>
                 <h1 className="text-2xl font-bold">
-                    {location.pathname.includes('/recipe/') ? 'Recipe Detail' : 
-                     location.pathname === '/add-recipe' ? 'Add Recipe' : 
-                     location.pathname === '/edit-recipe' ? 'Edit Recipe' : 'Recipe List'}
+                    {pageTitle}
                 </h1>
                 <div>
                     {!isAddRecipePage && (

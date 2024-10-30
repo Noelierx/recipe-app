@@ -2,6 +2,26 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabaseClient';
 import { RecipeWithDetails } from '@/types/types';
 
+const mapSubRecipeIngredients = (subRecipe: any) => ({
+  ...subRecipe,
+  ingredients: subRecipe.sub_recipe_ingredients.map(mapIngredient)
+});
+
+const mapIngredient = (sri: any) => ({
+  amount: sri.amount,
+  unit: sri.unit,
+  ingredient: sri.ingredient
+});
+
+const createRecipeWithDetails = (recipeData: any, ingredientsData: any, tagsData: any, subRecipesData: any): RecipeWithDetails => ({
+  ...recipeData,
+  recipe_ingredients: ingredientsData || [],
+  tags: tagsData ? tagsData.map((t: { tag: string }) => t.tag) : [],
+  sub_recipes: subRecipesData ? subRecipesData.map(mapSubRecipeIngredients) : [],
+  prep_time: typeof recipeData.prep_time === 'number' ? recipeData.prep_time : null,
+  cook_time: typeof recipeData.cook_time === 'number' ? recipeData.cook_time : null,
+});
+
 export const useRecipeDetails = (recipeId: number) => {
   const [recipe, setRecipe] = useState<RecipeWithDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -22,20 +42,14 @@ export const useRecipeDetails = (recipeId: number) => {
 
         const { data: ingredientsData, error: ingredientsError } = await supabase
           .from('recipe_ingredients')
-          .select(`
-            amount,
-            unit,
-            ingredient:ingredients (name)
-          `)
+          .select(`amount, unit, ingredient:ingredients (name)`)
           .eq('recipe_id', recipeId);
 
         if (ingredientsError) throw new Error(ingredientsError.message);
 
         const { data: tagsData, error: tagsError } = await supabase
           .from('recipe_tags')
-          .select(`
-            tag:tags (name)
-          `)
+          .select(`tag:tags (name)`)
           .eq('recipe_id', recipeId);
 
         if (tagsError) throw new Error(tagsError.message);
@@ -56,22 +70,7 @@ export const useRecipeDetails = (recipeId: number) => {
 
         if (subRecipesError) throw new Error(subRecipesError.message);
 
-        const recipeWithDetails: RecipeWithDetails = {
-          ...recipeData,
-          recipe_ingredients: ingredientsData || [],
-          tags: tagsData ? tagsData.map(t => t.tag) : [],
-          sub_recipes: subRecipesData ? subRecipesData.map(sr => ({
-            ...sr,
-            ingredients: sr.sub_recipe_ingredients.map(sri => ({
-              amount: sri.amount,
-              unit: sri.unit,
-              ingredient: sri.ingredient
-            }))
-          })) : [],
-          prep_time: typeof recipeData.prep_time === 'number' ? recipeData.prep_time : null,
-          cook_time: typeof recipeData.cook_time === 'number' ? recipeData.cook_time : null,
-        };
-
+        const recipeWithDetails = createRecipeWithDetails(recipeData, ingredientsData, tagsData, subRecipesData);
         setRecipe(recipeWithDetails);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
