@@ -148,7 +148,8 @@ const handleSubRecipeIngredients = async (subRecipe: SubRecipe) => {
 
 const deleteRemainingSubRecipes = async (existingSubRecipeIds: Set<number>) => {
   if (existingSubRecipeIds.size > 0) {
-    await supabase.from('sub_recipes').delete().in('id', Array.from(existingSubRecipeIds));
+    const { error } = await supabase.from('sub_recipes').delete().in('id', Array.from(existingSubRecipeIds));
+    if (error) throw error;
   }
 };
 
