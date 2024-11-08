@@ -15,9 +15,12 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
 
   const handleIngredientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    const processedValue = name === 'amount' ? (value === '' ? 0 : Number(value)) : value;
+
     setNewIngredient(prev => ({
       ...prev,
-      [name]: name === 'amount' ? (value === '' ? 0 : Number(value)) : value
+      [name]: processedValue
     }));
   };
 
