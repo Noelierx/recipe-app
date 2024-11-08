@@ -42,83 +42,24 @@ export const useDeleteRecipe = () => {
     setError(null);
 
     try {
-      // Get all sub_recipes for this recipe
-      const { data: subRecipes, error: subRecipesError } = await supabase
-        .from('sub_recipes')
-        .select('id')
-        .eq('recipe_id', recipeId);
+      const subRecipes = await getSubRecipes(recipeId);
+      if (!subRecipes) return false;
 
-      if (subRecipesError) throw subRecipesError;
+      await Promise.all(subRecipes.map(({ id: subRecipeId }) => deleteSubRecipeAndIngredients(subRecipeId)));
 
-      // Use deleteSubRecipeAndIngredients for each sub-recipe
-      for (const { id: subRecipeId } of subRecipes) {
-        await deleteSubRecipeAndIngredients(subRecipeId);
-      }
+      const recipeIngredients = await getRecipeIngredients(recipeId);
+      if (!recipeIngredients) return false;
 
-      // Delete sub_recipe_ingredients and their corresponding ingredients
-      const { data: recipeIngredients, error: recipeIngredientsError } = await supabase
-        .from('recipe_ingredients')
-        .select('ingredient_id')
-        .eq('recipe_id', recipeId);
+      await deleteRecipeIngredients(recipeId);
+      await Promise.all(recipeIngredients.map(({ ingredient_id }) => deleteIngredient(ingredient_id)));
 
-      if (recipeIngredientsError) throw recipeIngredientsError;
+      const recipeTags = await getRecipeTags(recipeId);
+      if (!recipeTags) return false;
 
-      const { error: deleteRecipeIngredientsError } = await supabase
-        .from('recipe_ingredients')
-        .delete()
-        .eq('recipe_id', recipeId);
+      await deleteRecipeTags(recipeId);
+      await deleteUnusedTags(recipeTags);
 
-      if (deleteRecipeIngredientsError) throw deleteRecipeIngredientsError;
-
-      for (const { ingredient_id } of recipeIngredients) {
-        const { error: deleteIngredientError } = await supabase
-          .from('ingredients')
-          .delete()
-          .eq('id', ingredient_id);
-
-        if (deleteIngredientError) throw deleteIngredientError;
-      }
-
-      // Get and delete recipe_tags, then delete unused tags
-      const { data: recipeTags, error: recipeTagsError } = await supabase
-        .from('recipe_tags')
-        .select('tag_id')
-        .eq('recipe_id', recipeId);
-
-      if (recipeTagsError) throw recipeTagsError;
-
-      const { error: deleteRecipeTagsError } = await supabase
-        .from('recipe_tags')
-        .delete()
-        .eq('recipe_id', recipeId);
-
-      if (deleteRecipeTagsError) throw deleteRecipeTagsError;
-
-      for (const { tag_id } of recipeTags) {
-        const { count, error: countError } = await supabase
-          .from('recipe_tags')
-          .select('*', { count: 'exact', head: true })
-          .eq('tag_id', tag_id);
-
-        if (countError) throw countError;
-
-        if (count === 0) {
-          const { error: deleteTagError } = await supabase
-            .from('tags')
-            .delete()
-            .eq('id', tag_id);
-
-          if (deleteTagError) throw deleteTagError;
-        }
-      }
-
-      // Delete the main recipe
-      const { error: deleteRecipeError } = await supabase
-        .from('recipes')
-        .delete()
-        .eq('id', recipeId);
-
-      if (deleteRecipeError) throw deleteRecipeError;
+      await deleteMainRecipe(recipeId);
 
       return true;
     } catch (err) {
@@ -153,4 +94,87 @@ export const useDeleteRecipe = () => {
   };
 
   return { deleteRecipe, deleteSubRecipe, isDeleting, error };
+};
+
+// New helper functions
+const getSubRecipes = async (recipeId: number) => {
+  const { data: subRecipes, error: subRecipesError } = await supabase
+    .from('sub_recipes')
+    .select('id')
+    .eq('recipe_id', recipeId);
+  if (subRecipesError) throw subRecipesError;
+  return subRecipes;
+};
+
+const getRecipeIngredients = async (recipeId: number) => {
+  const { data: recipeIngredients, error: recipeIngredientsError } = await supabase
+    .from('recipe_ingredients')
+    .select('ingredient_id')
+    .eq('recipe_id', recipeId);
+  if (recipeIngredientsError) throw recipeIngredientsError;
+  return recipeIngredients;
+};
+
+const deleteRecipeIngredients = async (recipeId: number) => {
+  const { error: deleteRecipeIngredientsError } = await supabase
+    .from('recipe_ingredients')
+    .delete()
+    .eq('recipe_id', recipeId);
+  if (deleteRecipeIngredientsError) throw deleteRecipeIngredientsError;
+};
+
+const deleteIngredient = async (ingredientId: number) => {
+  const { error: deleteIngredientError } = await supabase
+    .from('ingredients')
+    .delete()
+    .eq('id', ingredientId);
+  if (deleteIngredientError) throw deleteIngredientError;
+};
+
+const getRecipeTags = async (recipeId: number) => {
+  const { data: recipeTags, error: recipeTagsError } = await supabase
+    .from('recipe_tags')
+    .select('tag_id')
+    .eq('recipe_id', recipeId);
+  if (recipeTagsError) throw recipeTagsError;
+  return recipeTags;
+};
+
+const deleteRecipeTags = async (recipeId: number) => {
+  const { error: deleteRecipeTagsError } = await supabase
+    .from('recipe_tags')
+    .delete()
+    .eq('recipe_id', recipeId);
+  if (deleteRecipeTagsError) throw deleteRecipeTagsError;
+};
+
+const deleteUnusedTags = async (recipeTags: Array<{ tag_id: number }>) => {
+  const tagIds = recipeTags.map(({ tag_id }) => tag_id);
+
+  const { data: usedTags, error: countError } = await supabase
+    .from('recipe_tags')
+    .select('tag_id')
+    .in('tag_id', tagIds);
+
+  if (countError) throw countError;
+
+  const usedTagIds = new Set(usedTags?.map(t => t.tag_id));
+  const unusedTagIds = tagIds.filter(id => !usedTagIds.has(id));
+
+  if (unusedTagIds.length > 0) {
+    const { error: deleteError } = await supabase
+      .from('tags')
+      .delete()
+      .in('id', unusedTagIds);
+
+    if (deleteError) throw deleteError;
+  }
+};
+
+const deleteMainRecipe = async (recipeId: number) => {
+  const { error: deleteRecipeError } = await supabase
+    .from('recipes')
+    .delete()
+    .eq('id', recipeId);
+  if (deleteRecipeError) throw deleteRecipeError;
 };

@@ -7,6 +7,11 @@ export const useRecipes = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const handleFetchErrors = (recipesError: any, recipesData: any) => {
+        if (recipesError) throw new Error(recipesError.message);
+        if (!recipesData) throw new Error('No recipes found');
+    };
+
     const fetchRecipes = useCallback(async () => {
         try {
             setLoading(true);
@@ -26,10 +31,9 @@ export const useRecipes = () => {
                     )
                 `);
 
-            if (recipesError) throw new Error(recipesError.message);
-            if (!recipesData) throw new Error('No recipes found');
+            handleFetchErrors(recipesError, recipesData);
 
-            const transformedRecipes: RecipeWithDetails[] = recipesData.map(recipe => {
+            const transformedRecipes: RecipeWithDetails[] = (recipesData || []).map(recipe => {
                 const recipeIngredients = recipe.recipe_ingredients || [];
                 const recipeTags = recipe.recipe_tags ? recipe.recipe_tags.map((rt: { tag: { name: string } }) => rt.tag) : [];
 
