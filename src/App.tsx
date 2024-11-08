@@ -7,26 +7,33 @@ import EditRecipe from './components/EditRecipe';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { useRecipes } from '@/hooks/useRecipes';
+import { ROUTES } from '@/types/routes';
 
 const App: React.FC = () => {
   const { recipes, loading, error } = useRecipes();
+
+  let content;
+
+  if (loading) {
+    content = <div>Loading...</div>;
+  } else if (error) {
+    content = <div>Error: {error}</div>;
+  } else {
+    content = (
+      <Routes>
+        <Route path={ROUTES.HOME} element={<RecipeList recipes={recipes || []} />} />
+        <Route path={ROUTES.RECIPE_DETAILS({ id: ':id' })} element={<RecipeDetails />} />
+        <Route path={ROUTES.ADD_RECIPE} element={<AddRecipe />} />
+        <Route path={ROUTES.EDIT_RECIPE({ id: ':id' })} element={<EditRecipe />} />
+      </Routes>
+    );
+  }
 
   return (
     <Router>
       <Header />
       <main className="container mx-auto p-4">
-        {loading ? (
-          <div>Loading...</div>
-        ) : error ? (
-          <div>Error: {error}</div>
-        ) : (
-          <Routes>
-            <Route path="/" element={<RecipeList recipes={recipes || []} />} />
-            <Route path="/recipe/:id" element={<RecipeDetails />} />
-            <Route path="/add-recipe" element={<AddRecipe />} />
-            <Route path="/recipe/:id/edit" element={<EditRecipe />} />
-          </Routes>
-        )}
+        {content}
       </main>
       <Footer />
     </Router>

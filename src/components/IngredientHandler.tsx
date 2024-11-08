@@ -13,11 +13,21 @@ interface IngredientHandlerProps {
 const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setIngredients }) => {
   const [newIngredient, setNewIngredient] = useState<Partial<Ingredient & { amount: number }>>({ name: '', amount: 0, unit: '' });
 
+  const getProcessedValue = (name: string, value: string): number | string => {
+    if (name === 'amount') {
+      return value === '' ? 0 : Number(value);
+    }
+    return value;
+  };
+
   const handleIngredientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    const processedValue = getProcessedValue(name, value);
+
     setNewIngredient(prev => ({
       ...prev,
-      [name]: name === 'amount' ? (value === '' ? 0 : Number(value)) : value
+      [name]: processedValue
     }));
   };
 

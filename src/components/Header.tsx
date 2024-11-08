@@ -1,13 +1,32 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, matchPath } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { ROUTES } from '@/types/routes';
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const isHomePage = location.pathname === ROUTES.HOME;
+    const isAddRecipePage = location.pathname === ROUTES.ADD_RECIPE;
+
+    const getTitle = (): string => {
+        const routeToTitleMap: { [key: string]: string } = {
+          [ROUTES.ADD_RECIPE]: 'Ajouter une recette',
+          [ROUTES.RECIPE_DETAILS({ id: ':id' })]: 'Détails de la recette',
+          [ROUTES.EDIT_RECIPE({ id: ':id' })]: 'Modifier la recette',
+        };
     
-    const isHomePage = location.pathname === '/';
-    const isAddRecipePage = location.pathname === '/add-recipe';
+        for (const route in routeToTitleMap) {
+          if (matchPath(route, location.pathname)) {
+            return routeToTitleMap[route];
+          }
+        }
+    
+        return 'Liste des recettes';
+      };
+    
+      const title = getTitle();
 
     return (
         <header className="bg-gray-800 text-white p-4">
@@ -15,27 +34,23 @@ const Header: React.FC = () => {
                 <div>
                     {!isHomePage && (
                         <Button
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate(ROUTES.HOME)}
                             variant="outline"
                             className="text-black"
-                            aria-label="Aller à l'accueil"
                         >
                             Accueil
                         </Button>
                     )}
                 </div>
                 <h1 className="text-2xl font-bold">
-                    {location.pathname.includes('/recipe/') ? 'Détails de la recette' : 
-                     location.pathname === '/add-recipe' ? 'Ajouter une recette' : 
-                     location.pathname === '/edit-recipe' ? 'Modifier la recette' : 'Liste des recettes'}
+                    {title}
                 </h1>
                 <div>
                     {!isAddRecipePage && (
                         <Button
-                            onClick={() => navigate('/add-recipe')}
+                            onClick={() => navigate(ROUTES.ADD_RECIPE)}
                             variant="outline"
                             className="text-black"
-                            aria-label="Ajouter une recette"
                         >
                             Ajouter une recette
                         </Button>
