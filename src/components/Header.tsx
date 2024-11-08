@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { ROUTES } from '@/types/routes';
+import { TITLES } from '@/types/translations'
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -10,14 +12,14 @@ const Header: React.FC = () => {
     const isAddRecipePage = location.pathname === '/add-recipe';
 
     const getTitle = (pathname: string): string => {
-        if (pathname.includes('/recipe/')) {
-            return 'Détails de la recette';
-        } else if (pathname === '/add-recipe') {
-            return 'Ajouter une recette';
-        } else if (pathname === '/edit-recipe') {
-            return 'Modifier la recette';
+        if (pathname.includes(ROUTES.RECIPE_DETAILS)) {
+            return TITLES.recipe_details;
+        } else if (pathname === ROUTES.ADD_RECIPE) {
+            return TITLES.add_recipe;
+        } else if (pathname === ROUTES.EDIT_RECIPE) {
+            return TITLES.edit_recipe;
         } else {
-            return 'Liste des recettes';
+            return TITLES.recipe_list;
         }
     };
 

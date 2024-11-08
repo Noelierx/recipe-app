@@ -99,20 +99,26 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
     };
 
     const renderTags = () => {
+        const getButtonVariant = (tag: Tag): "secondary" | "outline" => {
+            const isSelected = selectedTags.some(t => 
+                t.id === tag.id || (t.id === undefined && t.name === tag.name)
+            );
+            return isSelected ? "secondary" : "outline";
+        };
         if (loading) {
-            return <div>Chargement des tags...</div>;
+            return <div className="text-muted">Chargement des tags...</div>;
         }
         if (error) {
-            return <div>Erreur lors du chargement des tags : {error}</div>;
+            return <div className="text-destructive">Erreur lors du chargement des tags : {error}</div>;
         }
         if (allTags.length === 0) {
-            return <div>Aucun tag disponible</div>;
+            return <div className="text-muted">Aucun tag disponible</div>;
         }
         return allTags.map((tag, index) => (
             <Button 
                 key={tag.id ?? `tag-${index}-${tag.name}`}
                 onClick={() => handleTagSelect(tag)}
-                variant={selectedTags.some(t => t.id === tag.id || (t.id === undefined && t.name === tag.name)) ? "secondary" : "outline"}
+                variant={getButtonVariant(tag)}
                 className="mr-2 mb-2"
             >
                 {tag.name}
