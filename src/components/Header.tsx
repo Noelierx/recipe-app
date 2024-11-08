@@ -38,9 +38,8 @@ const Header: React.FC = () => {
                             onClick={() => navigate(ROUTES.HOME)}
                             variant="outline"
                             className="text-black"
-                            aria-label="Go to home"
                         >
-                            Home
+                            Accueil
                         </Button>
                     )}
                 </div>
@@ -53,9 +52,8 @@ const Header: React.FC = () => {
                             onClick={() => navigate(ROUTES.ADD_RECIPE)}
                             variant="outline"
                             className="text-black"
-                            aria-label="Add a recipe"
                         >
-                            Add a recipe
+                            Ajouter une recette
                         </Button>
                     )}
                 </div>
