@@ -149,20 +149,25 @@ const deleteRecipeTags = async (recipeId: number) => {
 };
 
 const deleteUnusedTags = async (recipeTags: Array<{ tag_id: number }>) => {
-  for (const { tag_id } of recipeTags) {
-    const { count, error: countError } = await supabase
-      .from('recipe_tags')
-      .select('*', { count: 'exact', head: true })
-      .eq('tag_id', tag_id);
-    if (countError) throw countError;
+  const tagIds = recipeTags.map(({ tag_id }) => tag_id);
 
-    if (count === 0) {
-      const { error: deleteTagError } = await supabase
-        .from('tags')
-        .delete()
-        .eq('id', tag_id);
-      if (deleteTagError) throw deleteTagError;
-    }
+  const { data: usedTags, error: countError } = await supabase
+    .from('recipe_tags')
+    .select('tag_id')
+    .in('tag_id', tagIds);
+
+  if (countError) throw countError;
+
+  const usedTagIds = new Set(usedTags?.map(t => t.tag_id));
+  const unusedTagIds = tagIds.filter(id => !usedTagIds.has(id));
+
+  if (unusedTagIds.length > 0) {
+    const { error: deleteError } = await supabase
+      .from('tags')
+      .delete()
+      .in('id', unusedTagIds);
+
+    if (deleteError) throw deleteError;
   }
 };
 
