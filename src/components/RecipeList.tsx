@@ -44,16 +44,19 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
 
     useEffect(() => {
         const matchesTags = (recipe: RecipeWithDetails): boolean => {
-            return selectedTags.length === 0 || selectedTags.every(selectedTag => 
+            if (selectedTags.length === 0) return true;
+            return selectedTags.every(selectedTag => 
                 recipe.tags.some(recipeTag => 
-                    recipeTag.id === selectedTag.id || 
-                    (recipeTag.id === undefined && recipeTag.name === selectedTag.name)
+                    (recipeTag.id && selectedTag.id && recipeTag.id === selectedTag.id) || 
+                    (!recipeTag.id && !selectedTag.id && recipeTag.name === selectedTag.name)
                 )
             );
         };
 
         const matchesSearch = (recipe: RecipeWithDetails): boolean => {
             const searchLower = searchQuery.toLowerCase();
+            const titleLower = recipe.title.toLowerCase();
+            if (titleLower.includes(searchLower)) return true;
             return recipe.title.toLowerCase().includes(searchLower) ||
                    recipe.recipe_ingredients.some(recipeIngredient => 
                        recipeIngredient.ingredient.name.toLowerCase().includes(searchLower)
@@ -98,13 +101,14 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
         }
     };
 
+    const getButtonVariant = (tag: Tag): "secondary" | "outline" => {
+        const isSelected = selectedTags.some(t => 
+            t.id === tag.id || (t.id === undefined && t.name === tag.name)
+        );
+        return isSelected ? "secondary" : "outline";
+    };
+
     const renderTags = () => {
-        const getButtonVariant = (tag: Tag): "secondary" | "outline" => {
-            const isSelected = selectedTags.some(t => 
-                t.id === tag.id || (t.id === undefined && t.name === tag.name)
-            );
-            return isSelected ? "secondary" : "outline";
-        };
         if (loading) {
             return <div className="text-muted">Chargement des tags...</div>;
         }
@@ -116,7 +120,7 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
         }
         return allTags.map((tag, index) => (
             <Button 
-                key={tag.id ?? `tag-${index}-${tag.name}`}
+                key={`tag-${tag.id ?? tag.name}-${index}`}
                 onClick={() => handleTagSelect(tag)}
                 variant={getButtonVariant(tag)}
                 className="mr-2 mb-2"

@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate, useLocation, matchPath } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/types/routes';
-import { TITLES } from '@/types/translations'
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -13,18 +12,18 @@ const Header: React.FC = () => {
 
     const getTitle = (): string => {
         const routeToTitleMap: { [key: string]: string } = {
-          [ROUTES.ADD_RECIPE]: TITLES.add_recipe,
-          [ROUTES.RECIPE_DETAILS(':id')]: TITLES.recipe_details,
-          [ROUTES.EDIT_RECIPE(':id')]: TITLES.edit_recipe,
+          [ROUTES.ADD_RECIPE]: 'Ajouter une recette',
+          [ROUTES.RECIPE_DETAILS({ id: ':id' })]: 'Détails de la recette',
+          [ROUTES.EDIT_RECIPE({ id: ':id' })]: 'Modifier la recette',
         };
-      
+    
         for (const route in routeToTitleMap) {
           if (matchPath(route, location.pathname)) {
             return routeToTitleMap[route];
           }
         }
-      
-        return TITLES.recipe_list;
+    
+        return 'Liste des recettes';
       };
     
       const title = getTitle();

@@ -22,9 +22,9 @@ const App: React.FC = () => {
     content = (
       <Routes>
         <Route path={ROUTES.HOME} element={<RecipeList recipes={recipes || []} />} />
-        <Route path={ROUTES.RECIPE_DETAILS(':id')} element={<RecipeDetails />} />
+        <Route path={ROUTES.RECIPE_DETAILS({ id: ':id' })} element={<RecipeDetails />} />
         <Route path={ROUTES.ADD_RECIPE} element={<AddRecipe />} />
-        <Route path={ROUTES.EDIT_RECIPE(':id')} element={<EditRecipe />} />
+        <Route path={ROUTES.EDIT_RECIPE({ id: ':id' })} element={<EditRecipe />} />
       </Routes>
     );
   }
