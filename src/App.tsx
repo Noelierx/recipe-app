@@ -7,6 +7,7 @@ import EditRecipe from './components/EditRecipe';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { useRecipes } from '@/hooks/useRecipes';
+import { ROUTES } from '@/types/routes';
 
 const App: React.FC = () => {
   const { recipes, loading, error } = useRecipes();
@@ -20,10 +21,10 @@ const App: React.FC = () => {
   } else {
     content = (
       <Routes>
-        <Route path="/" element={<RecipeList recipes={recipes || []} />} />
-        <Route path="/recipe/:id" element={<RecipeDetails />} />
-        <Route path="/add-recipe" element={<AddRecipe />} />
-        <Route path="/recipe/:id/edit" element={<EditRecipe />} />
+        <Route path={ROUTES.HOME} element={<RecipeList recipes={recipes || []} />} />
+        <Route path={ROUTES.RECIPE_DETAILS(':id')} element={<RecipeDetails />} />
+        <Route path={ROUTES.ADD_RECIPE} element={<AddRecipe />} />
+        <Route path={ROUTES.EDIT_RECIPE(':id')} element={<EditRecipe />} />
       </Routes>
     );
   }

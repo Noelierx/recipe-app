@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, matchPath } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/types/routes';
 import { TITLES } from '@/types/translations'
@@ -7,23 +7,27 @@ import { TITLES } from '@/types/translations'
 const Header: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    
-    const isHomePage = location.pathname === '/';
-    const isAddRecipePage = location.pathname === '/add-recipe';
 
-    const getTitle = (pathname: string): string => {
-        if (pathname.includes(ROUTES.RECIPE_DETAILS)) {
-            return TITLES.recipe_details;
-        } else if (pathname === ROUTES.ADD_RECIPE) {
-            return TITLES.add_recipe;
-        } else if (pathname === ROUTES.EDIT_RECIPE) {
-            return TITLES.edit_recipe;
-        } else {
-            return TITLES.recipe_list;
+    const isHomePage = location.pathname === ROUTES.HOME;
+    const isAddRecipePage = location.pathname === ROUTES.ADD_RECIPE;
+
+    const getTitle = (): string => {
+        const routeToTitleMap: { [key: string]: string } = {
+          [ROUTES.ADD_RECIPE]: TITLES.add_recipe,
+          [ROUTES.RECIPE_DETAILS(':id')]: TITLES.recipe_details,
+          [ROUTES.EDIT_RECIPE(':id')]: TITLES.edit_recipe,
+        };
+      
+        for (const route in routeToTitleMap) {
+          if (matchPath(route, location.pathname)) {
+            return routeToTitleMap[route];
+          }
         }
-    };
-
-    const title = getTitle(location.pathname);
+      
+        return TITLES.recipe_list;
+      };
+    
+      const title = getTitle();
 
     return (
         <header className="bg-gray-800 text-white p-4">
@@ -31,12 +35,12 @@ const Header: React.FC = () => {
                 <div>
                     {!isHomePage && (
                         <Button
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate(ROUTES.HOME)}
                             variant="outline"
                             className="text-black"
-                            aria-label="Aller à l'accueil"
+                            aria-label="Go to home"
                         >
-                            Accueil
+                            Home
                         </Button>
                     )}
                 </div>
@@ -46,12 +50,12 @@ const Header: React.FC = () => {
                 <div>
                     {!isAddRecipePage && (
                         <Button
-                            onClick={() => navigate('/add-recipe')}
+                            onClick={() => navigate(ROUTES.ADD_RECIPE)}
                             variant="outline"
                             className="text-black"
-                            aria-label="Ajouter une recette"
+                            aria-label="Add a recipe"
                         >
-                            Ajouter une recette
+                            Add a recipe
                         </Button>
                     )}
                 </div>
