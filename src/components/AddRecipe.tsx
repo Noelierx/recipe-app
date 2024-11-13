@@ -106,6 +106,7 @@ function AddRecipe() {
                     <Clock className="mr-2" aria-hidden="true" />
                     <Input
                         id="prepTime"
+                        name="prepTime"
                         type="number"
                         value={recipe.prep_time}
                         onChange={(e) => setRecipe({ ...recipe, prep_time: Number(e.target.value) })}
@@ -121,6 +122,7 @@ function AddRecipe() {
                     <Flame className="mr-2" aria-hidden="true" />
                     <Input
                         id="cookTime"
+                        name="cookTime"
                         type="number"
                         value={recipe.cook_time}
                         onChange={(e) => setRecipe({ ...recipe, cook_time: Number(e.target.value) })}

@@ -140,6 +140,7 @@ const EditRecipe: React.FC = () => {
                     <Clock className="mr-2" aria-hidden="true" />
                     <Input
                         id="prepTime"
+                        name="prepTime"
                         type="number"
                         value={prepTime}
                         onChange={handleInputChange}
@@ -155,6 +156,7 @@ const EditRecipe: React.FC = () => {
                     <Flame className="mr-2" aria-hidden="true" />
                     <Input
                         id="cookTime"
+                        name="cookTime"
                         type="number"
                         value={cookTime}
                         onChange={handleInputChange}
