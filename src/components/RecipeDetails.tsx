@@ -58,6 +58,7 @@ const RecipeDetails: React.FC = () => {
         const success = await deleteRecipe(recipeId);
         if (success) {
             navigate('/');
+            window.location.reload();
         }
     };
 

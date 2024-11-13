@@ -29,7 +29,8 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
     );
   }, [setSubRecipes]);
 
-  const addSubRecipe = useCallback(() => {
+  const addSubRecipe = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     setSubRecipes(prevSubRecipes => [
       ...prevSubRecipes, 
       { id: Date.now(), title: '', instructions: '', ingredients: [] }
