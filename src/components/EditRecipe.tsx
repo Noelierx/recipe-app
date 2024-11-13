@@ -4,7 +4,6 @@ import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 import RecipeForm from 'components/RecipeForm';
-import { validateAndTransformId } from '@/utils/formatters';
 
 const EditRecipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -44,17 +43,14 @@ const EditRecipe: React.FC = () => {
                 ...subRecipe,
                 ingredients: subRecipe.ingredients.map(ingredient => ({
                     ...ingredient,
-                    id: validateAndTransformId(ingredient.ingredient.id)
+                    id: (ingredient as any).id || ''
                 }))
             }));
             const success = await handleRecipe({
                 ...recipe,
                 prep_time: prepTime,
                 cook_time: cookTime,
-            }, ingredients.map(ingredient => ({
-                ...ingredient,
-                id: validateAndTransformId(ingredient.ingredient.id)
-            })), transformedSubRecipes, selectedTags, newTags);
+            }, ingredients, transformedSubRecipes, selectedTags, newTags);
             if (success) {
                 navigate(`/recipe/${recipeId}`);
             }

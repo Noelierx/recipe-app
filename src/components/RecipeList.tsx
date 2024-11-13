@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { Clock, Flame } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import SearchBar from 'components/SearchBar';
-import { useNavigate } from 'react-router-dom';
 import { RecipeWithDetails, Tag } from '@/types/types';
 import { useGetTags } from '@/hooks/useGetTags';
 

@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { CirclePlus, Trash2 } from 'lucide-react';
+import IngredientHandler from 'components/IngredientHandler';
+import RecipeInstructionsEditor from 'components/RecipeInstructionsEditor';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import IngredientHandler from 'components/IngredientHandler';
-import RecipeInstructionsEditor from 'components/RecipeInstructionsEditor';
 import { SubRecipe, RecipeIngredient } from '@/types/types';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 

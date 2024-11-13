@@ -7,6 +7,7 @@ import IngredientHandler from 'components/IngredientHandler';
 import RecipeInstructionsEditor from 'components/RecipeInstructionsEditor';
 import SubRecipeHandler from 'components/SubRecipeHandler';
 import TagHandler from 'components/TagHandler';
+import TimeInput from 'components/TimeInput';
 import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 
 interface RecipeFormProps {
@@ -102,33 +103,22 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
             </div>
 
             <div>
-                <Label htmlFor="prepTime">Temps de préparation (minutes)</Label>
-                <div className="flex items-center">
-                    <Clock className="mr-2" aria-hidden="true" />
-                    <Input
-                        id="prepTime"
-                        name="prepTime"
-                        type="number"
-                        value={prepTime || ''}
-                        onChange={(e) => setPrepTime(e.target.value ? Number(e.target.value) : 0)}
-                        min=""
-                    />
-                </div>
+                <TimeInput
+                    id="prepTime"
+                    label="Temps de préparation (minutes)"
+                    value={prepTime}
+                    onChange={(value) => setPrepTime(value ?? 0)}
+                    icon={<Clock className="mr-2" aria-hidden="true" />}
+                />
             </div>
-
             <div>
-                <Label htmlFor="cookTime">Temps de cuisson (minutes)</Label>
-                <div className="flex items-center">
-                    <Flame className="mr-2" aria-hidden="true" />
-                    <Input
-                        id="cookTime"
-                        name="cookTime"
-                        type="number"
-                        value={cookTime || ''}
-                        onChange={(e) => setCookTime(e.target.value ? Number(e.target.value) : 0)}
-                        min=""
-                    />
-                </div>
+                <TimeInput
+                    id="cookTime"
+                    label="Temps de cuisson (minutes)"
+                    value={cookTime}
+                    onChange={(value) => setCookTime(value ?? 0)}
+                    icon={<Flame className="mr-2" aria-hidden="true" />}
+                />
             </div>
 
             <Button type="submit" disabled={loading}>
