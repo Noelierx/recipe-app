@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import IngredientHandler from 'components/IngredientHandler';
 import TagHandler from 'components/TagHandler';
@@ -10,6 +9,8 @@ import SubRecipeHandler from 'components/SubRecipeHandler';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/types';
 import { Clock, Flame } from 'lucide-react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 function AddRecipe() {
     const navigate = useNavigate();
@@ -31,7 +32,10 @@ function AddRecipe() {
         if (recipe.title && (ingredients.length > 0 || subRecipes.length > 0) && recipe.instructions) {
             const subRecipesAny = subRecipes as any[];
             const result = await handleRecipe(
-                recipe,
+                {
+                    ...recipe,
+                    instructions: recipe.instructions,
+                },
                 ingredients,
                 subRecipesAny,
                 selectedTags,
@@ -47,16 +51,6 @@ function AddRecipe() {
         }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        const numberFields = ['servings', 'prep_time', 'cook_time'];
-        
-        setRecipe(prev => ({
-            ...prev,
-            [name]: numberFields.includes(name) ? Math.max(0, parseInt(value, 10) || 0) : value
-        }));
-    };
-
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -65,7 +59,7 @@ function AddRecipe() {
                     id="title"
                     name="title"
                     value={recipe.title}
-                    onChange={handleInputChange}
+                    onChange={(e) => setRecipe({ ...recipe, title: e.target.value })}
                     placeholder="Ajouter le titre de la recette"
                     required
                 />
@@ -78,7 +72,7 @@ function AddRecipe() {
                     name="servings"
                     type="number"
                     value={recipe.servings}
-                    onChange={handleInputChange}
+                    onChange={(e) => setRecipe({ ...recipe, servings: Number(e.target.value) })}
                     min="1"
                     required
                 />
@@ -103,13 +97,11 @@ function AddRecipe() {
 
             <div>
                 <Label htmlFor="instructions">Instructions</Label>
-                <Textarea
+                <ReactQuill
                     id="instructions"
-                    name="instructions"
                     value={recipe.instructions}
-                    onChange={handleInputChange}
+                    onChange={(value) => setRecipe(prev => ({ ...prev, instructions: value }))}
                     placeholder="Ajouter les instructions pour réaliser la recette"
-                    required
                 />
             </div>
 
@@ -119,10 +111,10 @@ function AddRecipe() {
                     <Clock className="mr-2" aria-hidden="true" />
                     <Input
                         id="prepTime"
-                        name="prepTime"
+                        name="prep_time"
                         type="number"
                         value={recipe.prep_time}
-                        onChange={handleInputChange}
+                        onChange={(e) => setRecipe({ ...recipe, prep_time: Number(e.target.value) })}
                         min="0"
                         required
                     />
@@ -135,10 +127,10 @@ function AddRecipe() {
                     <Flame className="mr-2" aria-hidden="true" />
                     <Input
                         id="cookTime"
-                        name="cookTime"
+                        name="cook_time"
                         type="number"
                         value={recipe.cook_time}
-                        onChange={handleInputChange}
+                        onChange={(e) => setRecipe({ ...recipe, cook_time: Number(e.target.value) })}
                         min="0"
                         required
                     />

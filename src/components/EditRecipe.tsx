@@ -11,6 +11,8 @@ import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Clock, Flame } from 'lucide-react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const EditRecipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -107,7 +109,10 @@ const EditRecipe: React.FC = () => {
                 />
             </div>
 
-            <IngredientHandler ingredients={ingredients} setIngredients={setIngredients} />
+            <IngredientHandler 
+                ingredients={ingredients} 
+                setIngredients={setIngredients} 
+            />
 
             <SubRecipeHandler 
                 subRecipes={subRecipes}
@@ -124,13 +129,11 @@ const EditRecipe: React.FC = () => {
 
             <div>
                 <Label htmlFor="instructions">Instructions</Label>
-                <Textarea
+                <ReactQuill
                     id="instructions"
-                    name="instructions"
                     value={recipe.instructions}
-                    onChange={handleInputChange}
-                    placeholder="Enter cooking instructions"
-                    required
+                    onChange={(value) => setRecipe(prev => ({ ...prev, instructions: value }))}
+                    placeholder="Ajouter les instructions pour réaliser la recette"
                 />
             </div>
 
@@ -140,7 +143,7 @@ const EditRecipe: React.FC = () => {
                     <Clock className="mr-2" aria-hidden="true" />
                     <Input
                         id="prepTime"
-                        name="prepTime"
+                        name="prep_time"
                         type="number"
                         value={prepTime}
                         onChange={handleInputChange}
@@ -156,7 +159,7 @@ const EditRecipe: React.FC = () => {
                     <Flame className="mr-2" aria-hidden="true" />
                     <Input
                         id="cookTime"
-                        name="cookTime"
+                        name="cook_time"
                         type="number"
                         value={cookTime}
                         onChange={handleInputChange}

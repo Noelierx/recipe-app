@@ -168,7 +168,7 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                                     <span>{recipe.cook_time} min cuisson</span>
                                 </div>
                             )}
-                            {recipe.instructions}
+                            <div dangerouslySetInnerHTML={{ __html: recipe.instructions }} />
                         </CardContent>
                         <CardFooter className="flex justify-between">
                             <Button onClick={() => viewRecipeDetail(recipe)}>Voir la recette</Button>

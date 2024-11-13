@@ -1,18 +1,18 @@
 import React, { useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import IngredientHandler from './IngredientHandler';
 import { SubRecipe, RecipeIngredient } from '@/types/types';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Importer le style de Quill
 
 interface SubRecipeHandlerProps {
   subRecipes: SubRecipe[];
   setSubRecipes: React.Dispatch<React.SetStateAction<SubRecipe[]>>;
   recipeId?: number;
 }
-
 
 const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({ 
   subRecipes, 
@@ -64,10 +64,10 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
             placeholder="titre de la sous-recette"
           />
           <Label htmlFor={`subrecipe-instructions-${index}`}>Instructions</Label>
-          <Textarea
+          <ReactQuill
             id={`subrecipe-instructions-${index}`}
             value={subRecipe.instructions}
-            onChange={(e) => handleSubRecipeChange(index, 'instructions', e.target.value)}
+            onChange={(value) => handleSubRecipeChange(index, 'instructions', value)}
             placeholder="Instructions de la sous-recette"
           />
           <IngredientHandler

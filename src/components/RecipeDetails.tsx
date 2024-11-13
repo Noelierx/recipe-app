@@ -101,11 +101,11 @@ const RecipeDetails: React.FC = () => {
                     {hasSubRecipes && adjustedSubRecipes.map((subRecipe, index) => (
                         <div key={index} className="mb-6">
                             <h3 className="text-xl font-semibold mb-2">{subRecipe.title}</h3>
-                            <p>{subRecipe.instructions}</p>
+                            <div dangerouslySetInnerHTML={{ __html: subRecipe.instructions }} />
                         </div>
                     ))}
                     {hasSubRecipes && (<h3 className="text-xl font-semibold mb-2">La suite</h3>)}
-                    <p className="mb-6">{recipe.instructions}</p>
+                    <div className="mb-6" dangerouslySetInnerHTML={{ __html: recipe.instructions }} />
                     <Button onClick={() => navigate(`/recipe/${recipe.id}/edit`)}>Modifier la recette</Button>
                 </div>
             </div>
