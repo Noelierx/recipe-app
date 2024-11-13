@@ -21,7 +21,8 @@ interface TimeInputProps {
           type="number"
           value={value || ''}
           onChange={(e) => {
-            onChange(e.target.value ? Number(e.target.value) : 0);
+            const value = e.target.value;
+            onChange(value === '' ? undefined : Number(value));
           }}
         />
       </div>
