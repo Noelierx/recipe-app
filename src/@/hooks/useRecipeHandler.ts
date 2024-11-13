@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import sanitizeHtml from 'sanitize-html';
 import { supabase } from '@/utils/supabaseClient';
 import { Recipe, RecipeIngredient, Tag } from '@/types/types';
 
@@ -85,12 +86,18 @@ export const useRecipeHandler = (recipeId?: number) => {
 
   const upsertMainRecipe = async (recipe: Partial<Recipe>, recipeId?: number): Promise<RecipeResult> => {
     const { title, instructions, servings, prep_time, cook_time } = recipe;
+
+    const sanitizedInstructions = sanitizeHtml(instructions || '', {
+      allowedTags: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li'],
+      allowedAttributes: {}
+    });
+
     let recipeResult: RecipeResult;
 
     if (recipeId) {
       const { data, error } = await supabase
         .from('recipes')
-        .update({ title, instructions, servings, prep_time, cook_time })
+        .update({ title, instructions: sanitizedInstructions, servings, prep_time, cook_time })
         .eq('id', recipeId)
         .select()
         .single();
@@ -99,7 +106,7 @@ export const useRecipeHandler = (recipeId?: number) => {
     } else {
       const { data, error } = await supabase
         .from('recipes')
-        .insert({ title, instructions, servings, prep_time, cook_time })
+        .insert({ title, instructions: sanitizedInstructions, servings, prep_time, cook_time })
         .select()
         .single();
       if (error) throw error;
@@ -154,12 +161,17 @@ export const useRecipeHandler = (recipeId?: number) => {
   };
 
   const upsertSubRecipe = async (subRecipe: SubRecipe, recipeId: number, existingSubRecipeIds: Set<number>) => {
+    const sanitizedInstructions = sanitizeHtml(subRecipe.instructions, {
+      allowedTags: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li'],
+      allowedAttributes: {}
+    });
+
     if (subRecipe.id && existingSubRecipeIds.has(subRecipe.id)) {
       const { error: updateError } = await supabase
         .from('sub_recipes')
         .update({
           title: subRecipe.title,
-          instructions: subRecipe.instructions
+          instructions: sanitizedInstructions
         })
         .eq('id', subRecipe.id);
 
@@ -172,7 +184,7 @@ export const useRecipeHandler = (recipeId?: number) => {
         .insert({
           recipe_id: recipeId,
           title: subRecipe.title,
-          instructions: subRecipe.instructions
+          instructions: sanitizedInstructions
         })
         .select('id')
         .single();
