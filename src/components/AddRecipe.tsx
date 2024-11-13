@@ -46,11 +46,14 @@ function AddRecipe() {
     };
 
     const handleTimeChange = (key: 'prep_time' | 'cook_time', value: number | ((prevState: number) => number)) => {
-        const newValue = typeof value === 'function' 
-            ? (value as (prevState: number) => number)(recipe[key] ?? 0)
-            : value >= 0 
-                ? value 
-                : 0;
+        let newValue: number;
+
+        if (typeof value === 'function') {
+            newValue = (value as (prevState: number) => number)(recipe[key] ?? 0);
+        } else {
+            const validValue = value >= 0 ? value : 0;
+            newValue = validValue;
+        }
 
         setRecipe(prev => ({
             ...prev,
