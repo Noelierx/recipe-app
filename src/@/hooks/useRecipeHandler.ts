@@ -87,7 +87,7 @@ export const useRecipeHandler = (recipeId?: number) => {
   const upsertMainRecipe = async (recipe: Partial<Recipe>, recipeId?: number): Promise<RecipeResult> => {
     const { title, instructions, servings, prep_time, cook_time } = recipe;
 
-    const sanitizedInstructions = sanitizeHtml(instructions || '', {
+    const sanitizedInstructions = sanitizeHtml(instructions ?? '', {
       allowedTags: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li'],
       allowedAttributes: {}
     });
