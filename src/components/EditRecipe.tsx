@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Clock, Flame } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import IngredientHandler from 'components/IngredientHandler';
-import TagHandler from 'components/TagHandler';
+import RecipeInstructionsEditor from 'components/RecipeInstructionsEditor';
 import SubRecipeHandler from 'components/SubRecipeHandler';
+import TagHandler from 'components/TagHandler';
 import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
-import { Clock, Flame } from 'lucide-react';
-import RecipeInstructionsEditor from './RecipeInstructionsEditor';
 
 const EditRecipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -140,7 +140,6 @@ const EditRecipe: React.FC = () => {
                     <Clock className="mr-2" aria-hidden="true" />
                     <Input
                         id="prepTime"
-                        name="prep_time"
                         type="number"
                         value={prepTime}
                         onChange={handleInputChange}
@@ -156,7 +155,6 @@ const EditRecipe: React.FC = () => {
                     <Flame className="mr-2" aria-hidden="true" />
                     <Input
                         id="cookTime"
-                        name="cook_time"
                         type="number"
                         value={cookTime}
                         onChange={handleInputChange}

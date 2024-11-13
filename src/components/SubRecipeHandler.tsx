@@ -2,10 +2,10 @@ import React, { useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import IngredientHandler from './IngredientHandler';
+import IngredientHandler from 'components/IngredientHandler';
+import RecipeInstructionsEditor from 'components/RecipeInstructionsEditor';
 import { SubRecipe, RecipeIngredient } from '@/types/types';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
-import RecipeInstructionsEditor from './RecipeInstructionsEditor';
 
 interface SubRecipeHandlerProps {
   subRecipes: SubRecipe[];

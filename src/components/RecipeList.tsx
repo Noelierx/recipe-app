@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
+import { Clock, Flame } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import SearchBar from 'components/SearchBar';
 import { useNavigate } from 'react-router-dom';
 import { RecipeWithDetails, Tag } from '@/types/types';
 import { useGetTags } from '@/hooks/useGetTags';
-import { Clock, Flame } from 'lucide-react';
-import SearchBar from './SearchBar';
+
 
 interface RecipeListProps {
     recipes: RecipeWithDetails[];
@@ -148,7 +150,12 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                                     <span>{recipe.cook_time} min cuisson</span>
                                 </div>
                             )}
-                            <div dangerouslySetInnerHTML={{ __html: recipe.instructions }} />
+                            <div className="mb-6" dangerouslySetInnerHTML={{ 
+                                __html: DOMPurify.sanitize(recipe.instructions, { 
+                                ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li'], 
+                                ALLOWED_ATTR: [] 
+                                }) 
+                            }} />
                         </CardContent>
                         <CardFooter className="flex justify-between">
                             <Button onClick={() => viewRecipeDetail(recipe)}>Voir la recette</Button>

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Clock, Flame } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import IngredientHandler from 'components/IngredientHandler';
-import TagHandler from 'components/TagHandler';
+import RecipeInstructionsEditor from './RecipeInstructionsEditor';
 import SubRecipeHandler from 'components/SubRecipeHandler';
+import TagHandler from 'components/TagHandler';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/types';
-import { Clock, Flame } from 'lucide-react';
-import RecipeInstructionsEditor from './RecipeInstructionsEditor';
 
 function AddRecipe() {
     const navigate = useNavigate();
@@ -109,7 +109,6 @@ function AddRecipe() {
                     <Clock className="mr-2" aria-hidden="true" />
                     <Input
                         id="prepTime"
-                        name="prep_time"
                         type="number"
                         value={recipe.prep_time}
                         onChange={(e) => setRecipe({ ...recipe, prep_time: Number(e.target.value) })}
@@ -125,7 +124,6 @@ function AddRecipe() {
                     <Flame className="mr-2" aria-hidden="true" />
                     <Input
                         id="cookTime"
-                        name="cook_time"
                         type="number"
                         value={recipe.cook_time}
                         onChange={(e) => setRecipe({ ...recipe, cook_time: Number(e.target.value) })}
