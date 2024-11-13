@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify';
+import { Clock, Flame } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +18,6 @@ import {
 import { RecipeIngredient } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
-import { Clock, Flame } from 'lucide-react';
 import { formatAmount } from '@/utils/formatters';
 
 const RecipeDetails: React.FC = () => {
@@ -57,6 +58,7 @@ const RecipeDetails: React.FC = () => {
         const success = await deleteRecipe(recipeId);
         if (success) {
             navigate('/');
+            window.location.reload();
         }
     };
 
@@ -122,11 +124,21 @@ const RecipeDetails: React.FC = () => {
                     {hasSubRecipes && adjustedSubRecipes.map((subRecipe, index) => (
                         <div key={index} className="mb-6">
                             <h3 className="text-xl font-semibold mb-2">{subRecipe.title}</h3>
-                            <p>{subRecipe.instructions}</p>
+                            <div dangerouslySetInnerHTML={{ 
+                                __html: DOMPurify.sanitize(subRecipe.instructions, {
+                                    ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li', 'a'],
+                                    ALLOWED_ATTR: [] 
+                                }) 
+                            }} />
                         </div>
                     ))}
                     {hasSubRecipes && (<h3 className="text-xl font-semibold mb-2">La suite</h3>)}
-                    <p className="mb-6">{recipe.instructions}</p>
+                    <div className="mb-6" dangerouslySetInnerHTML={{ 
+                        __html: DOMPurify.sanitize(recipe.instructions, { 
+                        ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li', 'a'], 
+                        ALLOWED_ATTR: [] 
+                        }) 
+                    }} />
                     <div className="flex space-x-4">
                         <Button onClick={() => navigate(`/recipe/${recipe.id}/edit`)}>Modifier la recette</Button>
                         <AlertDialog>

@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import IngredientHandler from './IngredientHandler';
+import IngredientHandler from 'components/IngredientHandler';
+import RecipeInstructionsEditor from 'components/RecipeInstructionsEditor';
 import { SubRecipe, RecipeIngredient } from '@/types/types';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 
@@ -12,7 +12,6 @@ interface SubRecipeHandlerProps {
   setSubRecipes: React.Dispatch<React.SetStateAction<SubRecipe[]>>;
   recipeId?: number;
 }
-
 
 const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({ 
   subRecipes, 
@@ -30,7 +29,8 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
     );
   }, [setSubRecipes]);
 
-  const addSubRecipe = useCallback(() => {
+  const addSubRecipe = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     setSubRecipes(prevSubRecipes => [
       ...prevSubRecipes, 
       { id: Date.now(), title: '', instructions: '', ingredients: [] }
@@ -64,10 +64,9 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
             placeholder="titre de la sous-recette"
           />
           <Label htmlFor={`subrecipe-instructions-${index}`}>Instructions</Label>
-          <Textarea
-            id={`subrecipe-instructions-${index}`}
+          <RecipeInstructionsEditor
             value={subRecipe.instructions}
-            onChange={(e) => handleSubRecipeChange(index, 'instructions', e.target.value)}
+            onChange={(value) => handleSubRecipeChange(index, 'instructions', value)}
             placeholder="Instructions de la sous-recette"
           />
           <IngredientHandler

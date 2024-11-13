@@ -96,7 +96,6 @@ export const useDeleteRecipe = () => {
   return { deleteRecipe, deleteSubRecipe, isDeleting, error };
 };
 
-// New helper functions
 const getSubRecipes = async (recipeId: number) => {
   const { data: subRecipes, error: subRecipesError } = await supabase
     .from('sub_recipes')

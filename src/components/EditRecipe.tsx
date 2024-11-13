@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import IngredientHandler from 'components/IngredientHandler';
-import TagHandler from 'components/TagHandler';
-import SubRecipeHandler from 'components/SubRecipeHandler';
-import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
-import { Clock, Flame } from 'lucide-react';
+import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
+import RecipeForm from 'components/RecipeForm';
 
 const EditRecipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -43,16 +36,6 @@ const EditRecipe: React.FC = () => {
         }
     }, [initialRecipe]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setRecipe(prev => ({
-            ...prev,
-            [name]: name === 'servings' ? parseInt(value, 10) : value
-        }));
-        if (name === 'prepTime') setPrepTime(parseInt(value, 10));
-        if (name === 'cookTime') setCookTime(parseInt(value, 10));
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (recipe.title && (ingredients.length || subRecipes.length) && recipe.instructions) {
@@ -81,97 +64,25 @@ const EditRecipe: React.FC = () => {
     if (!recipe) return <div>Recette non trouvée</div>;
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <Label htmlFor="title">Titre de la recette</Label>
-                <Input
-                    id="title"
-                    name="title"
-                    value={recipe.title}
-                    onChange={handleInputChange}
-                    placeholder="Entrer le titre de la recette"
-                    required
-                />
-            </div>
-
-            <div>
-                <Label htmlFor="servings">Portions</Label>
-                <Input
-                    id="servings"
-                    name="servings"
-                    type="number"
-                    value={recipe.servings}
-                    onChange={handleInputChange}
-                    min="1"
-                    required
-                />
-            </div>
-
-            <IngredientHandler ingredients={ingredients} setIngredients={setIngredients} />
-
-            <SubRecipeHandler 
-                subRecipes={subRecipes}
-                setSubRecipes={setSubRecipes}
-                recipeId={recipeId}
-            />
-
-            <TagHandler 
-                selectedTags={selectedTags} 
-                setSelectedTags={setSelectedTags}
-                newTags={newTags}
-                setNewTags={setNewTags}
-            />
-
-            <div>
-                <Label htmlFor="instructions">Instructions</Label>
-                <Textarea
-                    id="instructions"
-                    name="instructions"
-                    value={recipe.instructions}
-                    onChange={handleInputChange}
-                    placeholder="Enter cooking instructions"
-                    required
-                />
-            </div>
-
-            <div>
-                <Label htmlFor="prepTime">Temps de préparation (minutes)</Label>
-                <div className="flex items-center">
-                    <Clock className="mr-2" aria-hidden="true" />
-                    <Input
-                        id="prepTime"
-                        name="prepTime"
-                        type="number"
-                        value={prepTime}
-                        onChange={handleInputChange}
-                        min="0"
-                        required
-                    />
-                </div>
-            </div>
-
-            <div>
-                <Label htmlFor="cookTime">Temps de cuisson (minutes)</Label>
-                <div className="flex items-center">
-                    <Flame className="mr-2" aria-hidden="true" />
-                    <Input
-                        id="cookTime"
-                        name="cookTime"
-                        type="number"
-                        value={cookTime}
-                        onChange={handleInputChange}
-                        min="0"
-                        required
-                    />
-                </div>
-            </div>
-
-            {updateError && <div className="text-red-500">{updateError}</div>}
-
-            <Button type="submit" disabled={updating}>
-                {updating ? 'Mise à jour...' : 'Mettre à jour la recette'}
-            </Button>
-        </form>
+        <RecipeForm
+            recipe={recipe}
+            setRecipe={setRecipe}
+            ingredients={ingredients}
+            setIngredients={setIngredients}
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+            newTags={newTags}
+            setNewTags={setNewTags}
+            subRecipes={subRecipes}
+            setSubRecipes={setSubRecipes}
+            prepTime={prepTime}
+            setPrepTime={setPrepTime}
+            cookTime={cookTime}
+            setCookTime={setCookTime}
+            onSubmit={handleSubmit}
+            loading={updating}
+            error={updateError || undefined}
+        />
     );
 };
 

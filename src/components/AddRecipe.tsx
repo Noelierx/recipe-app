@@ -1,25 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import IngredientHandler from 'components/IngredientHandler';
-import TagHandler from 'components/TagHandler';
-import SubRecipeHandler from 'components/SubRecipeHandler';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/types';
-import { Clock, Flame } from 'lucide-react';
+import RecipeForm from 'components/RecipeForm';
+
+interface RecipeFormState extends Partial<Recipe> {
+  prep_time?: number;
+  cook_time?: number;
+}
 
 function AddRecipe() {
     const navigate = useNavigate();
     const { handleRecipe, loading, error } = useRecipeHandler();
-    const [recipe, setRecipe] = useState<Partial<Recipe & { prep_time?: number; cook_time?: number }>>({
+    const [recipe, setRecipe] = useState<RecipeFormState>({
         title: '',
         instructions: '',
         servings: 1,
-        prep_time: undefined,
-        cook_time: undefined,
+        prep_time: 0,
+        cook_time: 0,
     });
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
     const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -47,107 +45,42 @@ function AddRecipe() {
         }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        const numberFields = ['servings', 'prep_time', 'cook_time'];
-        
+    const handleTimeChange = (key: 'prep_time' | 'cook_time', value: number | ((prevState: number) => number)) => {
+        let newValue: number;
+
+        if (typeof value === 'function') {
+            newValue = (value as (prevState: number) => number)(recipe[key] ?? 0);
+        } else {
+            const validValue = value >= 0 ? value : 0;
+            newValue = validValue;
+        }
+
         setRecipe(prev => ({
             ...prev,
-            [name]: numberFields.includes(name) ? Math.max(0, parseInt(value, 10) || 0) : value
+            [key]: newValue
         }));
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <Label htmlFor="title">Titre de la recette</Label>
-                <Input
-                    id="title"
-                    name="title"
-                    value={recipe.title}
-                    onChange={handleInputChange}
-                    placeholder="Ajouter le titre de la recette"
-                    required
-                />
-            </div>
-
-            <div>
-                <Label htmlFor="servings">Portions</Label>
-                <Input
-                    id="servings"
-                    name="servings"
-                    type="number"
-                    value={recipe.servings}
-                    onChange={handleInputChange}
-                    min="1"
-                    required
-                />
-            </div>
-
-            <IngredientHandler 
-                ingredients={ingredients} 
-                setIngredients={setIngredients} 
-            />
-
-            <SubRecipeHandler 
-                subRecipes={subRecipes}
-                setSubRecipes={setSubRecipes}
-            />
-
-            <TagHandler 
-                selectedTags={selectedTags} 
-                setSelectedTags={setSelectedTags}
-                newTags={newTags}
-                setNewTags={setNewTags}
-            />
-
-            <div>
-                <Label htmlFor="instructions">Instructions</Label>
-                <Textarea
-                    id="instructions"
-                    name="instructions"
-                    value={recipe.instructions}
-                    onChange={handleInputChange}
-                    placeholder="Ajouter les instructions pour réaliser la recette"
-                    required
-                />
-            </div>
-
-            <div>
-                <Label htmlFor="prepTime">Temps de préparation (minutes)</Label>
-                <div className="flex items-center">
-                    <Clock className="mr-2" aria-hidden="true" />
-                    <Input
-                        id="prepTime"
-                        name="prepTime"
-                        type="number"
-                        value={recipe.prep_time}
-                        onChange={handleInputChange}
-                        min="0"
-                        required
-                    />
-                </div>
-            </div>
-
-            <div>
-                <Label htmlFor="cookTime">Temps de cuisson (minutes)</Label>
-                <div className="flex items-center">
-                    <Flame className="mr-2" aria-hidden="true" />
-                    <Input
-                        id="cookTime"
-                        name="cookTime"
-                        type="number"
-                        value={recipe.cook_time}
-                        onChange={handleInputChange}
-                        min="0"
-                        required
-                    />
-                </div>
-            </div>
-
-            <Button type="submit" disabled={loading}>Ajouter la recette</Button>
-            {error && <p className="text-red-500">{error}</p>}
-        </form>
+        <RecipeForm
+            recipe={recipe}
+            setRecipe={setRecipe}
+            ingredients={ingredients}
+            setIngredients={setIngredients}
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+            newTags={newTags}
+            setNewTags={setNewTags}
+            subRecipes={subRecipes}
+            setSubRecipes={setSubRecipes}
+            prepTime={recipe.prep_time ?? 0}
+            setPrepTime={(value) => handleTimeChange('prep_time', value)}
+            cookTime={recipe.cook_time ?? 0}
+            setCookTime={(value) => handleTimeChange('cook_time', value)}
+            onSubmit={handleSubmit}
+            loading={loading}
+            error={error ?? undefined}
+        />
     );
 }
 
