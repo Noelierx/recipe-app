@@ -17,6 +17,7 @@ import { RecipeIngredient } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 import { Clock, Flame } from 'lucide-react';
+import { formatAmount } from '@/utils/formatters';
 
 const RecipeDetails: React.FC = () => {
     const navigate = useNavigate();
@@ -41,10 +42,6 @@ const RecipeDetails: React.FC = () => {
             ...ing,
             amount: (ing.amount / originalServings) * newServings
         })) || [];
-    };
-
-    const formatAmount = (amount: number) => {
-        return amount % 1 === 0 ? amount.toString() : amount.toFixed(2);
     };
 
     const adjustedMainIngredients = adjustIngredients(recipe.recipe_ingredients, recipe.servings, servings);
