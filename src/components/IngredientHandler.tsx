@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CirclePlus, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,7 +109,9 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
               onChange={(e) => updateIngredient(index, 'name', e.target.value)}
               className="flex-grow"
             />
-            <Button type="button" onClick={() => removeIngredient(index)} variant="destructive" size="sm">Retirer l'ingrédient</Button>
+            <Button type="button" onClick={() => removeIngredient(index)} variant="destructive" size="sm">
+              <Trash2 className="mr-2" /> Retirer l'ingrédient
+            </Button>
           </div>
         ))
       ) : (
@@ -134,7 +137,9 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
           onChange={handleIngredientChange}
           placeholder="Unité"
         />
-        <Button type="button" onClick={addIngredient}>Ajouter l'ingrédient</Button>
+        <Button type="button" onClick={addIngredient}>
+          <CirclePlus className="mr-2"/> Ajouter l'ingrédient
+        </Button>
       </div>
     </div>
   );

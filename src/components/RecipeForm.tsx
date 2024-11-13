@@ -109,10 +109,9 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
                         id="prepTime"
                         name="prepTime"
                         type="number"
-                        value={prepTime}
-                        onChange={(e) => setPrepTime(Number(e.target.value))}
-                        min="0"
-                        required
+                        value={prepTime || ''}
+                        onChange={(e) => setPrepTime(e.target.value ? Number(e.target.value) : 0)}
+                        min=""
                     />
                 </div>
             </div>
@@ -125,10 +124,9 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
                         id="cookTime"
                         name="cookTime"
                         type="number"
-                        value={cookTime}
-                        onChange={(e) => setCookTime(Number(e.target.value))}
-                        min="0"
-                        required
+                        value={cookTime || ''}
+                        onChange={(e) => setCookTime(e.target.value ? Number(e.target.value) : 0)}
+                        min=""
                     />
                 </div>
             </div>
