@@ -10,8 +10,7 @@ import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Clock, Flame } from 'lucide-react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import RecipeInstructionsEditor from './RecipeInstructionsEditor';
 
 const EditRecipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -128,9 +127,8 @@ const EditRecipe: React.FC = () => {
 
             <div>
                 <Label htmlFor="instructions">Instructions</Label>
-                <ReactQuill
-                    id="instructions"
-                    value={recipe.instructions}
+                <RecipeInstructionsEditor
+                    value={recipe.instructions || ''}
                     onChange={(value) => setRecipe(prev => ({ ...prev, instructions: value }))}
                     placeholder="Ajouter les instructions pour réaliser la recette"
                 />

@@ -5,8 +5,7 @@ import { Label } from "@/components/ui/label";
 import IngredientHandler from './IngredientHandler';
 import { SubRecipe, RecipeIngredient } from '@/types/types';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Importer le style de Quill
+import RecipeInstructionsEditor from './RecipeInstructionsEditor';
 
 interface SubRecipeHandlerProps {
   subRecipes: SubRecipe[];
@@ -64,8 +63,7 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
             placeholder="titre de la sous-recette"
           />
           <Label htmlFor={`subrecipe-instructions-${index}`}>Instructions</Label>
-          <ReactQuill
-            id={`subrecipe-instructions-${index}`}
+          <RecipeInstructionsEditor
             value={subRecipe.instructions}
             onChange={(value) => handleSubRecipeChange(index, 'instructions', value)}
             placeholder="Instructions de la sous-recette"

@@ -9,8 +9,7 @@ import SubRecipeHandler from 'components/SubRecipeHandler';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/types';
 import { Clock, Flame } from 'lucide-react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import RecipeInstructionsEditor from './RecipeInstructionsEditor';
 
 function AddRecipe() {
     const navigate = useNavigate();
@@ -97,9 +96,8 @@ function AddRecipe() {
 
             <div>
                 <Label htmlFor="instructions">Instructions</Label>
-                <ReactQuill
-                    id="instructions"
-                    value={recipe.instructions}
+                <RecipeInstructionsEditor
+                    value={recipe.instructions || ''}
                     onChange={(value) => setRecipe(prev => ({ ...prev, instructions: value }))}
                     placeholder="Ajouter les instructions pour réaliser la recette"
                 />
