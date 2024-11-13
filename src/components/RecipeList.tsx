@@ -1,22 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-  } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from 'react-router-dom';
 import { RecipeWithDetails, Tag } from '@/types/types';
 import { useGetTags } from '@/hooks/useGetTags';
-import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 import { Clock, Flame } from 'lucide-react';
 import SearchBar from './SearchBar';
 
@@ -32,7 +20,6 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
     const navigate = useNavigate();
     const { getTags, loading, error } = useGetTags();
     const [allTags, setAllTags] = useState<Tag[]>([]);
-    const { deleteRecipe, isDeleting, error: deleteError } = useDeleteRecipe();
 
     useEffect(() => {
         const fetchTags = async () => {
@@ -92,13 +79,6 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                 return newTags;
             }
         });
-    };
-
-    const handleDeleteRecipe = async (recipeId: number) => {
-        const success = await deleteRecipe(recipeId);
-        if (success) {
-            window.location.reload();
-        }
     };
 
     const getButtonVariant = (tag: Tag): "secondary" | "outline" => {
@@ -172,31 +152,10 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                         </CardContent>
                         <CardFooter className="flex justify-between">
                             <Button onClick={() => viewRecipeDetail(recipe)}>Voir la recette</Button>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" disabled={isDeleting}>Supprimer la recette</Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            Cette action ne peut pas être annulée. Cela supprimera définitivement la recette
-                                            et retirera les données de nos serveurs.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleDeleteRecipe(recipe.id)}>
-                                            {isDeleting ? 'Supression...' : 'Supprimer'}
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
                         </CardFooter>
                     </Card>
                 ))}
             </div>
-            {deleteError && <div className="text-red-500 mt-4">Erreur en supprimant la recette: {deleteError}</div>}
         </div>
     );
 };
