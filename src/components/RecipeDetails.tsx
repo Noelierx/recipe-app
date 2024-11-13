@@ -126,7 +126,7 @@ const RecipeDetails: React.FC = () => {
                             <h3 className="text-xl font-semibold mb-2">{subRecipe.title}</h3>
                             <div dangerouslySetInnerHTML={{ 
                                 __html: DOMPurify.sanitize(subRecipe.instructions, {
-                                    ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li'],
+                                    ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li', 'a'],
                                     ALLOWED_ATTR: [] 
                                 }) 
                             }} />
@@ -135,7 +135,7 @@ const RecipeDetails: React.FC = () => {
                     {hasSubRecipes && (<h3 className="text-xl font-semibold mb-2">La suite</h3>)}
                     <div className="mb-6" dangerouslySetInnerHTML={{ 
                         __html: DOMPurify.sanitize(recipe.instructions, { 
-                        ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li'], 
+                        ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li', 'a'], 
                         ALLOWED_ATTR: [] 
                         }) 
                     }} />

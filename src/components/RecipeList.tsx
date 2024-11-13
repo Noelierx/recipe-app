@@ -152,7 +152,7 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                             )}
                             <div className="mb-6" dangerouslySetInnerHTML={{ 
                                 __html: DOMPurify.sanitize(recipe.instructions, { 
-                                ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li'], 
+                                ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li', 'a'], 
                                 ALLOWED_ATTR: [] 
                                 }) 
                             }} />
