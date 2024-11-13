@@ -43,7 +43,7 @@ const EditRecipe: React.FC = () => {
                 ...subRecipe,
                 ingredients: subRecipe.ingredients.map(ingredient => ({
                     ...ingredient,
-                    id: (ingredient as any).id || ''
+                    id: String(ingredient.ingredient.id || '')
                 }))
             }));
             const success = await handleRecipe({
