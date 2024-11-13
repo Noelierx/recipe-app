@@ -31,10 +31,7 @@ function AddRecipe() {
         if (recipe.title && (ingredients.length > 0 || subRecipes.length > 0) && recipe.instructions) {
             const subRecipesAny = subRecipes as any[];
             const result = await handleRecipe(
-                {
-                    ...recipe,
-                    instructions: recipe.instructions,
-                },
+                recipe,
                 ingredients,
                 subRecipesAny,
                 selectedTags,
