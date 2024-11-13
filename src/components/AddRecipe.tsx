@@ -46,11 +46,17 @@ function AddRecipe() {
     };
 
     const handleTimeChange = (key: 'prep_time' | 'cook_time', value: number | ((prevState: number) => number)) => {
+        const newValue = typeof value === 'function' 
+            ? (value as (prevState: number) => number)(recipe[key] ?? 0)
+            : value >= 0 
+                ? value 
+                : 0;
+
         setRecipe(prev => ({
-          ...prev,
-          [key]: typeof value === 'function' ? (value as (prevState: number) => number)(prev[key] ?? 0) : value >= 0 ? value : 0
+            ...prev,
+            [key]: newValue
         }));
-      };
+    };
 
     return (
         <RecipeForm
