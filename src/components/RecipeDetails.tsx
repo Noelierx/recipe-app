@@ -2,8 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from "@/components/ui/alert-dialog"
 import { RecipeIngredient } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
+import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 import { Clock, Flame } from 'lucide-react';
 
 const RecipeDetails: React.FC = () => {
@@ -12,6 +24,7 @@ const RecipeDetails: React.FC = () => {
     const recipeId = id ? parseInt(id, 10) : 0;
     const { recipe, loading, error } = useRecipeDetails(recipeId);
     const [servings, setServings] = useState<number>(recipe?.servings || 0);
+    const { deleteRecipe, isDeleting, error: deleteError } = useDeleteRecipe();
 
     useEffect(() => {
         if (recipe) {
@@ -30,6 +43,10 @@ const RecipeDetails: React.FC = () => {
         })) || [];
     };
 
+    const formatAmount = (amount: number) => {
+        return amount % 1 === 0 ? amount.toString() : amount.toFixed(2);
+    };
+
     const adjustedMainIngredients = adjustIngredients(recipe.recipe_ingredients, recipe.servings, servings);
 
     const adjustedSubRecipes = recipe.sub_recipes?.map(subRecipe => ({
@@ -38,6 +55,13 @@ const RecipeDetails: React.FC = () => {
     })) || [];
 
     const hasSubRecipes = recipe.sub_recipes?.length > 0;
+
+    const handleDeleteRecipe = async () => {
+        const success = await deleteRecipe(recipeId);
+        if (success) {
+            navigate('/');
+        }
+    };
 
     return (
         <div className="max-w-7xl mx-auto px-4">
@@ -74,7 +98,7 @@ const RecipeDetails: React.FC = () => {
                     <ul className="list-disc pl-5 mb-6">
                         {adjustedMainIngredients.map((ing, index) => (
                             <li key={index}>
-                                {ing.ingredient.name}: {ing.amount.toFixed(2)} {ing.unit}
+                                {ing.ingredient.name}: {formatAmount(ing.amount)} {ing.unit}
                             </li>
                         ))}
                     </ul>
@@ -87,7 +111,7 @@ const RecipeDetails: React.FC = () => {
                                     <ul className="list-disc pl-5">
                                         {subRecipe.ingredients.map((ing, ingIndex) => (
                                             <li key={ingIndex}>
-                                                {ing.ingredient.name}: {ing.amount.toFixed(2)} {ing.unit}
+                                                {ing.ingredient.name}: {formatAmount(ing.amount)} {ing.unit}
                                             </li>
                                         ))}
                                     </ul>
@@ -106,9 +130,32 @@ const RecipeDetails: React.FC = () => {
                     ))}
                     {hasSubRecipes && (<h3 className="text-xl font-semibold mb-2">La suite</h3>)}
                     <p className="mb-6">{recipe.instructions}</p>
-                    <Button onClick={() => navigate(`/recipe/${recipe.id}/edit`)}>Modifier la recette</Button>
+                    <div className="flex space-x-4">
+                        <Button onClick={() => navigate(`/recipe/${recipe.id}/edit`)}>Modifier la recette</Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" disabled={isDeleting}>Supprimer la recette</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Cette action ne peut pas être annulée. Cela supprimera définitivement la recette
+                                        et retirera les données de nos serveurs.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDeleteRecipe()}>
+                                        {isDeleting ? 'Suppression...' : 'Supprimer'}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
                 </div>
             </div>
+            {deleteError && <div className="text-red-500 mt-4">Erreur en supprimant la recette: {deleteError}</div>}
         </div>
     );
 };

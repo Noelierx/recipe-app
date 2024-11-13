@@ -39,7 +39,6 @@ export const useRecipeDetails = (recipeId: number) => {
   return { recipe, loading, error };
 };
 
-// New helper functions
 const fetchRecipeData = async (recipeId: number) => {
   const { data: recipeData, error: recipeError } = await supabase
     .from('recipes')
