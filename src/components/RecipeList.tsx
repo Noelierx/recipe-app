@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { Clock, Flame } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import SearchBar from 'components/SearchBar';
-import { useNavigate } from 'react-router-dom';
 import { RecipeWithDetails, Tag } from '@/types/types';
 import { useGetTags } from '@/hooks/useGetTags';
 
@@ -138,18 +138,18 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            {recipe.prep_time && (
-                                <div className="flex items-center mb-2">
-                                    <Clock className="mr-2" aria-hidden="true" />
-                                    <span>{recipe.prep_time} min préparation</span>
-                                </div>
-                            )}
-                            {recipe.cook_time && (
-                                <div className="flex items-center mb-2">
-                                    <Flame className="mr-2" aria-hidden="true" />
-                                    <span>{recipe.cook_time} min cuisson</span>
-                                </div>
-                            )}
+                        {recipe.prep_time ? (
+                            <div className="flex items-center mb-4">
+                                <Clock className="mr-2" aria-hidden="true" />
+                                <span>Temps de préparation: {recipe.prep_time} minutes</span>
+                            </div>
+                        ) : null}
+                        {recipe.cook_time ? (
+                            <div className="flex items-center mb-4">
+                                <Flame className="mr-2" aria-hidden="true" />
+                                <span>Temps de cuisson: {recipe.cook_time} minutes</span>
+                            </div>
+                        ) : null}
                             <div className="mb-6" dangerouslySetInnerHTML={{ 
                                 __html: DOMPurify.sanitize(recipe.instructions, { 
                                 ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li', 'a'], 

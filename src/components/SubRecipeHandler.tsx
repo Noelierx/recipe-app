@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
+import { CirclePlus, Trash2 } from 'lucide-react';
+import IngredientHandler from 'components/IngredientHandler';
+import RecipeInstructionsEditor from 'components/RecipeInstructionsEditor';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import IngredientHandler from 'components/IngredientHandler';
-import RecipeInstructionsEditor from 'components/RecipeInstructionsEditor';
 import { SubRecipe, RecipeIngredient } from '@/types/types';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 
@@ -79,11 +80,13 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
             variant="destructive"
             disabled={isDeleting}
           >
-            Retirer la sous-recette
+            <Trash2 className="mr-2" /> Retirer la sous-recette
           </Button>
         </div>
       ))}
-      <Button onClick={addSubRecipe}>Ajouter une sous-recette</Button>
+      <Button onClick={addSubRecipe}>
+        <CirclePlus className="mr-2" /> Ajouter une sous-recette
+      </Button>
     </div>
   );
 };

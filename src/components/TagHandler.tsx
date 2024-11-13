@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CirclePlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tag } from '@/types/types';
@@ -82,7 +83,9 @@ const TagHandler: React.FC<TagHandlerProps> = ({ selectedTags, setSelectedTags, 
           onChange={(e) => setNewTag(e.target.value)}
           placeholder="Nouveau tag"
         />
-        <Button type="button" onClick={handleNewTagAdd}>Ajouter un tag</Button>
+        <Button type="button" onClick={handleNewTagAdd}>
+          <CirclePlus className="mr-2" /> Ajouter un tag
+        </Button>
       </div>
     </div>
   );
