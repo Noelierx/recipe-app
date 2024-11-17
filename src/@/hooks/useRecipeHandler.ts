@@ -51,9 +51,38 @@ const createTagIfNotExists = async (tagName: string) => {
 };
 
 const updateTagInDatabase = async (tagId: string, newTagName: string) => {
+  if (!tagId?.trim() || !newTagName?.trim()) {
+    throw new Error('Tag ID and new name are required');
+  }
+
+  const { data: existingTag, error: fetchError } = await supabase
+    .from('tags')
+    .select()
+    .eq('id', tagId)
+    .single();
+
+  if (fetchError || !existingTag) {
+    throw new Error(`Tag with ID ${tagId} not found`);
+  }
+
+  const { data: duplicateTag, error: duplicateError } = await supabase
+    .from('tags')
+    .select()
+    .eq('name', newTagName.trim())
+    .neq('id', tagId)
+    .maybeSingle();
+
+  if (duplicateError) {
+    throw new Error(`Error checking for duplicate tag: ${duplicateError.message}`);
+  }
+
+  if (duplicateTag) {
+    throw new Error(`Tag with name "${newTagName}" already exists`);
+  }
+
   const { error } = await supabase
     .from('tags')
-    .update({ name: newTagName })
+    .update({ name: newTagName.trim() })
     .eq('id', tagId);
 
   if (error) throw new Error(`Error updating tag: ${error.message}`);

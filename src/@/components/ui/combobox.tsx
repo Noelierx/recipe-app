@@ -25,11 +25,11 @@ type Option = {
 }
 
 interface ComboboxProps {
-  items: Option[]
-  onSelect: (value: string) => void
-  placeholder: string
-  renderItem: (item: Option) => React.ReactNode
-  className?: string
+  readonly items: Option[]
+  readonly onSelect: (value: string) => void
+  readonly placeholder: string
+  readonly renderItem: (item: Option) => React.ReactNode
+  readonly className?: string
 }
 
 export function Combobox({ items, onSelect, placeholder, renderItem, className }: ComboboxProps) {
@@ -51,7 +51,7 @@ export function Combobox({ items, onSelect, placeholder, renderItem, className }
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={`p-0`} style={{ minWidth: 'auto', width: 'auto' }}>
+      <PopoverContent className={cn("p-0 w-auto min-w-[var(--radix-popover-trigger-width)]")}>
         <Command>
           <CommandInput placeholder={`Search ${placeholder}...`} className="h-9" />
           <CommandList>

@@ -90,7 +90,13 @@ const TagHandler: React.FC<TagHandlerProps> = ({ selectedTags, setSelectedTags, 
             <div className="flex items-center justify-between">
               <span className="flex-1">{item.label}</span>
               <div className="flex items-center gap-1">
-                <Button onClick={() => startEditingTag(allTags.find(tag => tag.name === item.label) as Tag)} className="ml-2">Modifier</Button>
+                <Button 
+                  onClick={() => startEditingTag(allTags.find(tag => tag.name === item.label) as Tag)}
+                  aria-label={`Modifier tag ${item.label}`}
+                  className="ml-2"
+                >
+                  Modifier
+                </Button>
               </div>
             </div>
           )}
