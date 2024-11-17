@@ -100,8 +100,12 @@ const TagHandler: React.FC<TagHandlerProps> = ({ selectedTags, setSelectedTags, 
           {selectedTags.map(tag => (
               <div key={tag.name} className="flex items-center bg-blue-500 text-white rounded-full px-3 py-1">
                   <span>{tag.name}</span>
-                  <button onClick={() => handleRemoveTag(tag)} className="ml-2 text-white">
-                      X
+                  <button 
+                    onClick={() => handleRemoveTag(tag)} 
+                    className="ml-2 text-white p-1 hover:bg-blue-600 rounded-full"
+                    aria-label={`Remove tag ${tag.name}`}
+                    title="Remove tag">
+                    <span aria-hidden="true">×</span>
                   </button>
               </div>
           ))}
