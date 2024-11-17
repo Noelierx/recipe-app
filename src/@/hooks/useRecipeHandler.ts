@@ -50,6 +50,15 @@ const createTagIfNotExists = async (tagName: string) => {
   return data;
 };
 
+const updateTagInDatabase = async (tagId: string, newTagName: string) => {
+  const { error } = await supabase
+    .from('tags')
+    .update({ name: newTagName })
+    .eq('id', tagId);
+
+  if (error) throw new Error(`Error updating tag: ${error.message}`);
+};
+
 export const useRecipeHandler = (recipeId?: number) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -238,9 +247,13 @@ export const useRecipeHandler = (recipeId?: number) => {
       .insert(allTagObjects.map(tag => ({ recipe_id: recipeId, tag_id: tag.id })));
   };
 
+  const updateTag = async (tagId: string, newTagName: string) => {
+    await updateTagInDatabase(tagId, newTagName);
+  };
+
   const updateSubRecipes = (newSubRecipes: SubRecipe[]) => {
     setSubRecipes(newSubRecipes);
   };
 
-  return { handleRecipe, loading, error, subRecipes, updateSubRecipes };
+  return { handleRecipe, loading, error, subRecipes, updateSubRecipes, updateTag };
 };
