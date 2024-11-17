@@ -51,7 +51,7 @@ export function Combobox({ items, onSelect, placeholder, renderItem, className }
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={`p-0`} style={{ minWidth: 'auto', width: 'auto' }}>
+      <PopoverContent className={cn("p-0 w-auto min-w-[var(--radix-popover-trigger-width)]")}>
         <Command>
           <CommandInput placeholder={`Search ${placeholder}...`} className="h-9" />
           <CommandList>
