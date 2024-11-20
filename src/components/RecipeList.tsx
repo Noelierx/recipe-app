@@ -37,7 +37,7 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
             return selectedTags.every(selectedTag => 
                 recipe.tags.some(recipeTag => 
                     (recipeTag.id && selectedTag.id && recipeTag.id === selectedTag.id) || 
-                    (!recipeTag.id && !selectedTag.id && recipeTag.name === selectedTag.name)
+                    (recipeTag.name === selectedTag.name)
                 )
             );
         };
@@ -46,10 +46,9 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
             const searchLower = searchQuery.toLowerCase();
             const titleLower = recipe.title.toLowerCase();
             if (titleLower.includes(searchLower)) return true;
-            return recipe.title.toLowerCase().includes(searchLower) ||
-                   recipe.recipe_ingredients.some(recipeIngredient => 
-                       recipeIngredient.ingredient.name.toLowerCase().includes(searchLower)
-                   );
+            return recipe.recipe_ingredients.some(recipeIngredient => 
+                recipeIngredient.ingredient.name.toLowerCase().includes(searchLower)
+            );
         };
 
         const filtered = recipes.filter(recipe => matchesTags(recipe) && matchesSearch(recipe));

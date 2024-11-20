@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { CirclePlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Combobox } from "@/components/ui/combobox";
 import { Tag } from '@/types/types';
 import { useGetTags } from '@/hooks/useGetTags';
+import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 
 interface TagHandlerProps {
   selectedTags: Tag[];
@@ -15,7 +17,9 @@ interface TagHandlerProps {
 const TagHandler: React.FC<TagHandlerProps> = ({ selectedTags, setSelectedTags, newTags, setNewTags }) => {
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [newTag, setNewTag] = useState('');
+  const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const { getTags } = useGetTags();
+  const { updateTag } = useRecipeHandler();
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -24,14 +28,6 @@ const TagHandler: React.FC<TagHandlerProps> = ({ selectedTags, setSelectedTags, 
     };
     fetchTags();
   }, [getTags]);
-
-  const handleTagSelect = (tag: Tag) => {
-    setSelectedTags(prev => 
-      prev.some(t => t.id === tag.id)
-        ? prev.filter(t => t.id !== tag.id)
-        : [...prev, tag]
-    );
-  };
 
   const handleNewTagAdd = () => {
     if (newTag && !newTags?.includes(newTag) && !selectedTags.some(t => t.name.toLowerCase() === newTag.toLowerCase())) {
@@ -44,48 +40,81 @@ const TagHandler: React.FC<TagHandlerProps> = ({ selectedTags, setSelectedTags, 
     }
   };
 
-  const removeNewTag = (tagToRemove: string) => {
-    if (setNewTags) {
-      setNewTags(prev => prev.filter(tag => tag !== tagToRemove));
-    } else {
-      setSelectedTags(prev => prev.filter(tag => tag.name !== tagToRemove));
+  const handleUpdateTag = async () => {
+    if (editingTag && newTag) {
+      await updateTag(editingTag.id!.toString(), newTag);
+      setAllTags(prev => prev.map(tag => (tag.id === editingTag.id ? { ...tag, name: newTag } : tag)));
+      setEditingTag(null);
+      setNewTag('');
     }
+  };
+
+  const startEditingTag = (tag: Tag) => {
+    setEditingTag(tag);
+    setNewTag(tag.name);
+  };
+
+  const handleRemoveTag = (tagToRemove: Tag) => {
+    setSelectedTags(prev => {
+      const updatedTags = prev.filter(tag => tag.name !== tagToRemove.name);
+      return updatedTags;
+    });
   };
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-2">
-        {allTags.map(tag => (
-          <Button
-            key={tag.id}
-            type="button"
-            onClick={() => handleTagSelect(tag)}
-            variant={selectedTags.some(t => t.id === tag.id) ? "secondary" : "outline"}
-          >
-            {tag.name}
-          </Button>
-        ))}
-        {newTags?.map((tag, index) => (
-          <Button
-            key={`new-${index}`}
-            type="button"
-            onClick={() => removeNewTag(tag)}
-            variant="secondary"
-          >
-            {tag} (New)
-          </Button>
-        ))}
-      </div>
-      <div className="flex gap-2">
+      <h2 className="text-lg font-bold mb-2">Ajouter un nouveau tag</h2>
+      <div className="flex gap-2 mb-4">
         <Input
           type="text"
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
-          placeholder="Nouveau tag"
+          placeholder={editingTag ? "Modifier le tag" : "Ajouter un nouveau tag"}
         />
-        <Button type="button" onClick={handleNewTagAdd}>
-          <CirclePlus className="mr-2" /> Ajouter un tag
+        <Button type="button" onClick={editingTag ? handleUpdateTag : handleNewTagAdd}>
+          <CirclePlus className="mr-2" /> {editingTag ? "Modifier le tag" : "Ajouter un tag"}
         </Button>
+      </div>
+
+      <h2 className="text-lg font-bold mb-2">Liste des tags</h2>
+      <Combobox
+          items={allTags.map(tag => ({ label: tag.name, value: tag.name }))}
+          onSelect={(value: string) => {
+            const selectedTag = allTags.find(tag => tag.name === value);
+            if (selectedTag && !selectedTags.includes(selectedTag)) {
+              setSelectedTags([...selectedTags, selectedTag]);
+            }
+          }}
+          placeholder="Rechercher des tags..."
+          renderItem={(item: { label: string; value: string }) => (
+            <div className="flex items-center justify-between">
+              <span className="flex-1">{item.label}</span>
+              <div className="flex items-center gap-1">
+                <Button 
+                  onClick={() => startEditingTag(allTags.find(tag => tag.name === item.label) as Tag)}
+                  aria-label={`Modifier tag ${item.label}`}
+                  className="ml-2"
+                >
+                  Modifier
+                </Button>
+              </div>
+            </div>
+          )}
+      />
+
+    <div className="mt-2 flex flex-wrap gap-2">
+          {selectedTags.map(tag => (
+              <div key={tag.name} className="flex items-center bg-blue-500 text-white rounded-full px-3 py-1">
+                  <span>{tag.name}</span>
+                  <button 
+                    onClick={() => handleRemoveTag(tag)} 
+                    className="ml-2 text-white p-1 hover:bg-blue-600 rounded-full"
+                    aria-label={`Remove tag ${tag.name}`}
+                    title="Remove tag">
+                    <span aria-hidden="true">×</span>
+                  </button>
+              </div>
+          ))}
       </div>
     </div>
   );
