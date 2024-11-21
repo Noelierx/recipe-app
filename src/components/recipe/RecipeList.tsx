@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import SearchBar from 'components/SearchBar';
-import { Loading, Error } from 'components/layout';
+import { Loading, ErrorMessage } from 'components/layout';
 import { RecipeWithDetails, Tag } from '@/types/types';
 import { useGetTags } from '@/hooks/useGetTags';
 
@@ -95,7 +95,7 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
             return <Loading />;
         }
         if (error) {
-            return <Error message={`Erreur lors du chargement des tags : ${error}`} />
+            return <ErrorMessage message={`Erreur lors du chargement des tags : ${error}`} />
         }
         if (allTags.length === 0) {
             return <div className="text-muted">Aucun tag disponible</div>;

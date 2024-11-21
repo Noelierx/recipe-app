@@ -4,7 +4,7 @@ import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 import RecipeForm from './RecipeForm';
-import { Loading, Error } from 'components/layout';
+import { Loading, ErrorMessage } from 'components/layout';
 
 const EditRecipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -61,7 +61,7 @@ const EditRecipe: React.FC = () => {
     };
 
     if (loadingRecipe) return <Loading />;
-    if (loadError) return <Error message={`Erreur lors du chargement de la recette : ${loadError}`} />;
+    if (loadError) return <ErrorMessage message={`Erreur lors du chargement de la recette : ${loadError}`} />;
     if (!recipe) return <div>Recette non trouvée</div>;
 
     return (
