@@ -5,7 +5,7 @@ interface ErrorProps {
   message: string;
 }
 
-const Error: React.FC<ErrorProps> = ({ message }) => {
+const ErrorMessage: React.FC<ErrorProps> = ({ message }) => {
   return (
       <Alert variant="destructive">
       <AlertDescription>
@@ -15,4 +15,4 @@ const Error: React.FC<ErrorProps> = ({ message }) => {
   );
 };
 
-export default Error;
+export default ErrorMessage;
