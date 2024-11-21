@@ -1,11 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import RecipeList from './components/RecipeList';
-import RecipeDetails from './components/RecipeDetails';
-import AddRecipe from './components/AddRecipe';
-import EditRecipe from './components/EditRecipe';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import { RecipeList, RecipeDetails, AddRecipe, EditRecipe } from './components/recipe';
+import { Header, Footer, Loading, ErrorMessage } from './components/layout';
 import { useRecipes } from '@/hooks/useRecipes';
 import { ROUTES } from '@/types/routes';
 
@@ -15,9 +11,9 @@ const App: React.FC = () => {
   let content;
 
   if (loading) {
-    content = <div>Loading...</div>;
+    content = <Loading />;
   } else if (error) {
-    content = <div>Error: {error}</div>;
+    content = <ErrorMessage message={error} />;
   } else {
     content = (
       <Routes>

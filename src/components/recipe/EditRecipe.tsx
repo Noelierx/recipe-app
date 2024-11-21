@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
-import RecipeForm from 'components/RecipeForm';
+import RecipeForm from './RecipeForm';
+import { Loading, ErrorMessage } from 'components/layout';
 
 const EditRecipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -59,8 +60,8 @@ const EditRecipe: React.FC = () => {
         }
     };
 
-    if (loadingRecipe) return <div>Chargement des détails de la recette...</div>;
-    if (loadError) return <div>Erreur lors du chargement de la recette : {loadError}</div>;
+    if (loadingRecipe) return <Loading />;
+    if (loadError) return <ErrorMessage message={`Erreur lors du chargement de la recette : ${loadError}`} />;
     if (!recipe) return <div>Recette non trouvée</div>;
 
     return (

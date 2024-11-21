@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { CirclePlus, Trash2 } from 'lucide-react';
-import IngredientHandler from 'components/IngredientHandler';
-import RecipeInstructionsEditor from 'components/RecipeInstructionsEditor';
+import { IngredientHandler } from 'components/handlers';
+import { RecipeInstructionsEditor } from 'components/recipe';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

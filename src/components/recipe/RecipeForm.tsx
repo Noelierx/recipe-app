@@ -3,10 +3,8 @@ import { Clock, Flame } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import IngredientHandler from 'components/IngredientHandler';
-import RecipeInstructionsEditor from 'components/RecipeInstructionsEditor';
-import SubRecipeHandler from 'components/SubRecipeHandler';
-import TagHandler from 'components/TagHandler';
+import { IngredientHandler, SubRecipeHandler, TagHandler } from 'components/handlers';
+import RecipeInstructionsEditor from './RecipeInstructionsEditor';
 import TimeInput from 'components/TimeInput';
 import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
 

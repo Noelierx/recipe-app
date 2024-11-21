@@ -19,6 +19,7 @@ import { RecipeIngredient } from '@/types/types';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 import { formatAmount } from '@/utils/formatters';
+import { Loading, ErrorMessage } from 'components/layout';
 
 const RecipeDetails: React.FC = () => {
     const navigate = useNavigate();
@@ -34,8 +35,8 @@ const RecipeDetails: React.FC = () => {
         }
     }, [recipe]);
 
-    if (loading) return <div>Chargement des détails de la recette...</div>;
-    if (error) return <div>Erreur lors du chargement de la recette : {error}</div>;
+    if (loading) return <Loading />;
+    if (error) return <ErrorMessage message={`Erreur lors du chargement de la recette : ${error}`} />;
     if (!recipe) return <div>Recette non trouvée</div>;
 
     const adjustIngredients = (ingredients: RecipeIngredient[] | undefined, originalServings: number, newServings: number) => {
