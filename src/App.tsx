@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import RecipeList from './components/recipe/RecipeList';
 import { RecipeDetails, AddRecipe, EditRecipe } from './components/recipe';
-import { Header, Footer } from './components/layout';
+import { Header, Footer, Loading, Error } from './components/layout';
 import { useRecipes } from '@/hooks/useRecipes';
 import { ROUTES } from '@/types/routes';
 
@@ -12,9 +12,9 @@ const App: React.FC = () => {
   let content;
 
   if (loading) {
-    content = <div>Loading...</div>;
+    content = <Loading />;
   } else if (error) {
-    content = <div>Error: {error}</div>;
+    content = <Error message={error} />;
   } else {
     content = (
       <Routes>
