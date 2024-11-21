@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
-import RecipeForm from 'components/RecipeForm';
+import RecipeForm from './RecipeForm';
 
 const EditRecipe: React.FC = () => {
     const { id } = useParams<{ id: string }>();

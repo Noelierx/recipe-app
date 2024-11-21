@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/types';
-import RecipeForm from 'components/RecipeForm';
+import RecipeForm from './RecipeForm';
 
 interface RecipeFormState extends Partial<Recipe> {
   prep_time?: number;
