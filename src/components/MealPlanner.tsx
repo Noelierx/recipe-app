@@ -31,6 +31,13 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
         localStorage.setItem('weeklyMealPlan', JSON.stringify(weeklyPlan));
     }, [weeklyPlan]);
 
+    const handleRecipeSelect = (value: string, day: keyof WeeklyPlan, mealType: keyof DayPlan) => {
+        const recipe = recipes.find(r => r.id === parseInt(value));
+        if (recipe) {
+            handleMealAssignment(day, mealType, recipe);
+        }
+    };
+
     const handleMealAssignment = (day: keyof WeeklyPlan, mealType: keyof DayPlan, recipe: RecipeWithDetails) => {
         setWeeklyPlan(prev => ({
             ...prev,
@@ -95,14 +102,7 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                                                 <DialogHeader>
                                                     <DialogTitle>Sélectionner une recette pour {day} {mealType}</DialogTitle>
                                                 </DialogHeader>
-                                                <Select 
-                                                    onValueChange={(value) => {
-                                                        const recipe = recipes.find(r => r.id === parseInt(value));
-                                                        if (recipe) {
-                                                            handleMealAssignment(day, mealType, recipe);
-                                                        }
-                                                    }}
-                                                >
+                                                <Select onValueChange={(value) => handleRecipeSelect(value, day, mealType)}>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Choisir une recette" />
                                                     </SelectTrigger>
