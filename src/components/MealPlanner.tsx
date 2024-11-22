@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox"
 import { RecipeWithDetails } from '@/types/RecipeTypes';
 import { DAYS_OF_WEEK, MEAL_TYPES, WeeklyPlan, DayPlan } from '@/types/mealPlannerTypes';
 
@@ -92,30 +91,21 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                                             </Button>
                                         </div>
                                     ) : (
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant="outline" size="sm">
-                                                    Ajouter une recette
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                    <DialogTitle>Sélectionner une recette pour {day} {mealType}</DialogTitle>
-                                                </DialogHeader>
-                                                <Select onValueChange={(value) => handleRecipeSelect(value, day, mealType)}>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Choisir une recette" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {recipes.map(recipe => (
-                                                            <SelectItem key={recipe.id} value={recipe.id.toString()}>
-                                                                {recipe.title}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </DialogContent>
-                                        </Dialog>
+                                        <Combobox
+                                            items={recipes.map(recipe => ({ 
+                                                label: recipe.title, 
+                                                value: recipe.id.toString() 
+                                            }))}
+                                            onSelect={(value: string) => {
+                                                handleRecipeSelect(value, day, mealType);
+                                            }}
+                                            placeholder="Ajouter recette"
+                                            renderItem={(item: { label: string; value: string }) => (
+                                                <div className="flex items-center justify-between">
+                                                    <span className="flex-1">{item.label}</span>
+                                                </div>
+                                            )}
+                                        />
                                     )}
                                 </div>
                             ))}
