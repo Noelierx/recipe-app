@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import sanitizeHtml from 'sanitize-html';
 import { supabase } from '@/utils/supabaseClient';
-import { Recipe, RecipeIngredient, Tag } from '@/types/types';
+import { Recipe, RecipeIngredient, Tag } from '@/types/RecipeTypes';
 
 type SubRecipeIngredient = RecipeIngredient & { id: string };
 type SubRecipe = { id?: number; title: string; instructions: string; ingredients: SubRecipeIngredient[] };

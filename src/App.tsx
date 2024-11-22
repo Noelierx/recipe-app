@@ -4,6 +4,7 @@ import { RecipeList, RecipeDetails, AddRecipe, EditRecipe } from './components/r
 import { Header, Footer, Loading, ErrorMessage } from './components/layout';
 import { useRecipes } from '@/hooks/useRecipes';
 import { ROUTES } from '@/types/routes';
+import MealPlanner from 'components/MealPlanner';
 
 const App: React.FC = () => {
   const { recipes, loading, error } = useRecipes();
@@ -21,6 +22,7 @@ const App: React.FC = () => {
         <Route path={ROUTES.RECIPE_DETAILS({ id: ':id' })} element={<RecipeDetails />} />
         <Route path={ROUTES.ADD_RECIPE} element={<AddRecipe />} />
         <Route path={ROUTES.EDIT_RECIPE({ id: ':id' })} element={<EditRecipe />} />
+        <Route path={ROUTES.MEAL_PLANNER} element={<MealPlanner recipes={recipes || []} />} />
       </Routes>
     );
   }

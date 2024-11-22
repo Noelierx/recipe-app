@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
-import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/types';
+import { Recipe, RecipeIngredient, SubRecipe, Tag } from '@/types/RecipeTypes';
 import RecipeForm from './RecipeForm';
 import { Loading, ErrorMessage } from 'components/layout';
 

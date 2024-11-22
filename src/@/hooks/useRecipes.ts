@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/utils/supabaseClient';
-import { RecipeWithDetails } from '@/types/types';
+import { RecipeWithDetails } from '@/types/RecipeTypes';
 
 export const useRecipes = () => {
     const [recipes, setRecipes] = useState<RecipeWithDetails[]>([]);

@@ -5,7 +5,7 @@ import { RecipeInstructionsEditor } from 'components/recipe';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SubRecipe, RecipeIngredient } from '@/types/types';
+import { SubRecipe, RecipeIngredient } from '@/types/RecipeTypes';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 
 interface SubRecipeHandlerProps {
