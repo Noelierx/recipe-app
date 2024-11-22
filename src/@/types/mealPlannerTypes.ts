@@ -5,8 +5,10 @@ export type DayOfWeek = typeof DAYS_OF_WEEK[number];
 export type MealType = typeof MEAL_TYPES[number];
 
 export interface MealSlot {
-    recipeId: string | null;
-    recipeName: string | null;
+    recipe: {
+        id: string;
+        name: string;
+    } | null;
 }
 
 export interface DayPlan {
