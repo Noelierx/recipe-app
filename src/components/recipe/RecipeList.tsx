@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import SearchBar from 'components/SearchBar';
 import { Loading, ErrorMessage } from 'components/layout';
-import { RecipeWithDetails, Tag } from '@/types/types';
+import { RecipeWithDetails, Tag } from '@/types/RecipeTypes';
 import { useGetTags } from '@/hooks/useGetTags';
 
 

@@ -3,7 +3,7 @@ import { CirclePlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Combobox } from "@/components/ui/combobox";
-import { Tag } from '@/types/types';
+import { Tag } from '@/types/RecipeTypes';
 import { useGetTags } from '@/hooks/useGetTags';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
 

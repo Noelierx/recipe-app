@@ -9,12 +9,14 @@ const Header: React.FC = () => {
 
     const isHomePage = location.pathname === ROUTES.HOME;
     const isAddRecipePage = location.pathname === ROUTES.ADD_RECIPE;
+    const isMealPlannerPage = location.pathname === ROUTES.MEAL_PLANNER;
 
     const getTitle = (): string => {
         const routeToTitleMap: { [key: string]: string } = {
           [ROUTES.ADD_RECIPE]: 'Ajouter une recette',
           [ROUTES.RECIPE_DETAILS({ id: ':id' })]: 'Détails de la recette',
           [ROUTES.EDIT_RECIPE({ id: ':id' })]: 'Modifier la recette',
+          [ROUTES.MEAL_PLANNER]: 'Planificateur de repas',
         };
     
         for (const route in routeToTitleMap) {
@@ -45,7 +47,7 @@ const Header: React.FC = () => {
                 <h1 className="text-2xl font-bold">
                     {title}
                 </h1>
-                <div>
+                <div className="flex gap-2">
                     {!isAddRecipePage && (
                         <Button
                             onClick={() => navigate(ROUTES.ADD_RECIPE)}
@@ -53,6 +55,15 @@ const Header: React.FC = () => {
                             className="text-black"
                         >
                             Ajouter une recette
+                        </Button>
+                    )}
+                    {!isMealPlannerPage && (
+                        <Button
+                            onClick={() => navigate(ROUTES.MEAL_PLANNER)}
+                            variant="outline"
+                            className="text-black"
+                        >
+                            Planificateur
                         </Button>
                     )}
                 </div>

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/utils/supabaseClient';
-import { Tag } from '@/types/types';
+import { Tag } from '@/types/RecipeTypes';
 
 export const useGetTags = () => {
   const [loading, setLoading] = useState(false);

@@ -15,7 +15,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
-import { RecipeIngredient } from '@/types/types';
+import { RecipeIngredient } from '@/types/RecipeTypes';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 import { formatAmount } from '@/utils/formatters';

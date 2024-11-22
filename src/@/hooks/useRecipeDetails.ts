@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabaseClient';
-import { RecipeWithDetails } from '@/types/types';
+import { RecipeWithDetails } from '@/types/RecipeTypes';
 
 export const useRecipeDetails = (recipeId: number) => {
   const [recipe, setRecipe] = useState<RecipeWithDetails | null>(null);

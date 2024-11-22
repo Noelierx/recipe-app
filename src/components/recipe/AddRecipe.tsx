@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecipeHandler } from '@/hooks/useRecipeHandler';
-import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/types';
+import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/RecipeTypes';
 import RecipeForm from './RecipeForm';
 
 interface RecipeFormState extends Partial<Recipe> {

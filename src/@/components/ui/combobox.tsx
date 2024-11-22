@@ -53,7 +53,7 @@ export function Combobox({ items, onSelect, placeholder, renderItem, className }
       </PopoverTrigger>
       <PopoverContent className={cn("p-0 w-auto min-w-[var(--radix-popover-trigger-width)]")}>
         <Command>
-          <CommandInput placeholder={`Search ${placeholder}...`} className="h-9" />
+          <CommandInput placeholder={`Rechercher ${placeholder}...`} className="h-9" />
           <CommandList>
             <CommandEmpty>No options found.</CommandEmpty>
             <CommandGroup>
