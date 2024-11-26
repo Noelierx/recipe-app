@@ -46,7 +46,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
                 }
             }
         });
-    }, [recipes, addRecipeIngredients]);
+    }, [addRecipeIngredients]);
 
     const getCurrentIngredients = useCallback((weeklyPlan: WeeklyPlan) => {
         const currentIngredients = new Set<string>();
@@ -54,7 +54,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
             getMealsForDay(dayPlan, currentIngredients);
         });
         return currentIngredients;
-    }, [recipes, addRecipeIngredients, getMealsForDay]);
+    }, [getMealsForDay]);
 
     const updateCheckedItems = useCallback((currentIngredients: Set<string>) => {
         setCheckedItems(prev => {
@@ -71,7 +71,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
     useEffect(() => {
         const currentIngredients = getCurrentIngredients(weeklyPlan);
         updateCheckedItems(currentIngredients);
-    }, [weeklyPlan, recipes, getCurrentIngredients, updateCheckedItems]);
+    }, [weeklyPlan, getCurrentIngredients, updateCheckedItems]);
 
     const addIngredientsToMap = (recipe: RecipeWithDetails, ratio: number, ingredientMap: Record<string, { amount: number; unit: string }>) => {
         const addIngredient = (ing: any) => {
