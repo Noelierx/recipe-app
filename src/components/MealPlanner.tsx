@@ -28,13 +28,13 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
         }), {} as WeeklyPlan);
     });
 
-    const servingsMap = Object.keys(weeklyPlan).reduce((acc, day) => {
+    const servingsMap = Object.entries(weeklyPlan).reduce((acc, [day, meals]) => {
         MEAL_TYPES.forEach(mealType => {
-            const meal = weeklyPlan[day as keyof WeeklyPlan][mealType];
-            if (meal.recipeId && !isNaN(Number(meal.recipeId))) {
-                const recipeIdNumber = Number(meal.recipeId);
+            const meal = meals[mealType];
+            const recipeId = Number(meal.recipeId);
+            if (meal.recipeId && !Number.isNaN(recipeId)) {
                 const validServings = Math.max(1, meal.servings || 1);
-                acc[recipeIdNumber] = (acc[recipeIdNumber] || 0) + validServings;
+                acc[recipeId] = (acc[recipeId] || 0) + validServings;
             }
         });
         return acc;
@@ -112,8 +112,15 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                                             <Input
                                                 type="number"
                                                 value={weeklyPlan[day][mealType].servings}
-                                                onChange={(e) => handleServingsChange(day, mealType, Number(e.target.value))}
+                                                onChange={(e) => {
+                                                    const value = Math.floor(Number(e.target.value));
+                                                    if (value >= 1 && value <= 99) {
+                                                        handleServingsChange(day, mealType, value);
+                                                    }
+                                                }}
                                                 min="1"
+                                                max="99"
+                                                step="1"
                                                 className="w-16"
                                             />
                                             <Button

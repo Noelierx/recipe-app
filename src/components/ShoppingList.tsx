@@ -37,7 +37,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
         });
     }, []);
 
-    const getMealsForDay = (dayPlan: DayPlan, currentIngredients: Set<string>) => {
+    const getMealsForDay = useCallback((dayPlan: DayPlan, currentIngredients: Set<string>) => {
         Object.values(dayPlan).forEach(meal => {
             if (meal.recipeId) {
                 const recipe = recipes.find(r => r.id === meal.recipeId);
@@ -46,7 +46,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
                 }
             }
         });
-    };
+    }, [recipes, addRecipeIngredients]);
 
     const getCurrentIngredients = useCallback((weeklyPlan: WeeklyPlan) => {
         const currentIngredients = new Set<string>();
@@ -54,7 +54,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
             getMealsForDay(dayPlan, currentIngredients);
         });
         return currentIngredients;
-    }, [recipes, addRecipeIngredients]);
+    }, [recipes, addRecipeIngredients, getMealsForDay]);
 
     const updateCheckedItems = useCallback((currentIngredients: Set<string>) => {
         setCheckedItems(prev => {
