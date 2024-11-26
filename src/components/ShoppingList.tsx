@@ -46,7 +46,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
                 }
             }
         });
-    }, [addRecipeIngredients]);
+    }, [addRecipeIngredients, recipes]);
 
     const getCurrentIngredients = useCallback((weeklyPlan: WeeklyPlan) => {
         const currentIngredients = new Set<string>();
