@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { RecipeWithDetails } from '@/types/RecipeTypes';
-import { WeeklyPlan } from '@/types/mealPlannerTypes';
+import { WeeklyPlan, DayPlan } from '@/types/mealPlannerTypes';
 import { formatAmount } from '@/utils/formatters';
 
 interface ShoppingListProps {
@@ -37,17 +37,21 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
         });
     }, []);
 
+    const getMealsForDay = (dayPlan: DayPlan, currentIngredients: Set<string>) => {
+        Object.values(dayPlan).forEach(meal => {
+            if (meal.recipeId) {
+                const recipe = recipes.find(r => r.id === meal.recipeId);
+                if (recipe) {
+                    addRecipeIngredients(recipe, currentIngredients);
+                }
+            }
+        });
+    };
+
     const getCurrentIngredients = useCallback((weeklyPlan: WeeklyPlan) => {
         const currentIngredients = new Set<string>();
         Object.values(weeklyPlan).forEach(dayPlan => {
-            Object.values(dayPlan).forEach(meal => {
-                if (meal.recipeId) {
-                    const recipe = recipes.find(r => r.id === meal.recipeId);
-                    if (recipe) {
-                        addRecipeIngredients(recipe, currentIngredients);
-                    }
-                }
-            });
+            getMealsForDay(dayPlan, currentIngredients);
         });
         return currentIngredients;
     }, [recipes, addRecipeIngredients]);
@@ -69,16 +73,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
         updateCheckedItems(currentIngredients);
     }, [weeklyPlan, recipes, getCurrentIngredients, updateCheckedItems]);
 
-    const calculateRecipeIngredients = (
-        recipe: RecipeWithDetails,
-        ratio: number,
-        ingredientMap: Record<string, { amount: number; unit: string }>
-    ) => {
-        if (ratio < 0) {
-            console.warn(`Negative ratio (${ratio}) detected for recipe ${recipe.id}`);
-            return;
-        }
-
+    const addIngredientsToMap = (recipe: RecipeWithDetails, ratio: number, ingredientMap: Record<string, { amount: number; unit: string }>) => {
         const addIngredient = (ing: any) => {
             const key = ing.ingredient.name;
             if (!ingredientMap[key]) {
@@ -93,27 +88,29 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
         });
     };
 
+    const processMeal = (meal: any, ingredientMap: Record<string, { amount: number; unit: string }>) => {
+        if (meal.recipeId) {
+            const recipe = recipes.find(r => r.id === meal.recipeId);
+            if (recipe) {
+                if (!recipe.servings) {
+                    console.error(`Recipe ${recipe.id} has invalid servings`);
+                    return;
+                }
+                const servings = servingsMap[meal.recipeId] || recipe.servings;
+                const ratio = servings / recipe.servings;
+
+                addIngredientsToMap(recipe, ratio, ingredientMap);
+            }
+        }
+    };
+
     const calculateIngredients = () => {
         const ingredientMap: Record<string, { amount: number; unit: string }> = {};
-
         Object.values(weeklyPlan).forEach(dayPlan => {
             Object.values(dayPlan).forEach(meal => {
-                if (meal.recipeId) {
-                    const recipe = recipes.find(r => r.id === meal.recipeId);
-                    if (recipe) {
-                        if (!recipe.servings) {
-                            console.error(`Recipe ${recipe.id} has invalid servings`);
-                            return;
-                        }
-                        const servings = servingsMap[meal.recipeId] || recipe.servings;
-                        const ratio = servings / recipe.servings;
-
-                        calculateRecipeIngredients(recipe, ratio, ingredientMap);
-                    }
-                }
+                processMeal(meal, ingredientMap);
             });
         });
-
         return ingredientMap;
     };
 
