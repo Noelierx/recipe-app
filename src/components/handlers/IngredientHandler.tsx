@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import { CirclePlus, Trash2 } from 'lucide-react';
+import React from 'react';
+import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RecipeIngredient, Ingredient } from '@/types/RecipeTypes';
-import { supabase } from '@/utils/supabaseClient';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { RecipeIngredient } from '@/types/RecipeTypes';
+import useIngredient from '@/hooks/useIngredient';
+import IngredientForm from './IngredientForm';
+import { allowedUnits } from '@/constants';
 
 interface IngredientHandlerProps {
   ingredients: RecipeIngredient[];
@@ -12,79 +15,29 @@ interface IngredientHandlerProps {
 }
 
 const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setIngredients }) => {
-  const [newIngredient, setNewIngredient] = useState<Partial<Ingredient & { amount: number }>>({ name: '', amount: 0, unit: '' });
+  const { addIngredient, ingredients: existingIngredients, loading, error } = useIngredient();
 
-  const getProcessedValue = (name: string, value: string): number | string => {
-    if (name === 'amount') {
-      return value === '' ? 0 : Number(value);
-    }
-    return value;
-  };
-
-  const handleIngredientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    const processedValue = getProcessedValue(name, value);
-
-    setNewIngredient(prev => ({
-      ...prev,
-      [name]: processedValue
-    }));
-  };
-
-  const addIngredient = async () => {
-    if (newIngredient.name && newIngredient.amount !== undefined && newIngredient.unit) {
-      try {
-        const { data, error } = await supabase
-          .from('ingredients')
-          .select('id')
-          .eq('name', newIngredient.name)
-          .single();
-
-        let ingredientId: number;
-        if (error || !data) {
-          const { data: newData, error: insertError } = await supabase
-            .from('ingredients')
-            .insert({ name: newIngredient.name })
-            .select('id')
-            .single();
-
-          if (insertError) throw insertError;
-          ingredientId = newData.id;
-        } else {
-          ingredientId = data.id;
-        }
-
-        setIngredients(prev => [
-          ...prev,
-          {
-            amount: newIngredient.amount!,
-            unit: newIngredient.unit!,
-            ingredient: {
-              id: ingredientId,
-              name: newIngredient.name!,
-              amount: newIngredient.amount!,
-              unit: newIngredient.unit!,
-            }
-          }
-        ]);
-        setNewIngredient({ name: '', amount: 0, unit: '' });
-      } catch (error) {
-        alert('Échec de l\'ajout de l\'ingrédient. Veuillez réessayer.');
+  const updateIngredient = (index: number, field: string, value: string | number) => {
+    setIngredients(prev => prev.map((ing, i) => {
+      if (i !== index) return ing;
+      if (field === 'amount') {
+        return { ...ing, amount: Number(value) };
+      } else if (field === 'name') {
+        return { 
+          ...ing, 
+          ingredient: { 
+            ...ing.ingredient, 
+            name: value as string 
+          } 
+        };
+      } else {
+        return { ...ing, [field]: value };
       }
-    } else {
-      alert('Veuillez remplir tous les champs de l\'ingrédient.');
-    }
+    }));
   };
 
   const removeIngredient = (index: number) => {
     setIngredients(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const updateIngredient = (index: number, field: string, value: string | number) => {
-    setIngredients(prev => prev.map((ing, i) => 
-      i === index ? { ...ing, [field]: field === 'amount' ? Number(value) : value } : ing
-    ));
   };
 
   return (
@@ -97,19 +50,28 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
               value={ing.amount}
               onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
               type="number"
-              className="w-20"
+              className="flex-1"
             />
-            <Input
+            <Select
+              name="unit"
               value={ing.unit}
-              onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
-              className="w-20"
-            />
+              onValueChange={(value) => updateIngredient(index, 'unit', value)}
+            >
+              <SelectTrigger className="flex-1 border border-gray-300 rounded-md p-2">
+                <SelectValue placeholder="Sélectionner une unité" />
+              </SelectTrigger>
+              <SelectContent>
+                {allowedUnits.map(unit => (
+                  <SelectItem key={unit} value={unit}>{unit}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Input
               value={ing.ingredient.name}
               onChange={(e) => updateIngredient(index, 'name', e.target.value)}
-              className="flex-grow"
+              className="flex-1"
             />
-            <Button type="button" onClick={() => removeIngredient(index)} variant="destructive" size="sm">
+            <Button type="button" onClick={() => removeIngredient(index)} variant="destructive" size="sm" className="flex-1">
               <Trash2 className="mr-2" /> Retirer l'ingrédient
             </Button>
           </div>
@@ -117,32 +79,15 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
       ) : (
         <p>Aucun ingrédient ajouté pour le moment.</p>
       )}
-      <div className="flex space-x-2">
-        <Input
-          name="name"
-          value={newIngredient.name}
-          onChange={handleIngredientChange}
-          placeholder="Ingrédient"
-        />
-        <Input
-          name="amount"
-          type="number"
-          value={newIngredient.amount ?? 0}
-          onChange={handleIngredientChange}
-          placeholder="Quantité"
-        />
-        <Input
-          name="unit"
-          value={newIngredient.unit}
-          onChange={handleIngredientChange}
-          placeholder="Unité"
-        />
-        <Button type="button" onClick={addIngredient}>
-          <CirclePlus className="mr-2"/> Ajouter l'ingrédient
-        </Button>
-      </div>
+      <IngredientForm
+        addIngredient={addIngredient}
+        setIngredients={setIngredients}
+        existingIngredients={existingIngredients}
+        loading={loading}
+        error={error}
+      />
     </div>
   );
-}
+};
 
 export default IngredientHandler;
