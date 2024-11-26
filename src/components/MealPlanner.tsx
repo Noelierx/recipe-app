@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Combobox } from "@/components/ui/combobox"
+import { Combobox } from "@/components/ui/combobox";
+import { Input } from "@/components/ui/input";
 import { RecipeWithDetails } from '@/types/RecipeTypes';
 import { DAYS_OF_WEEK, MEAL_TYPES, WeeklyPlan, DayPlan } from '@/types/mealPlannerTypes';
+import ShoppingList from './ShoppingList';
 
 interface MealPlannerProps {
     recipes: RecipeWithDetails[];
 }
 
 const initialDayPlan: DayPlan = {
-    'matin': { recipeId: null, recipeName: null },
-    'midi': { recipeId: null, recipeName: null },
-    'soir': { recipeId: null, recipeName: null }
+    'matin': { recipeId: null, recipeName: null, servings: 1 },
+    'midi': { recipeId: null, recipeName: null, servings: 1 },
+    'soir': { recipeId: null, recipeName: null, servings: 1 }
 };
 
 const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
@@ -23,8 +25,20 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
         return DAYS_OF_WEEK.reduce((acc, day) => ({
             ...acc,
             [day]: { ...initialDayPlan }
-        }), {});
+        }), {} as WeeklyPlan);
     });
+
+    const servingsMap = Object.entries(weeklyPlan).reduce((acc, [day, meals]) => {
+        MEAL_TYPES.forEach(mealType => {
+            const meal = meals[mealType];
+            const recipeId = Number(meal.recipeId);
+            if (meal.recipeId && !Number.isNaN(recipeId)) {
+                const validServings = Math.max(1, meal.servings || 1);
+                acc[recipeId] = (acc[recipeId] || 0) + validServings;
+            }
+        });
+        return acc;
+    }, {} as { [key: number]: number });
 
     useEffect(() => {
         localStorage.setItem('weeklyMealPlan', JSON.stringify(weeklyPlan));
@@ -63,6 +77,19 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
         }));
     };
 
+    const handleServingsChange = (day: keyof WeeklyPlan, mealType: keyof DayPlan, servings: number) => {
+        setWeeklyPlan(prev => ({
+            ...prev,
+            [day]: {
+                ...prev[day],
+                [mealType]: {
+                    ...prev[day][mealType],
+                    servings
+                }
+            }
+        }));
+    };
+
     return (
         <div className="container mx-auto p-4">
             {recipes.length === 0 ? (
@@ -82,19 +109,34 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                                             <span className="text-sm">
                                                 {weeklyPlan[day][mealType].recipeName}
                                             </span>
+                                            <Input
+                                                type="number"
+                                                value={weeklyPlan[day][mealType].servings}
+                                                onChange={(e) => {
+                                                    const value = Math.floor(Number(e.target.value));
+                                                    if (value >= 1 && value <= 99) {
+                                                        handleServingsChange(day, mealType, value);
+                                                    }
+                                                }}
+                                                min="1"
+                                                max="99"
+                                                step="1"
+                                                className="w-16"
+                                            />
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => removeMealAssignment(day, mealType)}
+                                                className="ml-auto"
                                             >
                                                 ×
                                             </Button>
                                         </div>
                                     ) : (
                                         <Combobox
-                                            items={recipes.map(recipe => ({ 
-                                                label: recipe.title, 
-                                                value: recipe.id.toString() 
+                                            items={recipes.map(recipe => ({
+                                                label: recipe.title,
+                                                value: recipe.id.toString()
                                             }))}
                                             onSelect={(value: string) => {
                                                 handleRecipeSelect(value, day, mealType);
@@ -113,6 +155,7 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                     ))}
                 </div>
             )}
+            <ShoppingList weeklyPlan={weeklyPlan} recipes={recipes} servingsMap={servingsMap} />
         </div>
     );
 };

@@ -7,6 +7,7 @@ export type MealType = typeof MEAL_TYPES[number];
 export interface MealSlot {
     recipeId: string | null;
     recipeName: string | null;
+    servings: number;
 }
 
 export interface DayPlan {
