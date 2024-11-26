@@ -2,21 +2,39 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabaseClient';
 import { Ingredient } from '@/types/RecipeTypes';
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000;
+
+const validateIngredient = (data: any): data is Ingredient[] => {
+  return Array.isArray(data) && data.every(item => 
+    typeof item === 'object' && 
+    'id' in item && 
+    'name' in item
+  );
+};
+
 const useIngredient = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
   useEffect(() => {
-    const fetchIngredients = async () => {
+    const fetchIngredients = async (retryCount = 0) => {
       setLoading(true);
       try {
         const { data, error } = await supabase
           .from('ingredients')
           .select('*');
         if (error) throw error;
+        if (!validateIngredient(data)) {
+          throw new Error('Invalid data format received');
+        }
         setIngredients(data);
       } catch (error) {
+        if (retryCount < MAX_RETRIES) {
+          setTimeout(() => fetchIngredients(retryCount + 1), RETRY_DELAY);
+          return;
+        }
         setError('Échec de la récupération des ingrédients. Veuillez réessayer.');
       } finally {
         setLoading(false);

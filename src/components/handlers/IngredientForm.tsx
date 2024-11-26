@@ -15,62 +15,73 @@ interface IngredientFormProps {
   error: string | null;
 }
 
+interface NewIngredientState {
+  name: string;
+  amount: number;
+  unit: string;
+  id: number;
+}
+
 const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngredients, existingIngredients, loading, error }) => {
-  const [newIngredient, setNewIngredient] = useState<Partial<RecipeIngredient & { amount: number }>>({
-    ingredient: { id: 0, name: '', amount: 0, unit: '' },
+  const [newIngredient, setNewIngredient] = useState<NewIngredientState>({
+    name: '',
     amount: 0,
-    unit: ''
+    unit: '',
+    id: 0
   });
 
   const getProcessedValue = (name: string, value: string): number | string => {
     if (name === 'amount') {
-      return value === '' ? 0 : Number(value);
+      const parsed = Number(value);
+      if (value !== '' && isNaN(parsed)) {
+        throw new Error('Invalid number input');
+      }
+      return value === '' ? 0 : parsed;
     }
     return value;
   };
 
-  const handleIngredientChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-
+  const handleValueChange = (name: string, value: string) => {
     const processedValue = getProcessedValue(name, value);
-
     setNewIngredient(prev => ({
       ...prev,
       [name]: processedValue
     }));
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleValueChange(e.target.name, e.target.value);
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    handleValueChange(name, value);
+  };
+
   const handleAutosuggestChange = (event: React.FormEvent<HTMLElement>, { newValue }: Autosuggest.ChangeEvent) => {
     setNewIngredient(prev => ({
       ...prev,
-      ingredient: {
-        ...prev.ingredient,
-        name: newValue,
-        amount: prev.ingredient?.amount ?? 0,
-        unit: prev.ingredient?.unit ?? '',
-        id: prev.ingredient?.id ?? 0
-      }
+      name: newValue
     }));
   };
 
   const addNewIngredient = async () => {
-    if (newIngredient.ingredient?.name && newIngredient.amount !== undefined && newIngredient.unit) {
-      const ingredientId = await addIngredient(newIngredient.ingredient.name);
+    if (newIngredient.name && newIngredient.amount !== undefined && newIngredient.unit) {
+      const ingredientId = await addIngredient(newIngredient.name);
       if (ingredientId) {
         setIngredients(prev => [
           ...prev,
           {
-            amount: newIngredient.amount!,
-            unit: newIngredient.unit!,
+            amount: newIngredient.amount,
+            unit: newIngredient.unit,
             ingredient: {
               id: ingredientId,
-              name: newIngredient.ingredient?.name ?? '',
-              amount: newIngredient.amount!,
-              unit: newIngredient.unit!,
+              name: newIngredient.name,
+              amount: newIngredient.amount,
+              unit: newIngredient.unit,
             }
           }
         ]);
-        setNewIngredient({ ingredient: { id: 0, name: '', amount: 0, unit: '' }, amount: 0, unit: '' });
+        setNewIngredient({ name: '', amount: 0, unit: '', id: 0 });
       } else {
         alert('Échec de l\'ajout de l\'ingrédient. Veuillez réessayer.');
       }
@@ -106,13 +117,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngre
   const onSuggestionSelected = (event: React.FormEvent, { suggestion }: { suggestion: Ingredient }) => {
     setNewIngredient(prev => ({
       ...prev,
-      ingredient: {
-        ...prev.ingredient,
-        name: suggestion.name,
-        amount: prev.ingredient?.amount ?? 0,
-        unit: prev.ingredient?.unit ?? '',
-        id: prev.ingredient?.id ?? 0
-      }
+      name: suggestion.name
     }));
   };
 
@@ -129,7 +134,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngre
         onSuggestionSelected={onSuggestionSelected}
         inputProps={{
           name: 'name',
-          value: newIngredient.ingredient?.name || '',
+          value: newIngredient.name,
           onChange: handleAutosuggestChange,
           placeholder: 'Ingrédient',
           className: 'border border-gray-300 rounded-md p-2 flex-1'
@@ -144,15 +149,15 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngre
       <Input
         name="amount"
         type="number"
-        value={newIngredient.amount ?? 0}
-        onChange={handleIngredientChange}
+        value={newIngredient.amount}
+        onChange={handleInputChange}
         placeholder="Quantité"
         className="flex-1"
       />
       <Select
         name="unit"
         value={newIngredient.unit}
-        onValueChange={(value) => handleIngredientChange({ target: { name: 'unit', value } } as React.ChangeEvent<HTMLSelectElement>)}
+        onValueChange={(value) => handleSelectChange('unit', value)}
       >
         <SelectTrigger className="flex-1 border border-gray-300 rounded-md p-2">
           <SelectValue placeholder="Sélectionner une unité" />

@@ -18,9 +18,22 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
   const { addIngredient, ingredients: existingIngredients, loading, error } = useIngredient();
 
   const updateIngredient = (index: number, field: string, value: string | number) => {
-    setIngredients(prev => prev.map((ing, i) => 
-      i === index ? { ...ing, [field]: field === 'amount' ? Number(value) : value } : ing
-    ));
+    setIngredients(prev => prev.map((ing, i) => {
+      if (i !== index) return ing;
+      if (field === 'amount') {
+        return { ...ing, amount: Number(value) };
+      } else if (field === 'name') {
+        return { 
+          ...ing, 
+          ingredient: { 
+            ...ing.ingredient, 
+            name: value as string 
+          } 
+        };
+      } else {
+        return { ...ing, [field]: value };
+      }
+    }));
   };
 
   const removeIngredient = (index: number) => {
