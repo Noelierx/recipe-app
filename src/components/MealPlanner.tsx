@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Combobox } from "@/components/ui/combobox"
+import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { RecipeWithDetails } from '@/types/RecipeTypes';
 import { DAYS_OF_WEEK, MEAL_TYPES, WeeklyPlan, DayPlan } from '@/types/mealPlannerTypes';
@@ -25,19 +25,20 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
         return DAYS_OF_WEEK.reduce((acc, day) => ({
             ...acc,
             [day]: { ...initialDayPlan }
-        }), {});
+        }), {} as WeeklyPlan);
     });
 
     const servingsMap = Object.keys(weeklyPlan).reduce((acc, day) => {
         MEAL_TYPES.forEach(mealType => {
             const meal = weeklyPlan[day as keyof WeeklyPlan][mealType];
-            if (meal.recipeId) {
-                const recipeIdNumber = parseInt(meal.recipeId as string, 10);
-                acc[recipeIdNumber] = (acc[recipeIdNumber] || 0) + meal.servings;
+            if (meal.recipeId && !isNaN(Number(meal.recipeId))) {
+                const recipeIdNumber = Number(meal.recipeId);
+                const validServings = Math.max(1, meal.servings || 1);
+                acc[recipeIdNumber] = (acc[recipeIdNumber] || 0) + validServings;
             }
         });
         return acc;
-    }, {} as Record<number, number>);
+    }, {} as { [key: number]: number });
 
     useEffect(() => {
         localStorage.setItem('weeklyMealPlan', JSON.stringify(weeklyPlan));
@@ -119,15 +120,16 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => removeMealAssignment(day, mealType)}
+                                                className="ml-auto"
                                             >
                                                 ×
                                             </Button>
                                         </div>
                                     ) : (
                                         <Combobox
-                                            items={recipes.map(recipe => ({ 
-                                                label: recipe.title, 
-                                                value: recipe.id.toString() 
+                                            items={recipes.map(recipe => ({
+                                                label: recipe.title,
+                                                value: recipe.id.toString()
                                             }))}
                                             onSelect={(value: string) => {
                                                 handleRecipeSelect(value, day, mealType);

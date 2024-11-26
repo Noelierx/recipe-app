@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { RecipeWithDetails } from '@/types/RecipeTypes';
 import { WeeklyPlan } from '@/types/mealPlannerTypes';
 import { formatAmount } from '@/utils/formatters';
@@ -12,33 +12,47 @@ interface ShoppingListProps {
 const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servingsMap }) => {
     const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>(() => {
         const saved = localStorage.getItem('checkedItems');
-        return saved ? JSON.parse(saved) : {};
+        if (!saved) return {};
+        try {
+            const parsed = JSON.parse(saved);
+            return typeof parsed === 'object' && parsed !== null ? parsed : {};
+        } catch (e) {
+            console.error('Failed to parse checkedItems from localStorage:', e);
+            return {};
+        }
     });
 
     useEffect(() => {
         localStorage.setItem('checkedItems', JSON.stringify(checkedItems));
     }, [checkedItems]);
 
-    useEffect(() => {
+    const addRecipeIngredients = useCallback((recipe: RecipeWithDetails, currentIngredients: Set<string>) => {
+        recipe.recipe_ingredients?.forEach(ing => {
+            currentIngredients.add(ing.ingredient.name);
+        });
+        recipe.sub_recipes?.forEach(subRecipe => {
+            subRecipe.ingredients?.forEach(ing => {
+                currentIngredients.add(ing.ingredient.name);
+            });
+        });
+    }, []);
+
+    const getCurrentIngredients = useCallback((weeklyPlan: WeeklyPlan) => {
         const currentIngredients = new Set<string>();
         Object.values(weeklyPlan).forEach(dayPlan => {
             Object.values(dayPlan).forEach(meal => {
                 if (meal.recipeId) {
                     const recipe = recipes.find(r => r.id === meal.recipeId);
                     if (recipe) {
-                        recipe.recipe_ingredients?.forEach(ing => {
-                            currentIngredients.add(ing.ingredient.name);
-                        });
-                        recipe.sub_recipes?.forEach(subRecipe => {
-                            subRecipe.ingredients?.forEach(ing => {
-                                currentIngredients.add(ing.ingredient.name);
-                            });
-                        });
+                        addRecipeIngredients(recipe, currentIngredients);
                     }
                 }
             });
         });
+        return currentIngredients;
+    }, [recipes, addRecipeIngredients]);
 
+    const updateCheckedItems = useCallback((currentIngredients: Set<string>) => {
         setCheckedItems(prev => {
             const updatedCheckedItems = { ...prev };
             Object.keys(updatedCheckedItems).forEach(key => {
@@ -48,41 +62,58 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
             });
             return updatedCheckedItems;
         });
-    }, [weeklyPlan, recipes]);
+    }, []);
+
+    useEffect(() => {
+        const currentIngredients = getCurrentIngredients(weeklyPlan);
+        updateCheckedItems(currentIngredients);
+    }, [weeklyPlan, recipes, getCurrentIngredients, updateCheckedItems]);
+
+    const calculateRecipeIngredients = (
+        recipe: RecipeWithDetails,
+        ratio: number,
+        ingredientMap: Record<string, { amount: number; unit: string }>
+    ) => {
+        if (ratio < 0) {
+            console.warn(`Negative ratio (${ratio}) detected for recipe ${recipe.id}`);
+            return;
+        }
+
+        const addIngredient = (ing: any) => {
+            const key = ing.ingredient.name;
+            if (!ingredientMap[key]) {
+                ingredientMap[key] = { amount: 0, unit: ing.unit };
+            }
+            ingredientMap[key].amount += ing.amount * ratio;
+        };
+
+        recipe.recipe_ingredients?.forEach(addIngredient);
+        recipe.sub_recipes?.forEach(subRecipe => {
+            subRecipe.ingredients?.forEach(addIngredient);
+        });
+    };
 
     const calculateIngredients = () => {
         const ingredientMap: Record<string, { amount: number; unit: string }> = {};
-        
+
         Object.values(weeklyPlan).forEach(dayPlan => {
             Object.values(dayPlan).forEach(meal => {
                 if (meal.recipeId) {
                     const recipe = recipes.find(r => r.id === meal.recipeId);
                     if (recipe) {
+                        if (!recipe.servings) {
+                            console.error(`Recipe ${recipe.id} has invalid servings`);
+                            return;
+                        }
                         const servings = servingsMap[meal.recipeId] || recipe.servings;
                         const ratio = servings / recipe.servings;
-    
-                        recipe.recipe_ingredients?.forEach(ing => {
-                            const key = ing.ingredient.name;
-                            if (!ingredientMap[key]) {
-                                ingredientMap[key] = { amount: 0, unit: ing.unit };
-                            }
-                            ingredientMap[key].amount += ing.amount * ratio;
-                        });
-    
-                        recipe.sub_recipes?.forEach(subRecipe => {
-                            subRecipe.ingredients?.forEach(ing => {
-                                const key = ing.ingredient.name;
-                                if (!ingredientMap[key]) {
-                                    ingredientMap[key] = { amount: 0, unit: ing.unit };
-                                }
-                                ingredientMap[key].amount += ing.amount * ratio;
-                            });
-                        });
+
+                        calculateRecipeIngredients(recipe, ratio, ingredientMap);
                     }
                 }
             });
         });
-    
+
         return ingredientMap;
     };
 
@@ -104,17 +135,17 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
                     const isChecked = checkedItems[key];
                     return (
                         <li key={key} className="flex justify-between items-center">
-                        <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => handleCheck(key)}
-                            className="mr-2"
-                        />
-                        <div className={`flex-1 ${isChecked ? 'line-through' : ''} flex justify-between`}>
-                            <span>{ingredientName}</span>
-                            <span className="ml-auto">{formatAmount(amount)} {unit}</span>
-                        </div>
-                    </li>
+                            <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => handleCheck(key)}
+                                className="mr-2"
+                            />
+                            <div className={`flex-1 ${isChecked ? 'line-through' : ''} flex justify-between`}>
+                                <span>{ingredientName}</span>
+                                <span className="ml-auto">{formatAmount(amount)} {unit}</span>
+                            </div>
+                        </li>
                     );
                 })}
             </ul>
