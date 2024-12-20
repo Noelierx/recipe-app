@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import Autosuggest from 'react-autosuggest';
+import React, { useState, useEffect } from 'react';
 import { CirclePlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { RecipeIngredient, Ingredient } from '@/types/RecipeTypes';
 import { allowedUnits } from '@/constants';
 
@@ -29,6 +29,11 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngre
     unit: '',
     id: 0
   });
+  const [allIngredients, setAllIngredients] = useState<Ingredient[]>(existingIngredients);
+
+  useEffect(() => {
+    setAllIngredients(existingIngredients);
+  }, [existingIngredients]);
 
   const getProcessedValue = (name: string, value: string): number | string => {
     if (name === 'amount') {
@@ -57,30 +62,25 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngre
     handleValueChange(name, value);
   };
 
-  const handleAutosuggestChange = (event: React.FormEvent<HTMLElement>, { newValue }: Autosuggest.ChangeEvent) => {
-    setNewIngredient(prev => ({
-      ...prev,
-      name: newValue
-    }));
-  };
-
   const addNewIngredient = async () => {
     if (newIngredient.name && newIngredient.amount !== undefined && newIngredient.unit) {
       const ingredientId = await addIngredient(newIngredient.name);
       if (ingredientId) {
+        const newIng = {
+          id: ingredientId,
+          name: newIngredient.name,
+          amount: newIngredient.amount,
+          unit: newIngredient.unit,
+        };
         setIngredients(prev => [
           ...prev,
           {
             amount: newIngredient.amount,
             unit: newIngredient.unit,
-            ingredient: {
-              id: ingredientId,
-              name: newIngredient.name,
-              amount: newIngredient.amount,
-              unit: newIngredient.unit,
-            }
+            ingredient: newIng
           }
         ]);
+        setAllIngredients(prev => [...prev, newIng]);
         setNewIngredient({ name: '', amount: 0, unit: '', id: 0 });
       } else {
         alert('Échec de l\'ajout de l\'ingrédient. Veuillez réessayer.');
@@ -90,61 +90,27 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngre
     }
   };
 
-  const getSuggestions = (value: string) => {
-    const inputValue = value.trim().toLowerCase();
-    const inputLength = inputValue.length;
-    return inputLength === 0 ? [] : existingIngredients.filter(ing =>
-      ing.name.toLowerCase().includes(inputValue)
-    );
-  };
-
-  const getSuggestionValue = (suggestion: Ingredient) => suggestion.name;
-
-  const renderSuggestion = (suggestion: Ingredient) => (
-    <div className="p-2 hover:bg-gray-200 cursor-pointer">
-      {suggestion.name}
-    </div>
-  );
-
-  const onSuggestionsFetchRequested = ({ value }: { value: string }) => {
-    setSuggestions(getSuggestions(value));
-  };
-
-  const onSuggestionsClearRequested = () => {
-    setSuggestions([]);
-  };
-
-  const onSuggestionSelected = (event: React.FormEvent, { suggestion }: { suggestion: Ingredient }) => {
-    setNewIngredient(prev => ({
-      ...prev,
-      name: suggestion.name
-    }));
-  };
-
-  const [suggestions, setSuggestions] = useState<Ingredient[]>([]);
-
   return (
-    <div className="flex space-x-2">
-      <Autosuggest
-        suggestions={suggestions}
-        onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-        onSuggestionsClearRequested={onSuggestionsClearRequested}
-        getSuggestionValue={getSuggestionValue}
-        renderSuggestion={renderSuggestion}
-        onSuggestionSelected={onSuggestionSelected}
-        inputProps={{
-          name: 'name',
-          value: newIngredient.name,
-          onChange: handleAutosuggestChange,
-          placeholder: 'Ingrédient',
-          className: 'border border-gray-300 rounded-md p-2 flex-1'
+    <div className="flex space-x-2 items-center">
+      <Combobox
+        items={allIngredients.map(ingredient => ({ label: ingredient.name, value: ingredient.name }))}
+        onSelect={(value: string) => {
+          const selectedIngredient = allIngredients.find(ingredient => ingredient.name === value);
+          if (selectedIngredient) {
+            setNewIngredient(prev => ({
+              ...prev,
+              name: selectedIngredient.name
+            }));
+          } else {
+            setNewIngredient(prev => ({
+              ...prev,
+              name: value
+            }));
+          }
         }}
-        theme={{
-          container: 'relative',
-          suggestionsContainer: 'absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full',
-          suggestion: 'p-2',
-          suggestionHighlighted: 'bg-gray-200'
-        }}
+        placeholder="Rechercher ou ajouter un ingrédient..."
+        renderItem={(item) => <div>{item.label}</div>}
+        className="flex-1"
       />
       <Input
         name="amount"
@@ -152,15 +118,15 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngre
         value={newIngredient.amount}
         onChange={handleInputChange}
         placeholder="Quantité"
-        className="flex-1"
+        className="w-24"
       />
       <Select
         name="unit"
         value={newIngredient.unit}
         onValueChange={(value) => handleSelectChange('unit', value)}
       >
-        <SelectTrigger className="flex-1 border border-gray-300 rounded-md p-2">
-          <SelectValue placeholder="Sélectionner une unité" />
+        <SelectTrigger className="w-32 border border-gray-300 rounded-md p-2">
+          <SelectValue placeholder="Unité" />
         </SelectTrigger>
         <SelectContent>
           {allowedUnits.map(unit => (
@@ -169,7 +135,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngre
         </SelectContent>
       </Select>
       <Button type="button" onClick={addNewIngredient} disabled={loading}>
-        <CirclePlus className="mr-2"/> Ajouter l'ingrédient
+        <CirclePlus className="mr-2"/> Ajouter
       </Button>
       {error && <p className="text-red-500">{error}</p>}
     </div>

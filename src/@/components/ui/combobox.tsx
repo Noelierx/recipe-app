@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown, Plus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -35,6 +35,20 @@ interface ComboboxProps {
 export function Combobox({ items, onSelect, placeholder, renderItem, className }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
+  const [inputValue, setInputValue] = React.useState("")
+
+  const handleSelect = (currentValue: string) => {
+    setValue(currentValue)
+    setInputValue(currentValue)
+    onSelect(currentValue)
+    setOpen(false)
+  }
+
+  const handleAddNew = () => {
+    if (inputValue) {
+      handleSelect(inputValue)
+    }
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -45,15 +59,18 @@ export function Combobox({ items, onSelect, placeholder, renderItem, className }
           aria-expanded={open}
           className={`w-full justify-between ${className}`}
         >
-          {value
-            ? items.find((item) => item.value === value)?.label
-            : placeholder}
+          {inputValue || placeholder}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className={cn("p-0 w-auto min-w-[var(--radix-popover-trigger-width)]")}>
         <Command>
-          <CommandInput placeholder={`Rechercher ${placeholder}...`} className="h-9" />
+          <CommandInput
+            placeholder={placeholder}
+            className="h-9"
+            value={inputValue}
+            onValueChange={setInputValue}
+          />
           <CommandList>
             <CommandEmpty>No options found.</CommandEmpty>
             <CommandGroup>
@@ -61,11 +78,7 @@ export function Combobox({ items, onSelect, placeholder, renderItem, className }
                 <CommandItem
                   key={item.value}
                   value={item.value}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue)
-                    onSelect(currentValue)
-                    setOpen(false)
-                  }}
+                  onSelect={handleSelect}
                 >
                   {renderItem(item)}
                   <Check
@@ -76,6 +89,15 @@ export function Combobox({ items, onSelect, placeholder, renderItem, className }
                   />
                 </CommandItem>
               ))}
+              {inputValue && !items.some(item => item.value === inputValue) && (
+                <CommandItem
+                  value={inputValue}
+                  onSelect={handleAddNew}
+                >
+                  <Plus className="mr-2" />
+                  Ajouter "{inputValue}"
+                </CommandItem>
+              )}
             </CommandGroup>
           </CommandList>
         </Command>
