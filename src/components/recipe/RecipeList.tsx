@@ -83,11 +83,11 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
         });
     };
 
-    const getButtonVariant = (tag: Tag): "secondary" | "outline" => {
+    const getButtonVariant = (tag: Tag): "default" | "secondary" => {
         const isSelected = selectedTags.some(t => 
             t.id === tag.id || (t.id === undefined && t.name === tag.name)
         );
-        return isSelected ? "secondary" : "outline";
+        return isSelected ? "default" : "secondary";
     };
 
     const renderTags = () => {
