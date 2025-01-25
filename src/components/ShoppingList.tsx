@@ -10,7 +10,21 @@ interface ShoppingListProps {
 }
 
 const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servingsMap }) => {
-    const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+    const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>(() => {
+        const saved = localStorage.getItem('checkedItems');
+        if (!saved) return {};
+        try {
+            const parsed = JSON.parse(saved);
+            return typeof parsed === 'object' && parsed !== null ? parsed : {};
+        } catch (e) {
+            console.error('Failed to parse checkedItems from localStorage:', e);
+            return {};
+        }
+    });
+
+    useEffect(() => {
+        localStorage.setItem('checkedItems', JSON.stringify(checkedItems));
+    }, [checkedItems]);
 
     const getCurrentIngredients = useCallback((weeklyPlan: WeeklyPlan) => {
         const currentIngredients = new Set<string>();
@@ -42,6 +56,11 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
     const updateCheckedItems = useCallback((currentIngredients: Set<string>) => {
         setCheckedItems(prev => {
             const updatedCheckedItems = { ...prev };
+            currentIngredients.forEach(key => {
+                if (!(key in updatedCheckedItems)) {
+                    updatedCheckedItems[key] = false;
+                }
+            });
             Object.keys(updatedCheckedItems).forEach(key => {
                 if (!currentIngredients.has(key)) {
                     delete updatedCheckedItems[key];
@@ -103,7 +122,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
             <ul className="space-y-2">
                 {Object.entries(ingredients).map(([key, { amount, unit }]) => {
                     const ingredientName = key.split('-')[0];
-                    const isChecked = checkedItems[key];
+                    const isChecked = checkedItems[key] || false;
                     return (
                         <li key={key} className="flex justify-between items-center">
                             <input
