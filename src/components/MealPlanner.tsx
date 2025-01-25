@@ -58,7 +58,8 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                 ...prev[day],
                 [mealType]: {
                     recipeId: recipe.id,
-                    recipeName: recipe.title
+                    recipeName: recipe.title,
+                    servings: 1
                 }
             }
         }));
@@ -71,7 +72,8 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                 ...prev[day],
                 [mealType]: {
                     recipeId: null,
-                    recipeName: null
+                    recipeName: null,
+                    servings: 1
                 }
             }
         }));
@@ -84,7 +86,7 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                 ...prev[day],
                 [mealType]: {
                     ...prev[day][mealType],
-                    servings
+                    servings: servings > 0 ? servings : 1
                 }
             }
         }));
