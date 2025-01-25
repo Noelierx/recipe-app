@@ -6,7 +6,7 @@ import { formatAmount } from '@/utils/formatters';
 interface ShoppingListProps {
     weeklyPlan: WeeklyPlan;
     recipes: RecipeWithDetails[];
-    servingsMap: { [key: number]: number };
+    servingsMap: Record<number, number>;
 }
 
 const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servingsMap }) => {
@@ -26,32 +26,35 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
         localStorage.setItem('checkedItems', JSON.stringify(checkedItems));
     }, [checkedItems]);
 
+    const addRecipeIngredients = (recipe: RecipeWithDetails, currentIngredients: Set<string>) => {
+        recipe.recipe_ingredients?.forEach(ingredient => {
+            currentIngredients.add(`${ingredient.ingredient.name}-${ingredient.unit}`);
+        });
+        recipe.sub_recipes?.forEach(subRecipe => {
+            subRecipe.ingredients?.forEach(ingredient => {
+                currentIngredients.add(`${ingredient.ingredient.name}-${ingredient.unit}`);
+            });
+        });
+    };
+
+    const getMealsForDay = useCallback((dayPlan: DayPlan, currentIngredients: Set<string>) => {
+        Object.values(dayPlan).forEach(meal => {
+            if (meal.recipeId) {
+                const recipe = recipes.find(r => r.id === meal.recipeId);
+                if (recipe) {
+                    addRecipeIngredients(recipe, currentIngredients);
+                }
+            }
+        });
+    }, [recipes]);
+
     const getCurrentIngredients = useCallback((weeklyPlan: WeeklyPlan) => {
         const currentIngredients = new Set<string>();
-
-        const getMealsForDay = (dayPlan: DayPlan, currentIngredients: Set<string>) => {
-            Object.values(dayPlan).forEach(meal => {
-                if (meal.recipeId) {
-                    const recipe = recipes.find(r => r.id === meal.recipeId);
-                    if (recipe) {
-                        recipe.recipe_ingredients?.forEach(ingredient => {
-                            currentIngredients.add(`${ingredient.ingredient.name}-${ingredient.unit}`);
-                        });
-                        recipe.sub_recipes?.forEach(subRecipe => {
-                            subRecipe.ingredients?.forEach(ingredient => {
-                                currentIngredients.add(`${ingredient.ingredient.name}-${ingredient.unit}`);
-                            });
-                        });
-                    }
-                }
-            });
-        };
-
         Object.values(weeklyPlan).forEach(dayPlan => {
             getMealsForDay(dayPlan, currentIngredients);
         });
         return currentIngredients;
-    }, [recipes]);
+    }, [getMealsForDay]);
 
     const updateCheckedItems = useCallback((currentIngredients: Set<string>) => {
         setCheckedItems(prev => {
@@ -98,7 +101,8 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
                     const recipe = recipes.find(r => r.id === meal.recipeId);
                     if (recipe) {
                         const servings = meal.servings || 1;
-                        const ratio = servings / recipe.servings;
+                        const recipeServings = recipe.servings || 1;
+                        const ratio = servings / recipeServings;
                         addIngredientsToMap(recipe, ratio, ingredientMap);
                     }
                 }
