@@ -12,6 +12,34 @@ export const useRecipes = () => {
         if (!recipesData) throw new Error('No recipes found');
     };
 
+    const mergeSubRecipeIngredients = (mainIngredients: any[], subRecipeIngredients: any[]) => {
+        subRecipeIngredients.forEach((sri: any) => {
+            const existingIngredient = mainIngredients.find(
+                (ing) => ing.ingredient.name === sri.ingredient.name && ing.unit === sri.unit
+            );
+            if (existingIngredient) {
+                existingIngredient.amount += sri.amount;
+            } else {
+                mainIngredients.push({
+                    amount: sri.amount,
+                    unit: sri.unit,
+                    ingredient: sri.ingredient,
+                });
+            }
+        });
+    };
+
+    const transformSubRecipes = (subRecipes: any[]) => {
+        return subRecipes.map((sr: any) => ({
+            ...sr,
+            ingredients: sr.sub_recipe_ingredients.map((sri: any) => ({
+                amount: sri.amount,
+                unit: sri.unit,
+                ingredient: sri.ingredient,
+            })),
+        }));
+    };
+
     const fetchRecipes = useCallback(async () => {
         try {
             setLoading(true);
@@ -51,34 +79,14 @@ export const useRecipes = () => {
                 const allIngredients = [...recipeIngredients];
 
                 subRecipes.forEach((subRecipe: any) => {
-                    subRecipe.sub_recipe_ingredients.forEach((sri: any) => {
-                        const existingIngredient = allIngredients.find(
-                            (ing) => ing.ingredient.name === sri.ingredient.name && ing.unit === sri.unit
-                        );
-                        if (existingIngredient) {
-                            existingIngredient.amount += sri.amount;
-                        } else {
-                            allIngredients.push({
-                                amount: sri.amount,
-                                unit: sri.unit,
-                                ingredient: sri.ingredient,
-                            });
-                        }
-                    });
+                    mergeSubRecipeIngredients(allIngredients, subRecipe.sub_recipe_ingredients);
                 });
 
                 return {
                     ...recipe,
                     recipe_ingredients: allIngredients,
                     tags: recipeTags,
-                    sub_recipes: subRecipes.map((sr: any) => ({
-                        ...sr,
-                        ingredients: sr.sub_recipe_ingredients.map((sri: any) => ({
-                            amount: sri.amount,
-                            unit: sri.unit,
-                            ingredient: sri.ingredient,
-                        })),
-                    })),
+                    sub_recipes: transformSubRecipes(subRecipes),
                 };
             });
 
