@@ -21,7 +21,6 @@ import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 import { formatAmount } from '@/utils/formatters';
 import { Loading, ErrorMessage } from 'components/layout';
 import { convertUnit } from '@/utils/unitConverter';
-import { Unit } from '@/constants';
 
 const RecipeDetails: React.FC = () => {
     const navigate = useNavigate();

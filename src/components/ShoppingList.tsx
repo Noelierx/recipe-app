@@ -62,13 +62,13 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
     };
 
     const calculateIngredients = () => {
-        const ingredientMap: Record<string, { amount: number; unit: string }> = {};
+        const ingredientMap: Record<string, { amount: number; unit: Unit }> = {};
         Object.values(weeklyPlan).forEach(dayPlan => {
             processDayPlan(dayPlan, ingredientMap);
         });
         Object.keys(ingredientMap).forEach(key => {
             const { amount, unit } = ingredientMap[key];
-            const converted = convertUnit(amount, unit as Unit);
+            const converted = convertUnit(amount, unit);
             ingredientMap[key] = converted;
         });
 
