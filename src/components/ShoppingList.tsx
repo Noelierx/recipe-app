@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { RecipeWithDetails, RecipeIngredient } from '@/types/RecipeTypes';
 import { DayPlan, WeeklyPlan } from '@/types/mealPlannerTypes';
 import { formatAmount } from '@/utils/formatters';
+import { convertUnit } from '@/utils/unitConverter';
+import { Unit } from '@/constants';
 
 interface ShoppingListProps {
     weeklyPlan: WeeklyPlan;
@@ -64,6 +66,12 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
         Object.values(weeklyPlan).forEach(dayPlan => {
             processDayPlan(dayPlan, ingredientMap);
         });
+        Object.keys(ingredientMap).forEach(key => {
+            const { amount, unit } = ingredientMap[key];
+            const converted = convertUnit(amount, unit as Unit);
+            ingredientMap[key] = converted;
+        });
+
         return ingredientMap;
     };
 
