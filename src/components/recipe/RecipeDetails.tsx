@@ -14,7 +14,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-  } from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog"
 import { RecipeIngredient } from '@/types/RecipeTypes';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
@@ -97,7 +97,7 @@ const RecipeDetails: React.FC = () => {
                     <h2 className="text-2xl font-semibold mb-4">Ingrédients:</h2>
                     <ul className="list-disc pl-5 mb-6">
                         {adjustedMainIngredients.map((ing, index) => (
-                            <li key={index}>
+                            <li key={`${ing.ingredient.id}-${index}`}>
                                 {ing.ingredient.name}: {formatAmount(ing.amount)} {ing.unit}
                             </li>
                         ))}
@@ -105,12 +105,12 @@ const RecipeDetails: React.FC = () => {
 
                     {hasSubRecipes && (
                         <>
-                            {adjustedSubRecipes.map((subRecipe, subIndex) => (
-                                <div key={subIndex} className="mb-4">
+                            {adjustedSubRecipes.map((subRecipe) => (
+                                <div key={subRecipe.id} className="mb-4">
                                     <h2 className="text-xl font-semibold mb-2">{subRecipe.title}</h2>
                                     <ul className="list-disc pl-5">
-                                        {subRecipe.ingredients.map((ing, ingIndex) => (
-                                            <li key={ingIndex}>
+                                        {subRecipe.ingredients.map((ing, index) => (
+                                            <li key={`${ing.ingredient.id}-${index}`}>
                                                 {ing.ingredient.name}: {formatAmount(ing.amount)} {ing.unit}
                                             </li>
                                         ))}
@@ -122,8 +122,8 @@ const RecipeDetails: React.FC = () => {
                 </div>
                 <div className="w-full md:w-1/2">
                     <h2 className="text-2xl font-semibold mb-4">Instructions:</h2>
-                    {hasSubRecipes && adjustedSubRecipes.map((subRecipe, index) => (
-                        <div key={index} className="mb-6">
+                    {hasSubRecipes && adjustedSubRecipes.map((subRecipe) => (
+                        <div key={subRecipe.id} className="mb-6">
                             <h3 className="text-xl font-semibold mb-2">{subRecipe.title}</h3>
                             <div dangerouslySetInnerHTML={{ 
                                 __html: DOMPurify.sanitize(subRecipe.instructions, {
