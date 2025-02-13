@@ -45,7 +45,7 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
       <Label htmlFor="ingredients">Ingrédients</Label>
       {ingredients && ingredients.length > 0 ? (
         ingredients.map((ing, index) => (
-          <div key={index} className="flex items-center space-x-2 mb-2">
+          <div key={`${ing.ingredient.id}-${index}`} className="flex items-center space-x-2 mb-2">
             <Input
               value={ing.amount}
               onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
