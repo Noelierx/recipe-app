@@ -56,15 +56,15 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
     <div>
       <h3>Sous-recette</h3>
       {subRecipes.map((subRecipe, index) => (
-        <div key={index} className="space-y-2 mb-4">
-          <Label htmlFor={`subrecipe-title-${index}`}>Titre</Label>
+        <div key={subRecipe.id || `new-${index}`} className="space-y-2 mb-4">
+          <Label htmlFor={`subrecipe-title-${subRecipe.id || `new-${index}`}`}>Titre</Label>
           <Input
-            id={`subrecipe-title-${index}`}
+            id={`subrecipe-title-${subRecipe.id || `new-${index}`}`}
             value={subRecipe.title}
             onChange={(e) => handleSubRecipeChange(index, 'title', e.target.value)}
             placeholder="titre de la sous-recette"
           />
-          <Label htmlFor={`subrecipe-instructions-${index}`}>Instructions</Label>
+          <Label htmlFor={`subrecipe-instructions-${subRecipe.id || `new-${index}`}`}>Instructions</Label>
           <RecipeInstructionsEditor
             value={subRecipe.instructions}
             onChange={(value) => handleSubRecipeChange(index, 'instructions', value)}
