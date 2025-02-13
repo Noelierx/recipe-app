@@ -44,7 +44,7 @@ const RecipeDetails: React.FC = () => {
     const adjustIngredients = (ingredients: RecipeIngredient[] | undefined, originalServings: number, newServings: number) => {
         return ingredients?.map(ing => {
             const adjustedAmount = (ing.amount / originalServings) * newServings;
-            const { amount, unit } = convertUnit(adjustedAmount, ing.unit as Unit);
+            const { amount, unit } = convertUnit(adjustedAmount, ing.unit);
             return { ...ing, amount, unit };
         }) || [];
     };

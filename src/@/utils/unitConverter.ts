@@ -10,8 +10,9 @@ const conversions: Partial<Record<Unit, { factor: number, newUnit: Unit }>> = {
 };
 
 export const convertUnit = (amount: number, unit: Unit): { amount: number, unit: Unit } => {
-  if (conversions[unit]) {
-    const { factor, newUnit } = conversions[unit]!;
+  const conversion = conversions[unit];
+  if (conversion) {
+    const { factor, newUnit } = conversion;
     if (amount >= factor) {
       return { amount: amount / factor, unit: newUnit };
     }
