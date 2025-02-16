@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { RecipeList, RecipeDetails, AddRecipe, EditRecipe } from './components/recipe';
+import MealPlanner from './components/mealPlanner/MealPlanner';
 import { Header, Footer, Loading, ErrorMessage } from './components/layout';
 import { useRecipes } from '@/hooks/useRecipes';
 import { ROUTES } from '@/types/routes';
-import MealPlanner from 'components/MealPlanner';
 
 const App: React.FC = () => {
   const { recipes, loading, error } = useRecipes();
