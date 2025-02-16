@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
+import CopyButton from "@/components/ui/copyButton";
 import { RecipeWithDetails } from '@/types/RecipeTypes';
 import { DAYS_OF_WEEK, MEAL_TYPES, WeeklyPlan, DayPlan } from '@/types/mealPlannerTypes';
 import ShoppingList from './ShoppingList';
 import SelectedMeals from './SelectedMeals';
+import { formatAmount } from '@/utils/formatters';
+import { calculateIngredients, calculateSelectedMeals } from '@/utils/mealPlannerUtils';
 
 interface MealPlannerProps {
     recipes: RecipeWithDetails[];
@@ -93,6 +96,23 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
         }));
     };
 
+    const getTextToCopy = () => {
+        const mealServingsMap = calculateSelectedMeals(weeklyPlan, recipes);
+
+        const selectedMealsText = Object.entries(mealServingsMap).map(([mealName, { servings }]) => {
+            return `${mealName}: ${servings} portions`;
+        }).join('\n');
+
+        const ingredientMap = calculateIngredients(weeklyPlan, recipes);
+
+        const shoppingListText = Object.entries(ingredientMap).map(([key, { amount, unit }]) => {
+            const ingredientName = key.split('-')[0];
+            return `${ingredientName}: ${formatAmount(amount)} ${unit}`;
+        }).join('\n');
+
+        return `Repas sélectionnés:\n${selectedMealsText}\n\nListe de courses:\n${shoppingListText}`;
+    };
+
     return (
         <div className="container mx-auto p-4">
             {recipes.length === 0 ? (
@@ -162,6 +182,7 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                 <ShoppingList weeklyPlan={weeklyPlan} recipes={recipes} servingsMap={servingsMap} />
                 <SelectedMeals weeklyPlan={weeklyPlan} recipes={recipes} />
             </div>
+            <CopyButton textToCopy={getTextToCopy()} buttonText="Copier toutes les informations" copyType="text" />
         </div>
     );
 };
