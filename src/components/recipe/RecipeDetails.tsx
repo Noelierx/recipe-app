@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import { Clock, Flame, Copy } from 'lucide-react';
+import { Clock, Flame } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { CopyButton } from "@/components/copyButton";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -66,14 +67,19 @@ const RecipeDetails: React.FC = () => {
         }
     };
 
-    const handleCopyURL = () => {
-        const url = window.location.href;
-        navigator.clipboard.writeText(url).then(() => {
-            setCopySuccess('URL copiée dans le presse-papiers !');
-            setTimeout(() => setCopySuccess(''), 3000);
-        }).catch(err => {
-            console.error('Erreur lors de la copie de l\'URL :', err);
-        });
+    const getTextToCopy = () => {
+        const mainIngredientsText = adjustedMainIngredients.map(ing => {
+            return `${ing.ingredient.name}: ${formatAmount(ing.amount)} ${ing.unit}`;
+        }).join('\n');
+
+        const subRecipesText = adjustedSubRecipes.map(subRecipe => {
+            const ingredientsText = subRecipe.ingredients.map(ing => {
+                return `${ing.ingredient.name}: ${formatAmount(ing.amount)} ${ing.unit}`;
+            }).join('\n');
+            return `${subRecipe.title}:\n${ingredientsText}`;
+        }).join('\n\n');
+
+        return `Ingrédients principaux:\n${mainIngredientsText}\n\nSous-recettes:\n${subRecipesText}`;
     };
 
     return (
@@ -81,9 +87,7 @@ const RecipeDetails: React.FC = () => {
             <div className="w-full mb-8">
                 <div className="flex justify-between items-center">
                     <h1 className="text-3xl font-semibold mb-4">{recipe.title}</h1>
-                    <Button onClick={handleCopyURL} aria-label="Copier l'URL de la recette">
-                        <Copy className="mr-2" /> Copier l'URL
-                    </Button>
+                    <CopyButton textToCopy={getTextToCopy()} buttonText="Copier les ingrédients" />
                 </div>
                 {copySuccess && <p className="text-green-500">{copySuccess}</p>}
                 <div className="flex items-center mb-4">

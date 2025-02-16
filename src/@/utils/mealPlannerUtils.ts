@@ -51,3 +51,24 @@ export const calculateIngredients = (weeklyPlan: WeeklyPlan, recipes: RecipeWith
 
     return ingredientMap;
 };
+
+export const calculateSelectedMeals = (weeklyPlan: WeeklyPlan, recipes: RecipeWithDetails[]) => {
+    const mealServingsMap: Record<string, { servings: number, recipeId: number }> = {};
+
+    Object.values(weeklyPlan).forEach(dayPlan => {
+        Object.values(dayPlan).forEach(meal => {
+            if (meal.recipeId) {
+                const recipe = recipes.find(r => r.id === meal.recipeId);
+                if (recipe) {
+                    const key = recipe.title;
+                    if (!mealServingsMap[key]) {
+                        mealServingsMap[key] = { servings: 0, recipeId: recipe.id };
+                    }
+                    mealServingsMap[key].servings += meal.servings;
+                }
+            }
+        });
+    });
+
+    return mealServingsMap;
+};

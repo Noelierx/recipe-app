@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
+import { CopyButton } from "@/components/copyButton";
 import { RecipeWithDetails } from '@/types/RecipeTypes';
 import { DAYS_OF_WEEK, MEAL_TYPES, WeeklyPlan, DayPlan } from '@/types/mealPlannerTypes';
 import ShoppingList from './ShoppingList';
 import SelectedMeals from './SelectedMeals';
 import { formatAmount } from '@/utils/formatters';
-import { calculateIngredients } from '@/utils/calculateIngredients';
+import { calculateIngredients, calculateSelectedMeals } from '@/utils/mealPlannerUtils';
 
 interface MealPlannerProps {
     recipes: RecipeWithDetails[];
@@ -30,8 +31,6 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
             [day]: { ...initialDayPlan }
         }), {} as WeeklyPlan);
     });
-
-    const [copySuccess, setCopySuccess] = useState<string>(''); // État pour le message de confirmation
 
     const servingsMap = Object.entries(weeklyPlan).reduce((acc, [day, meals]) => {
         MEAL_TYPES.forEach(mealType => {
@@ -97,23 +96,8 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
         }));
     };
 
-    const handleCopy = () => {
-        const mealServingsMap: Record<string, { servings: number, recipeId: number }> = {};
-
-        Object.values(weeklyPlan).forEach(dayPlan => {
-            Object.values(dayPlan).forEach(meal => {
-                if (meal.recipeId) {
-                    const recipe = recipes.find(r => r.id === meal.recipeId);
-                    if (recipe) {
-                        const key = recipe.title;
-                        if (!mealServingsMap[key]) {
-                            mealServingsMap[key] = { servings: 0, recipeId: recipe.id };
-                        }
-                        mealServingsMap[key].servings += meal.servings;
-                    }
-                }
-            });
-        });
+    const getTextToCopy = () => {
+        const mealServingsMap = calculateSelectedMeals(weeklyPlan, recipes);
 
         const selectedMealsText = Object.entries(mealServingsMap).map(([mealName, { servings }]) => {
             return `${mealName}: ${servings} portions`;
@@ -126,13 +110,7 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
             return `${ingredientName}: ${formatAmount(amount)} ${unit}`;
         }).join('\n');
 
-        const textToCopy = `Repas sélectionnés:\n${selectedMealsText}\n\nListe de courses:\n${shoppingListText}`;
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            setCopySuccess('Les informations ont été copiées dans le presse-papiers !');
-            setTimeout(() => setCopySuccess(''), 3000);
-        }).catch(err => {
-            console.error('Erreur lors de la copie des informations :', err);
-        });
+        return `Repas sélectionnés:\n${selectedMealsText}\n\nListe de courses:\n${shoppingListText}`;
     };
 
     return (
@@ -204,8 +182,7 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                 <ShoppingList weeklyPlan={weeklyPlan} recipes={recipes} servingsMap={servingsMap} />
                 <SelectedMeals weeklyPlan={weeklyPlan} recipes={recipes} />
             </div>
-            <Button onClick={handleCopy} className="mt-4">Copier toutes les informations</Button>
-            {copySuccess && <p className="text-green-500 mt-2">{copySuccess}</p>}
+            <CopyButton textToCopy={getTextToCopy()} buttonText="Copier toutes les informations" />
         </div>
     );
 };

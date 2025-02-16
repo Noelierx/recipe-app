@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { RecipeWithDetails } from '@/types/RecipeTypes';
 import { WeeklyPlan } from '@/types/mealPlannerTypes';
 import { formatAmount } from '@/utils/formatters';
-import { calculateIngredients } from '@/utils/calculateIngredients';
+import { calculateIngredients } from '@/utils/mealPlannerUtils';
 
 interface ShoppingListProps {
     weeklyPlan: WeeklyPlan;
