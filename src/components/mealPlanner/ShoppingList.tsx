@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { RecipeWithDetails, RecipeIngredient } from '@/types/RecipeTypes';
-import { DayPlan, WeeklyPlan } from '@/types/mealPlannerTypes';
+import { RecipeWithDetails } from '@/types/RecipeTypes';
+import { WeeklyPlan } from '@/types/mealPlannerTypes';
 import { formatAmount } from '@/utils/formatters';
-import { convertUnit } from '@/utils/unitConverter';
-import { Unit } from '@/constants';
+import { calculateIngredients } from '@/utils/calculateIngredients';
 
 interface ShoppingListProps {
     weeklyPlan: WeeklyPlan;
@@ -28,54 +27,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes }) => {
         localStorage.setItem('checkedItems', JSON.stringify(checkedItems));
     }, [checkedItems]);
 
-    const addIngredientsToMap = (recipe: RecipeWithDetails, ratio: number, ingredientMap: Record<string, { amount: number; unit: Unit }>) => {
-        const addIngredient = (ingredient: RecipeIngredient) => {
-            const key = `${ingredient.ingredient.name}-${ingredient.unit}`;
-            if (!ingredientMap[key]) {
-                ingredientMap[key] = { amount: 0, unit: ingredient.unit };
-            }
-            ingredientMap[key].amount += ingredient.amount * ratio;
-        };
-
-        recipe.recipe_ingredients?.forEach(addIngredient);
-        recipe.sub_recipes?.forEach(subRecipe => {
-            subRecipe.ingredients?.forEach(addIngredient);
-        });
-    };
-
-    const processMeal = (meal: any, ingredientMap: Record<string, { amount: number; unit: Unit }>) => {
-        if (meal.recipeId) {
-            const recipe = recipes.find(r => r.id === meal.recipeId);
-            if (recipe) {
-                const servings = meal.servings || 1;
-                const recipeServings = recipe.servings || 1;
-                const ratio = servings / recipeServings;
-                addIngredientsToMap(recipe, ratio, ingredientMap);
-            }
-        }
-    };
-
-    const processDayPlan = (dayPlan: DayPlan, ingredientMap: Record<string, { amount: number; unit: Unit }>) => {
-        Object.values(dayPlan).forEach(meal => {
-            processMeal(meal, ingredientMap);
-        });
-    };
-
-    const calculateIngredients = () => {
-        const ingredientMap: Record<string, { amount: number; unit: Unit }> = {};
-        Object.values(weeklyPlan).forEach(dayPlan => {
-            processDayPlan(dayPlan, ingredientMap);
-        });
-        Object.keys(ingredientMap).forEach(key => {
-            const { amount, unit } = ingredientMap[key];
-            const converted = convertUnit(amount, unit);
-            ingredientMap[key] = converted;
-        });
-
-        return ingredientMap;
-    };
-
-    const ingredients = calculateIngredients();
+    const ingredients = calculateIngredients(weeklyPlan, recipes);
 
     const handleCheck = (key: string) => {
         setCheckedItems(prev => ({ ...prev, [key]: !prev[key] }));
