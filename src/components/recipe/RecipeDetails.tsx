@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import { Clock, Flame } from 'lucide-react';
+import { Clock, Flame, Copy } from 'lucide-react'; // Importer l'icône Copy
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +29,7 @@ const RecipeDetails: React.FC = () => {
     const { recipe, loading, error } = useRecipeDetails(recipeId);
     const [servings, setServings] = useState<number>(recipe?.servings || 0);
     const { deleteRecipe, isDeleting, error: deleteError } = useDeleteRecipe();
+    const [copySuccess, setCopySuccess] = useState<string>('');
 
     useEffect(() => {
         if (recipe) {
@@ -65,10 +66,26 @@ const RecipeDetails: React.FC = () => {
         }
     };
 
+    const handleCopyURL = () => {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            setCopySuccess('URL copiée dans le presse-papiers !');
+            setTimeout(() => setCopySuccess(''), 3000);
+        }).catch(err => {
+            console.error('Erreur lors de la copie de l\'URL :', err);
+        });
+    };
+
     return (
         <div className="max-w-7xl mx-auto px-4">
             <div className="w-full mb-8">
-                <h1 className="text-3xl font-semibold mb-4">{recipe.title}</h1>
+                <div className="flex justify-between items-center">
+                    <h1 className="text-3xl font-semibold mb-4">{recipe.title}</h1>
+                    <Button onClick={handleCopyURL} aria-label="Copier l'URL de la recette">
+                        <Copy className="mr-2" /> Copier l'URL
+                    </Button>
+                </div>
+                {copySuccess && <p className="text-green-500">{copySuccess}</p>}
                 <div className="flex items-center mb-4">
                     <label htmlFor="servings" className="mr-2">Portions:</label>
                     <Input
