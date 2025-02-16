@@ -81,7 +81,13 @@ const RecipeDetails: React.FC = () => {
 
         const mainInstructionsText = sanitizeInstructions(recipe.instructions);
 
-        return `Ingrédients principaux:\n${mainIngredientsText}\n\n${hasSubRecipes ? `Sous-recettes:\n${subRecipesText}\n\n` : ''}Instructions:\n${mainInstructionsText}`;
+        let textToCopy = `Ingrédients principaux:\n${mainIngredientsText}\n\n`;
+        if (hasSubRecipes) {
+            textToCopy += `Sous-recettes:\n${subRecipesText}\n\n`;
+        }
+        textToCopy += `Instructions:\n${mainInstructionsText}`;
+
+        return textToCopy;
     };
 
     return (
