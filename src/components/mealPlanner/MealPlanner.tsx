@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { RecipeWithDetails } from '@/types/RecipeTypes';
 import { DAYS_OF_WEEK, MEAL_TYPES, WeeklyPlan, DayPlan } from '@/types/mealPlannerTypes';
 import ShoppingList from './ShoppingList';
+import SelectedMeals from './SelectedMeals';
 
 interface MealPlannerProps {
     recipes: RecipeWithDetails[];
@@ -157,7 +158,10 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                     ))}
                 </div>
             )}
-            <ShoppingList weeklyPlan={weeklyPlan} recipes={recipes} servingsMap={servingsMap} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <ShoppingList weeklyPlan={weeklyPlan} recipes={recipes} servingsMap={servingsMap} />
+                <SelectedMeals weeklyPlan={weeklyPlan} recipes={recipes} />
+            </div>
         </div>
     );
 };
