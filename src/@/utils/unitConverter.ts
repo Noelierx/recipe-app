@@ -3,8 +3,8 @@ import { Unit } from '@/constants';
 const conversions: Partial<Record<Unit, { factor: number, newUnit: Unit }>> = {
   g: { factor: 1000, newUnit: 'kg' },
   kg: { factor: 1 / 1000, newUnit: 'g' },
-  ml: { factor: 1000, newUnit: 'l' },
-  l: { factor: 1 / 1000, newUnit: 'ml' },
+  ml: { factor: 10, newUnit: 'cl' },
+  cl: { factor: 10, newUnit: 'l' },
   tsp: { factor: 3, newUnit: 'tbsp' },
   tbsp: { factor: 16, newUnit: 'cup' },
   cup: { factor: 1 / 16, newUnit: 'tbsp' },
