@@ -11,7 +11,7 @@ interface ShoppingListProps {
     servingsMap: Record<number, number>;
 }
 
-const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servingsMap }) => {
+const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes }) => {
     const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>(() => {
         const saved = localStorage.getItem('checkedItems');
         if (!saved) return {};
@@ -28,7 +28,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
         localStorage.setItem('checkedItems', JSON.stringify(checkedItems));
     }, [checkedItems]);
 
-    const addIngredientsToMap = (recipe: RecipeWithDetails, ratio: number, ingredientMap: Record<string, { amount: number; unit: string }>) => {
+    const addIngredientsToMap = (recipe: RecipeWithDetails, ratio: number, ingredientMap: Record<string, { amount: number; unit: Unit }>) => {
         const addIngredient = (ingredient: RecipeIngredient) => {
             const key = `${ingredient.ingredient.name}-${ingredient.unit}`;
             if (!ingredientMap[key]) {
@@ -43,7 +43,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
         });
     };
 
-    const processMeal = (meal: any, ingredientMap: Record<string, { amount: number; unit: string }>) => {
+    const processMeal = (meal: any, ingredientMap: Record<string, { amount: number; unit: Unit }>) => {
         if (meal.recipeId) {
             const recipe = recipes.find(r => r.id === meal.recipeId);
             if (recipe) {
@@ -55,7 +55,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes, servin
         }
     };
 
-    const processDayPlan = (dayPlan: DayPlan, ingredientMap: Record<string, { amount: number; unit: string }>) => {
+    const processDayPlan = (dayPlan: DayPlan, ingredientMap: Record<string, { amount: number; unit: Unit }>) => {
         Object.values(dayPlan).forEach(meal => {
             processMeal(meal, ingredientMap);
         });
