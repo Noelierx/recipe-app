@@ -30,7 +30,6 @@ const RecipeDetails: React.FC = () => {
     const { recipe, loading, error } = useRecipeDetails(recipeId);
     const [servings, setServings] = useState<number>(recipe?.servings || 0);
     const { deleteRecipe, isDeleting, error: deleteError } = useDeleteRecipe();
-    const [copySuccess, setCopySuccess] = useState<string>('');
 
     useEffect(() => {
         if (recipe) {
@@ -89,7 +88,6 @@ const RecipeDetails: React.FC = () => {
                     <h1 className="text-3xl font-semibold mb-4">{recipe.title}</h1>
                     <CopyButton textToCopy={getTextToCopy()} buttonText="Copier les ingrédients" />
                 </div>
-                {copySuccess && <p className="text-green-500">{copySuccess}</p>}
                 <div className="flex items-center mb-4">
                     <label htmlFor="servings" className="mr-2">Portions:</label>
                     <Input
