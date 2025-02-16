@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import DOMPurify from 'dompurify';
 import { Clock, Flame } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CopyButton } from "@/components/copyButton";
+import CopyButton from "@/components/ui/copyButton";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -22,6 +21,7 @@ import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 import { formatAmount } from '@/utils/formatters';
 import { Loading, ErrorMessage } from 'components/layout';
 import { convertUnit } from '@/utils/unitConverter';
+import { sanitizeInstructions } from '@/utils/sanitizeInstructions';
 
 const RecipeDetails: React.FC = () => {
     const navigate = useNavigate();
@@ -75,10 +75,13 @@ const RecipeDetails: React.FC = () => {
             const ingredientsText = subRecipe.ingredients.map(ing => {
                 return `${ing.ingredient.name}: ${formatAmount(ing.amount)} ${ing.unit}`;
             }).join('\n');
-            return `${subRecipe.title}:\n${ingredientsText}`;
+            const instructionsText = sanitizeInstructions(subRecipe.instructions);
+            return `${subRecipe.title}:\n${ingredientsText}\n\nInstructions:\n${instructionsText}`;
         }).join('\n\n');
 
-        return `Ingrédients principaux:\n${mainIngredientsText}\n\nSous-recettes:\n${subRecipesText}`;
+        const mainInstructionsText = sanitizeInstructions(recipe.instructions);
+
+        return `Ingrédients principaux:\n${mainIngredientsText}\n\n${hasSubRecipes ? `Sous-recettes:\n${subRecipesText}\n\n` : ''}Instructions:\n${mainInstructionsText}`;
     };
 
     return (
@@ -86,7 +89,10 @@ const RecipeDetails: React.FC = () => {
             <div className="w-full mb-8">
                 <div className="flex justify-between items-center">
                     <h1 className="text-3xl font-semibold mb-4">{recipe.title}</h1>
-                    <CopyButton textToCopy={getTextToCopy()} buttonText="Copier les ingrédients" />
+                    <div className="flex space-x-4">
+                        <CopyButton textToCopy={getTextToCopy()} buttonText="Copier les détails de la recette" copyType="text" />
+                        <CopyButton buttonText="Copier l'URL de la recette" copyType="url" />
+                    </div>
                 </div>
                 <div className="flex items-center mb-4">
                     <label htmlFor="servings" className="mr-2">Portions:</label>
@@ -147,19 +153,13 @@ const RecipeDetails: React.FC = () => {
                         <div key={index} className="mb-6">
                             <h3 className="text-xl font-semibold mb-2">{subRecipe.title}</h3>
                             <div dangerouslySetInnerHTML={{ 
-                                __html: DOMPurify.sanitize(subRecipe.instructions, {
-                                    ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li', 'a'],
-                                    ALLOWED_ATTR: [] 
-                                }) 
+                                __html: sanitizeInstructions(subRecipe.instructions)
                             }} />
                         </div>
                     ))}
                     {hasSubRecipes && (<h3 className="text-xl font-semibold mb-2">La suite</h3>)}
                     <div className="mb-6" dangerouslySetInnerHTML={{ 
-                        __html: DOMPurify.sanitize(recipe.instructions, { 
-                        ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li', 'a'], 
-                        ALLOWED_ATTR: [] 
-                        }) 
+                        __html: sanitizeInstructions(recipe.instructions)
                     }} />
                     <div className="flex space-x-4">
                         <Button onClick={() => navigate(`/recipe/${recipe.id}/edit`)}>Modifier la recette</Button>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
-import { CopyButton } from "@/components/copyButton";
+import CopyButton from "@/components/ui/copyButton";
 import { RecipeWithDetails } from '@/types/RecipeTypes';
 import { DAYS_OF_WEEK, MEAL_TYPES, WeeklyPlan, DayPlan } from '@/types/mealPlannerTypes';
 import ShoppingList from './ShoppingList';
@@ -182,7 +182,7 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
                 <ShoppingList weeklyPlan={weeklyPlan} recipes={recipes} servingsMap={servingsMap} />
                 <SelectedMeals weeklyPlan={weeklyPlan} recipes={recipes} />
             </div>
-            <CopyButton textToCopy={getTextToCopy()} buttonText="Copier toutes les informations" />
+            <CopyButton textToCopy={getTextToCopy()} buttonText="Copier toutes les informations" copyType="text" />
         </div>
     );
 };
