@@ -14,12 +14,13 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-  } from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog"
 import { RecipeIngredient } from '@/types/RecipeTypes';
 import { useRecipeDetails } from '@/hooks/useRecipeDetails';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 import { formatAmount } from '@/utils/formatters';
 import { Loading, ErrorMessage } from 'components/layout';
+import { convertUnit } from '@/utils/unitConverter';
 
 const RecipeDetails: React.FC = () => {
     const navigate = useNavigate();
@@ -40,10 +41,11 @@ const RecipeDetails: React.FC = () => {
     if (!recipe) return <div>Recette non trouvée</div>;
 
     const adjustIngredients = (ingredients: RecipeIngredient[] | undefined, originalServings: number, newServings: number) => {
-        return ingredients?.map(ing => ({
-            ...ing,
-            amount: (ing.amount / originalServings) * newServings
-        })) || [];
+        return ingredients?.map(ing => {
+            const adjustedAmount = (ing.amount / originalServings) * newServings;
+            const { amount, unit } = convertUnit(adjustedAmount, ing.unit);
+            return { ...ing, amount, unit };
+        }) || [];
     };
 
     const adjustedMainIngredients = adjustIngredients(recipe.recipe_ingredients, recipe.servings, servings);

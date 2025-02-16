@@ -7,7 +7,8 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@
 import { RecipeIngredient } from '@/types/RecipeTypes';
 import useIngredient from '@/hooks/useIngredient';
 import IngredientForm from './IngredientForm';
-import { allowedUnits } from '@/constants';
+import { allowedUnits, Unit } from '@/constants';
+import { convertUnit } from '@/utils/unitConverter';
 
 interface IngredientHandlerProps {
   ingredients: RecipeIngredient[];
@@ -21,7 +22,8 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
     setIngredients(prev => prev.map((ing, i) => {
       if (i !== index) return ing;
       if (field === 'amount') {
-        return { ...ing, amount: Number(value) };
+        const { amount, unit } = convertUnit(Number(value), ing.unit as Unit);
+        return { ...ing, amount, unit };
       } else if (field === 'name') {
         return { 
           ...ing, 
