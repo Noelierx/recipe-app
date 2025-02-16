@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { WeeklyPlan } from '@/types/mealPlannerTypes';
 import { RecipeWithDetails } from '@/types/RecipeTypes';
+import { calculateSelectedMeals } from '@/utils/mealPlannerUtils';
 
 interface SelectedMealsProps {
     weeklyPlan: WeeklyPlan;
@@ -9,22 +10,7 @@ interface SelectedMealsProps {
 }
 
 const SelectedMeals: React.FC<SelectedMealsProps> = ({ weeklyPlan, recipes }) => {
-    const mealServingsMap: Record<string, { servings: number, recipeId: number }> = {};
-
-    Object.values(weeklyPlan).forEach(dayPlan => {
-        Object.values(dayPlan).forEach(meal => {
-            if (meal.recipeId) {
-                const recipe = recipes.find(r => r.id === meal.recipeId);
-                if (recipe) {
-                    const key = recipe.title;
-                    if (!mealServingsMap[key]) {
-                        mealServingsMap[key] = { servings: 0, recipeId: recipe.id };
-                    }
-                    mealServingsMap[key].servings += meal.servings;
-                }
-            }
-        });
-    });
+    const mealServingsMap = calculateSelectedMeals(weeklyPlan, recipes);
 
     return (
         <div className="border rounded-lg m-4 p-4 max-w-md">
