@@ -12,6 +12,7 @@ export interface Ingredient {
   unit: string;
   id?: number;
   name: string;
+  order: number;
 }
 
 export interface RecipeIngredient {
