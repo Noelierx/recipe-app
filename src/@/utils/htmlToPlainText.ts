@@ -56,7 +56,7 @@ export const htmlToPlainText = (html: string): string => {
     
     // Clean up extra newlines and whitespace
     return plainText
-        .replace(/\n\s*\n\s*\n/g, '\n\n') // Replace multiple newlines with double newline
-        .replace(/^\s+|\s+$/g, '') // Trim whitespace from start and end
+        .replace(/\n{3,}/g, '\n\n') // Replace 3 or more newlines with double newline
+        .trim() // Trim whitespace from start and end
         .replace(/[ \t]+/g, ' '); // Replace multiple spaces/tabs with single space
 };
