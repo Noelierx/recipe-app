@@ -5,8 +5,7 @@ import { Clock, Flame } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import SearchBar from 'components/SearchBar';
-import { Loading, ErrorMessage } from 'components/layout';
+import FilterSection from 'components/FilterSection';
 import { RecipeWithDetails, Tag } from '@/types/RecipeTypes';
 import { useGetTags } from '@/hooks/useGetTags';
 
@@ -82,44 +81,17 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
         });
     };
 
-    const getButtonVariant = (tag: Tag): "default" | "secondary" => {
-        const isSelected = selectedTags.some(t =>
-            t.id === tag.id || (t.id === undefined && t.name === tag.name)
-        );
-        return isSelected ? "default" : "secondary";
-    };
-
-    const renderTags = () => {
-        if (loading) {
-            return <Loading />;
-        }
-        if (error) {
-            return <ErrorMessage message={`Erreur lors du chargement des tags : ${error}`} />
-        }
-        if (allTags.length === 0) {
-            return <div className="text-muted">Aucun tag disponible</div>;
-        }
-        return allTags.map((tag, index) => (
-            <Button
-                key={`tag-${tag.id ?? tag.name}-${index}`}
-                onClick={() => handleTagSelect(tag)}
-                variant={getButtonVariant(tag)}
-                className="mr-2 mb-2"
-            >
-                {tag.name}
-            </Button>
-        ));
-    };
-
     return (
         <div>
-            <SearchBar
+            <FilterSection
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                allTags={allTags}
+                selectedTags={selectedTags}
+                onTagSelect={handleTagSelect}
+                loading={loading}
+                error={error}
             />
-            <div className="mb-4">
-                {renderTags()}
-            </div>
             <Button onClick={sortRecipes} className="mb-4">
                 Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
             </Button>
