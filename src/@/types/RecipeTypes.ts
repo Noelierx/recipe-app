@@ -30,6 +30,8 @@ export interface SubRecipe {
   title: string;
   instructions: string;
   ingredients: RecipeIngredient[];
+  isReference?: boolean;
+  originalId?: number;
 }
 
 export interface RecipeWithDetails extends Recipe {

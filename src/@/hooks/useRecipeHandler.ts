@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import sanitizeHtml from 'sanitize-html';
 import { supabase } from '@/utils/supabaseClient';
-import { Recipe, RecipeIngredient, Tag } from '@/types/RecipeTypes';
-
-type SubRecipeIngredient = RecipeIngredient & { id: string };
-type SubRecipe = { id?: number; title: string; instructions: string; ingredients: SubRecipeIngredient[] };
+import { Recipe, RecipeIngredient, Tag, SubRecipe } from '@/types/RecipeTypes';
 
 interface RecipeResult {
   id: number;
@@ -179,6 +176,9 @@ export const useRecipeHandler = (recipeId?: number) => {
   };
 
   const handleSubRecipes = async (subRecipes: SubRecipe[], recipeId: number, existingRecipeId: number | null) => {
+    // Filter out referenced subrecipes - we don't want to save them to database
+    const ownedSubRecipes = subRecipes.filter(sr => !sr.isReference);
+    
     if (existingRecipeId !== null) {
       const { data: existingSubRecipes, error: fetchError } = await supabase
         .from('sub_recipes')
@@ -187,7 +187,7 @@ export const useRecipeHandler = (recipeId?: number) => {
       
       if (fetchError) throw fetchError;
       const existingSubRecipeIds = new Set(existingSubRecipes.map(sr => sr.id));
-      for (const subRecipe of subRecipes) {
+      for (const subRecipe of ownedSubRecipes) {
         await upsertSubRecipe(subRecipe, recipeId, existingSubRecipeIds);
       }
       if (existingSubRecipeIds.size > 0) {
@@ -197,7 +197,7 @@ export const useRecipeHandler = (recipeId?: number) => {
           .in('id', Array.from(existingSubRecipeIds));
       }
     } else {
-      for (const subRecipe of subRecipes) {
+      for (const subRecipe of ownedSubRecipes) {
         await upsertSubRecipe(subRecipe, recipeId, new Set());
       }
     }
