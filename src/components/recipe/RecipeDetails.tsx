@@ -22,6 +22,7 @@ import { formatAmount } from '@/utils/formatters';
 import { Loading, ErrorMessage } from 'components/layout';
 import { convertUnit } from '@/utils/unitConverter';
 import { sanitizeInstructions } from '@/utils/sanitizeInstructions';
+import { htmlToPlainText } from '@/utils/htmlToPlainText';
 
 const RecipeDetails: React.FC = () => {
     const navigate = useNavigate();
@@ -75,11 +76,11 @@ const RecipeDetails: React.FC = () => {
             const ingredientsText = subRecipe.ingredients.map(ing => {
                 return `${ing.ingredient.name}: ${formatAmount(ing.amount)} ${ing.unit}`;
             }).join('\n');
-            const instructionsText = sanitizeInstructions(subRecipe.instructions);
+            const instructionsText = htmlToPlainText(sanitizeInstructions(subRecipe.instructions));
             return `${subRecipe.title}:\n${ingredientsText}\n\nInstructions:\n${instructionsText}`;
         }).join('\n\n');
 
-        const mainInstructionsText = sanitizeInstructions(recipe.instructions);
+        const mainInstructionsText = htmlToPlainText(sanitizeInstructions(recipe.instructions));
 
         let textToCopy = `Ingrédients principaux:\n${mainIngredientsText}\n\n`;
         if (hasSubRecipes) {
