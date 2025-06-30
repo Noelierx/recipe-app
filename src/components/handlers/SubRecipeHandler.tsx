@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubRecipe, RecipeIngredient } from '@/types/RecipeTypes';
 import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
+import SubRecipeSelector from 'components/SubRecipeSelector';
 
 interface SubRecipeHandlerProps {
   subRecipes: SubRecipe[];
@@ -35,6 +36,16 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
     setSubRecipes(prevSubRecipes => [
       ...prevSubRecipes, 
       { id: Date.now(), title: '', instructions: '', ingredients: [] }
+    ]);
+  }, [setSubRecipes]);
+
+  const addExistingSubRecipe = useCallback((selectedSubRecipe: SubRecipe) => {
+    setSubRecipes(prevSubRecipes => [
+      ...prevSubRecipes,
+      {
+        ...selectedSubRecipe,
+        id: Date.now(), // Generate new ID for the copy
+      }
     ]);
   }, [setSubRecipes]);
 
@@ -84,9 +95,12 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
           </Button>
         </div>
       ))}
-      <Button onClick={addSubRecipe}>
-        <CirclePlus className="mr-2" /> Ajouter une sous-recette
-      </Button>
+      <div className="flex gap-2">
+        <Button onClick={addSubRecipe}>
+          <CirclePlus className="mr-2" /> Ajouter une sous-recette
+        </Button>
+        <SubRecipeSelector onSelectSubRecipe={addExistingSubRecipe} />
+      </div>
     </div>
   );
 };
