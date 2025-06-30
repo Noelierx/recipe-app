@@ -49,7 +49,10 @@ const SubRecipeSelector: React.FC<SubRecipeSelectorProps> = ({ onSelectSubRecipe
   };
 
   const formatAmount = (amount: number): string => {
-    return amount % 1 === 0 ? amount.toString() : amount.toFixed(2).replace(/\.?0+$/, '');
+    if (amount % 1 === 0) return amount.toString();
+    const fixed = amount.toFixed(2);
+    // Remove trailing zeros and decimal point if not needed (safer alternative to regex)
+    return fixed.replace(/\.?0*$/, '');
   };
 
   return (
