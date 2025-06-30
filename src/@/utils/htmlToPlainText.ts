@@ -7,44 +7,48 @@ export const htmlToPlainText = (html: string): string => {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
 
+    // Helper functions to handle specific HTML elements
+    const handleParagraph = (element: Element, result: string): string => {
+        if (result && !result.endsWith('\n')) {
+            return result + '\n' + extractTextContent(element) + '\n';
+        }
+        return result + extractTextContent(element) + '\n';
+    };
+
+    const handleListItem = (element: Element): string => {
+        return '• ' + extractTextContent(element) + '\n';
+    };
+
+    const handleList = (element: Element, result: string): string => {
+        if (result && !result.endsWith('\n')) {
+            return result + '\n' + extractTextContent(element);
+        }
+        return result + extractTextContent(element);
+    };
+
     // Helper function to process text nodes and convert HTML structure to plain text
     const extractTextContent = (element: Element): string => {
         let result = '';
         
         for (const child of Array.from(element.childNodes)) {
             if (child.nodeType === Node.TEXT_NODE) {
-                // Add text content
-                result += child.textContent || '';
+                // Add text content using nullish coalescing
+                result += child.textContent ?? '';
             } else if (child.nodeType === Node.ELEMENT_NODE) {
                 const childElement = child as Element;
                 const tagName = childElement.tagName.toLowerCase();
                 
-                switch (tagName) {
-                    case 'br':
-                        result += '\n';
-                        break;
-                    case 'p':
-                        if (result && !result.endsWith('\n')) {
-                            result += '\n';
-                        }
-                        result += extractTextContent(childElement);
-                        result += '\n';
-                        break;
-                    case 'li':
-                        result += '• ' + extractTextContent(childElement);
-                        result += '\n';
-                        break;
-                    case 'ul':
-                    case 'ol':
-                        if (result && !result.endsWith('\n')) {
-                            result += '\n';
-                        }
-                        result += extractTextContent(childElement);
-                        break;
-                    default:
-                        // For other tags (b, strong, i, em, u, a), just extract text content
-                        result += extractTextContent(childElement);
-                        break;
+                if (tagName === 'br') {
+                    result += '\n';
+                } else if (tagName === 'p') {
+                    result = handleParagraph(childElement, result);
+                } else if (tagName === 'li') {
+                    result += handleListItem(childElement);
+                } else if (tagName === 'ul' || tagName === 'ol') {
+                    result = handleList(childElement, result);
+                } else {
+                    // For other tags (b, strong, i, em, u, a), just extract text content
+                    result += extractTextContent(childElement);
                 }
             }
         }
