@@ -44,13 +44,23 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
       ...prevSubRecipes,
       {
         ...selectedSubRecipe,
-        id: Date.now(), // Generate new ID for the copy
+        isReference: true,
+        originalId: selectedSubRecipe.id,
+        id: undefined, // Don't assign new ID for references
       }
     ]);
   }, [setSubRecipes]);
 
   const removeSubRecipe = useCallback(async (index: number) => {
     const subRecipe = subRecipes[index];
+    
+    // If it's a reference, just remove it from the list without deleting from database
+    if (subRecipe.isReference) {
+      setSubRecipes(prev => prev.filter((_, i) => i !== index));
+      return;
+    }
+    
+    // For non-reference subrecipes, delete from database if they have an ID
     if (subRecipe.id) {
       const success = await deleteSubRecipe(subRecipe.id);
       if (success) {
@@ -68,30 +78,50 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
       <h3>Sous-recette</h3>
       {subRecipes.map((subRecipe, index) => (
         <div key={index} className="space-y-2 mb-4">
+          {subRecipe.isReference && (
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-2 mb-2">
+              <p className="text-sm text-blue-700">📎 Sous-recette référencée (non modifiable)</p>
+            </div>
+          )}
           <Label htmlFor={`subrecipe-title-${index}`}>Titre</Label>
           <Input
             id={`subrecipe-title-${index}`}
             value={subRecipe.title}
-            onChange={(e) => handleSubRecipeChange(index, 'title', e.target.value)}
+            onChange={(e) => !subRecipe.isReference && handleSubRecipeChange(index, 'title', e.target.value)}
             placeholder="titre de la sous-recette"
+            readOnly={subRecipe.isReference}
           />
           <Label htmlFor={`subrecipe-instructions-${index}`}>Instructions</Label>
           <RecipeInstructionsEditor
             value={subRecipe.instructions}
-            onChange={(value) => handleSubRecipeChange(index, 'instructions', value)}
+            onChange={(value) => !subRecipe.isReference && handleSubRecipeChange(index, 'instructions', value)}
             placeholder="Instructions de la sous-recette"
           />
-          <IngredientHandler
-            ingredients={subRecipe.ingredients || []}
-            setIngredients={(ingredients) => handleSubRecipeChange(index, 'ingredients', ingredients)}
-          />
+          {!subRecipe.isReference && (
+            <IngredientHandler
+              ingredients={subRecipe.ingredients || []}
+              setIngredients={(ingredients) => handleSubRecipeChange(index, 'ingredients', ingredients)}
+            />
+          )}
+          {subRecipe.isReference && (
+            <div>
+              <Label>Ingrédients (lecture seule)</Label>
+              <div className="border rounded p-3 bg-gray-50">
+                {subRecipe.ingredients.map((ing, ingIndex) => (
+                  <div key={ingIndex} className="text-sm mb-1">
+                    {ing.ingredient.name}: {ing.amount} {ing.unit}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <Button 
             type="button" 
             onClick={() => removeSubRecipe(index)}
             variant="destructive"
             disabled={isDeleting}
           >
-            <Trash2 className="mr-2" /> Retirer la sous-recette
+            <Trash2 className="mr-2" /> {subRecipe.isReference ? 'Retirer la référence' : 'Retirer la sous-recette'}
           </Button>
         </div>
       ))}
