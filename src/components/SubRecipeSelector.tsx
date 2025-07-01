@@ -27,8 +27,8 @@ const SubRecipeSelector: React.FC<SubRecipeSelectorProps> = ({ onSelectSubRecipe
     
     const query = searchQuery.toLowerCase();
     return subRecipes.filter(sr => 
-      sr.title.toLowerCase().includes(query) ||
-      sr.recipe_title.toLowerCase().includes(query) ||
+      sr.title.toLowerCase().includes(query) ??
+      sr.recipe_title.toLowerCase().includes(query) ??
       sr.ingredients.some(ing => 
         ing.ingredient.name.toLowerCase().includes(query)
       )
