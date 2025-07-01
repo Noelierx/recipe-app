@@ -99,7 +99,7 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
           />
           {!subRecipe.isReference && (
             <IngredientHandler
-              ingredients={subRecipe.ingredients || []}
+              ingredients={subRecipe.ingredients ?? []}
               setIngredients={(ingredients) => handleSubRecipeChange(index, 'ingredients', ingredients)}
             />
           )}

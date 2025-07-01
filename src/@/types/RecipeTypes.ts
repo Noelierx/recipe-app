@@ -18,6 +18,7 @@ export interface RecipeIngredient {
   amount: number;
   unit: string;
   ingredient: Ingredient;
+  order_position?: number;
 }
 
 export interface Tag {

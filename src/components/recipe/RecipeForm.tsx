@@ -48,30 +48,34 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
     error,
 }) => {
     return (
-        <form onSubmit={onSubmit} className="space-y-4">
-            <div>
-                <Label htmlFor="title">Titre de la recette</Label>
-                <Input
-                    id="title"
-                    name="title"
-                    value={recipe.title}
-                    onChange={(e) => setRecipe({ ...recipe, title: e.target.value })}
-                    placeholder="Ajouter le titre de la recette"
-                    required
-                />
-            </div>
+        <form onSubmit={onSubmit} className="space-y-6">
+            <div className="space-y-4">
+                <div>
+                    <Label htmlFor="title">Titre de la recette</Label>
+                    <Input
+                        id="title"
+                        name="title"
+                        value={recipe.title}
+                        onChange={(e) => setRecipe({ ...recipe, title: e.target.value })}
+                        placeholder="Ajouter le titre de la recette"
+                        className="h-11"
+                        required
+                    />
+                </div>
 
-            <div>
-                <Label htmlFor="servings">Portions</Label>
-                <Input
-                    id="servings"
-                    name="servings"
-                    type="number"
-                    value={recipe.servings}
-                    onChange={(e) => setRecipe({ ...recipe, servings: Number(e.target.value) })}
-                    min="1"
-                    required
-                />
+                <div>
+                    <Label htmlFor="servings">Portions</Label>
+                    <Input
+                        id="servings"
+                        name="servings"
+                        type="number"
+                        value={recipe.servings}
+                        onChange={(e) => setRecipe({ ...recipe, servings: Number(e.target.value) })}
+                        min="1"
+                        className="h-11 w-32"
+                        required
+                    />
+                </div>
             </div>
 
             <IngredientHandler 
@@ -94,35 +98,35 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
             <div>
                 <Label htmlFor="instructions">Instructions</Label>
                 <RecipeInstructionsEditor
-                    value={recipe.instructions || ''}
+                    value={recipe.instructions ?? ''}
                     onChange={(value) => setRecipe(prev => ({ ...prev, instructions: value }))}
                     placeholder="Ajouter les instructions pour réaliser la recette"
                 />
             </div>
 
-            <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <TimeInput
                     id="prepTime"
                     label="Temps de préparation (minutes)"
                     value={prepTime}
                     onChange={(value) => setPrepTime(value ?? 0)}
-                    icon={<Clock className="mr-2" aria-hidden="true" />}
+                    icon={<Clock className="mr-2 h-4 w-4" aria-hidden="true" />}
                 />
-            </div>
-            <div>
                 <TimeInput
                     id="cookTime"
                     label="Temps de cuisson (minutes)"
                     value={cookTime}
                     onChange={(value) => setCookTime(value ?? 0)}
-                    icon={<Flame className="mr-2" aria-hidden="true" />}
+                    icon={<Flame className="mr-2 h-4 w-4" aria-hidden="true" />}
                 />
             </div>
 
-            <Button type="submit" disabled={loading}>
-                {loading ? 'En cours de traitement...' : 'Soumettre'}
-            </Button>
-            {error && <p className="text-red-500">{error}</p>}
+            <div className="pt-4">
+                <Button type="submit" disabled={loading} className="w-full sm:w-auto">
+                    {loading ? 'En cours de traitement...' : 'Soumettre'}
+                </Button>
+                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            </div>
         </form>
     );
 };

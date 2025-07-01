@@ -39,7 +39,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ weeklyPlan, recipes }) => {
             <ul className="space-y-2">
                 {Object.entries(ingredients).map(([key, { amount, unit }]) => {
                     const ingredientName = key.split('-')[0];
-                    const isChecked = checkedItems[key] || false;
+                    const isChecked = checkedItems[key] ?? false;
                     return (
                         <li key={key} className="flex justify-between items-center">
                             <input

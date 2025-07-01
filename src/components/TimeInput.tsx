@@ -12,18 +12,21 @@ interface TimeInputProps {
   
   const TimeInput: React.FC<TimeInputProps> = ({ value, onChange, icon, label, id }) => (
     <div>
-      <Label htmlFor={id}>{label}</Label>
-      <div className="flex items-center">
+      <Label htmlFor={id} className="text-sm md:text-base">{label}</Label>
+      <div className="flex items-center mt-1">
         {icon}
         <Input
           id={id}
           name={id}
           type="number"
-          value={value || ''}
+          value={value ?? ''}
           onChange={(e) => {
             const value = e.target.value;
             onChange(value === '' ? undefined : Number(value));
           }}
+          className="h-11"
+          min="0"
+          step="1"
         />
       </div>
     </div>

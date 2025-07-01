@@ -160,13 +160,14 @@ export const useRecipeHandler = (recipeId?: number) => {
         .eq('recipe_id', existingRecipeId);
     }
 
-    const updatedIngredients = await Promise.all(mainIngredients.map(async (ing) => {
+    const updatedIngredients = await Promise.all(mainIngredients.map(async (ing, index) => {
       const ingredientData = await createIngredientIfNotExists(ing.ingredient);
       return {
         recipe_id: recipeId,
         ingredient_id: ingredientData.id,
         amount: ing.amount,
-        unit: ing.unit
+        unit: ing.unit,
+        order_position: ing.order_position ?? index
       };
     }));
 
@@ -245,13 +246,14 @@ export const useRecipeHandler = (recipeId?: number) => {
       .delete()
       .eq('sub_recipe_id', subRecipe.id);
   
-    const updatedSubIngredients = await Promise.all(subRecipe.ingredients.map(async (ing) => {
+    const updatedSubIngredients = await Promise.all(subRecipe.ingredients.map(async (ing, index) => {
       const ingredientData = await createIngredientIfNotExists(ing.ingredient);
       return {
         sub_recipe_id: subRecipe.id,
         ingredient_id: ingredientData.id,
         amount: ing.amount,
-        unit: ing.unit
+        unit: ing.unit,
+        order_position: ing.order_position ?? index
       };
     }));
   

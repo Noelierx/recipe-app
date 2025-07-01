@@ -29,11 +29,11 @@ const EditRecipe: React.FC = () => {
     useEffect(() => {
         if (initialRecipe) {
             setRecipe(initialRecipe);
-            setIngredients(initialRecipe.recipe_ingredients || []);
-            setSelectedTags(initialRecipe.tags || []);
-            setSubRecipes(initialRecipe.sub_recipes || []);
-            setPrepTime(initialRecipe.prep_time || 0);
-            setCookTime(initialRecipe.cook_time || 0);
+            setIngredients(initialRecipe.recipe_ingredients ?? []);
+            setSelectedTags(initialRecipe.tags ?? []);
+            setSubRecipes(initialRecipe.sub_recipes ?? []);
+            setPrepTime(initialRecipe.prep_time ?? 0);
+            setCookTime(initialRecipe.cook_time ?? 0);
         }
     }, [initialRecipe]);
 

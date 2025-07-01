@@ -18,11 +18,11 @@ const App: React.FC = () => {
   } else {
     content = (
       <Routes>
-        <Route path={ROUTES.HOME} element={<RecipeList recipes={recipes || []} />} />
+        <Route path={ROUTES.HOME} element={<RecipeList recipes={recipes ?? []} />} />
         <Route path={ROUTES.RECIPE_DETAILS({ id: ':id' })} element={<RecipeDetails />} />
         <Route path={ROUTES.ADD_RECIPE} element={<AddRecipe />} />
         <Route path={ROUTES.EDIT_RECIPE({ id: ':id' })} element={<EditRecipe />} />
-        <Route path={ROUTES.MEAL_PLANNER} element={<MealPlanner recipes={recipes || []} />} />
+        <Route path={ROUTES.MEAL_PLANNER} element={<MealPlanner recipes={recipes ?? []} />} />
       </Routes>
     );
   }
@@ -30,7 +30,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Header />
-      <main className="container mx-auto p-4">
+      <main className="container mx-auto px-4 py-6 min-h-screen">
         {content}
       </main>
       <Footer />

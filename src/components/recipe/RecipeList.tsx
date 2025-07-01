@@ -5,8 +5,7 @@ import { Clock, Flame } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import SearchBar from 'components/SearchBar';
-import { Loading, ErrorMessage } from 'components/layout';
+import FilterSection from 'components/FilterSection';
 import { RecipeWithDetails, Tag } from '@/types/RecipeTypes';
 import { useGetTags } from '@/hooks/useGetTags';
 
@@ -82,82 +81,61 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
         });
     };
 
-    const getButtonVariant = (tag: Tag): "default" | "secondary" => {
-        const isSelected = selectedTags.some(t =>
-            t.id === tag.id || (t.id === undefined && t.name === tag.name)
-        );
-        return isSelected ? "default" : "secondary";
-    };
-
-    const renderTags = () => {
-        if (loading) {
-            return <Loading />;
-        }
-        if (error) {
-            return <ErrorMessage message={`Erreur lors du chargement des tags : ${error}`} />
-        }
-        if (allTags.length === 0) {
-            return <div className="text-muted">Aucun tag disponible</div>;
-        }
-        return allTags.map((tag, index) => (
-            <Button
-                key={`tag-${tag.id ?? tag.name}-${index}`}
-                onClick={() => handleTagSelect(tag)}
-                variant={getButtonVariant(tag)}
-                className="mr-2 mb-2"
-            >
-                {tag.name}
-            </Button>
-        ));
-    };
-
     return (
         <div>
-            <SearchBar
+            <FilterSection
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                allTags={allTags}
+                selectedTags={selectedTags}
+                onTagSelect={handleTagSelect}
+                loading={loading}
+                error={error}
             />
-            <div className="mb-4">
-                {renderTags()}
-            </div>
-            <Button onClick={sortRecipes} className="mb-4">
+            <Button onClick={sortRecipes} className="mb-4" size="sm">
                 Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
             </Button>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredRecipes.map(recipe => (
-                    <Card key={recipe.id}>
-                        <CardHeader>
-                            <CardTitle>{recipe.title}</CardTitle>
+                    <Card key={recipe.id} className="flex flex-col">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-lg md:text-xl line-clamp-2">{recipe.title}</CardTitle>
                             <div className="flex flex-wrap gap-1 mt-2">
                                 {recipe.tags.map((tag, index) => (
-                                    <Badge key={`${recipe.id}-${tag.id ?? index}-${tag.name}`}>
+                                    <Badge key={`${recipe.id}-${tag.id ?? index}-${tag.name}`} variant="secondary" className="text-xs">
                                         {tag.name}
                                     </Badge>
                                 ))}
                             </div>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="flex-1 pt-0">
                             {recipe.prep_time ? (
-                                <div className="flex items-center mb-4">
-                                    <Clock className="mr-2" aria-hidden="true" />
-                                    <span>Temps de préparation: {recipe.prep_time} minutes</span>
+                                <div className="flex items-center mb-3">
+                                    <Clock className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                                    <span className="text-sm">Temps de préparation: {recipe.prep_time} minutes</span>
                                 </div>
                             ) : null}
                             {recipe.cook_time ? (
-                                <div className="flex items-center mb-4">
-                                    <Flame className="mr-2" aria-hidden="true" />
-                                    <span>Temps de cuisson: {recipe.cook_time} minutes</span>
+                                <div className="flex items-center mb-3">
+                                    <Flame className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                                    <span className="text-sm">Temps de cuisson: {recipe.cook_time} minutes</span>
                                 </div>
                             ) : null}
-                            <div className="mb-6" dangerouslySetInnerHTML={{
+                            <div className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(recipe.instructions, {
                                     ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li', 'a'],
                                     ALLOWED_ATTR: []
                                 })
                             }} />
                         </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <Button onClick={() => viewRecipeDetail(recipe)}>Voir la recette</Button>
+                        <CardFooter className="pt-3">
+                            <Button 
+                                onClick={() => viewRecipeDetail(recipe)} 
+                                className="w-full"
+                                size="sm"
+                            >
+                                Voir la recette
+                            </Button>
                         </CardFooter>
                     </Card>
                 ))}
