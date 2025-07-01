@@ -25,8 +25,8 @@ export const calculateIngredients = (weeklyPlan: WeeklyPlan, recipes: RecipeWith
         if (meal.recipeId) {
             const recipe = recipes.find(r => r.id === meal.recipeId);
             if (recipe) {
-                const servings = meal.servings ?? 1;
-                const recipeServings = recipe.servings ?? 1;
+                const servings = meal.servings || 1;
+                const recipeServings = recipe.servings || 1;
                 const ratio = servings / recipeServings;
                 addIngredientsToMap(recipe, ratio);
             }
