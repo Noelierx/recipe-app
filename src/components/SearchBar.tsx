@@ -13,7 +13,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, onSearchChange }) =>
             placeholder="Chercher une recette" 
             value={searchQuery} 
             onChange={(e) => onSearchChange(e.target.value)} 
-            className="mb-4 w-full"
+            className="mb-4 w-full h-11"
             aria-label="Chercher des recettes par ingrédients, tags ou titre"
             role="searchbox"
             onKeyDown={(e) => {
