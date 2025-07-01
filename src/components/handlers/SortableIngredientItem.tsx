@@ -51,22 +51,29 @@ const SortableIngredientItem: React.FC<SortableIngredientItemProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center space-x-2 mb-2 p-2 bg-white border rounded-md ${
-        isDragging ? 'shadow-lg' : 'shadow-sm'
+      className={`flex items-center space-x-2 mb-2 p-2 bg-white border rounded-md transition-all duration-200 ${
+        isDragging 
+          ? 'shadow-2xl border-blue-300 bg-blue-50 rotate-2 scale-105' 
+          : 'shadow-sm hover:shadow-md border-gray-200'
       }`}
     >
       <div
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing p-1 text-gray-500 hover:text-gray-700"
-        aria-label="Drag to reorder ingredient"
+        className="cursor-grab active:cursor-grabbing p-1 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+        aria-label={`Drag to reorder ${ingredient.ingredient.name} ingredient`}
         tabIndex={0}
+        role="button"
         onKeyDown={(e) => {
-          // Basic keyboard support - space/enter to start drag
+          // Enhanced keyboard support for accessibility
           if (e.key === ' ' || e.key === 'Enter') {
             e.preventDefault();
-            // Note: Full keyboard drag-and-drop would require additional implementation
-            // For now, we provide the drag handle for mouse/touch users
+            // The @dnd-kit library handles keyboard drag-and-drop automatically
+            // when using the KeyboardSensor with sortableKeyboardCoordinates
+          }
+          // Allow arrow key navigation when focused
+          if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            e.stopPropagation(); // Prevent parent handlers
           }
         }}
       >

@@ -107,7 +107,12 @@ const constructRecipeWithDetails = (
 ): RecipeWithDetails => {
   return {
     ...recipeData,
-    recipe_ingredients: ingredientsData,
+    recipe_ingredients: ingredientsData.map((ingredient: any) => ({
+      amount: ingredient.amount,
+      unit: ingredient.unit,
+      ingredient: ingredient.ingredient,
+      order_position: ingredient.order_position
+    })),
     tags: tagsData,
     sub_recipes: subRecipesData.map((sr: any) => ({
       ...sr,
