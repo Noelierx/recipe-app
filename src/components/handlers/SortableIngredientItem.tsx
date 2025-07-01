@@ -58,6 +58,7 @@ const SortableIngredientItem: React.FC<SortableIngredientItemProps> = ({
       }`}
     >
       <button
+        type="button"
         {...attributes}
         {...listeners}
         className="cursor-grab active:cursor-grabbing p-1 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
