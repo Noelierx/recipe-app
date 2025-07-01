@@ -177,15 +177,14 @@ export const useRecipeHandler = (recipeId?: number) => {
   };
 
   const handleSubRecipes = async (subRecipes: SubRecipe[], recipeId: number, existingRecipeId: number | null) => {
-    // Filter out referenced subrecipes - we don't want to save them to database
     const ownedSubRecipes = subRecipes.filter(sr => !sr.isReference);
-    
+    const referencedSubRecipes = subRecipes.filter(sr => sr.isReference && sr.originalId);
+
     if (existingRecipeId !== null) {
       const { data: existingSubRecipes, error: fetchError } = await supabase
         .from('sub_recipes')
         .select('id')
         .eq('recipe_id', existingRecipeId);
-      
       if (fetchError) throw fetchError;
       const existingSubRecipeIds = new Set(existingSubRecipes.map(sr => sr.id));
       for (const subRecipe of ownedSubRecipes) {
@@ -201,6 +200,21 @@ export const useRecipeHandler = (recipeId?: number) => {
       for (const subRecipe of ownedSubRecipes) {
         await upsertSubRecipe(subRecipe, recipeId, new Set());
       }
+    }
+
+    await supabase
+      .from('recipe_sub_recipes')
+      .delete()
+      .eq('recipe_id', recipeId);
+
+    if (referencedSubRecipes.length > 0) {
+      const associations = referencedSubRecipes.map(sr => ({
+        recipe_id: recipeId,
+        sub_recipe_id: sr.originalId
+      }));
+      await supabase
+        .from('recipe_sub_recipes')
+        .insert(associations);
     }
   };
 
