@@ -91,53 +91,107 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngre
   };
 
   return (
-    <div className="flex space-x-2 items-center">
-      <Combobox
-        items={allIngredients.map(ingredient => ({ label: ingredient.name, value: ingredient.name }))}
-        onSelect={(value: string) => {
-          const selectedIngredient = allIngredients.find(ingredient => ingredient.name === value);
-          if (selectedIngredient) {
-            setNewIngredient(prev => ({
-              ...prev,
-              name: selectedIngredient.name
-            }));
-          } else {
-            setNewIngredient(prev => ({
-              ...prev,
-              name: value
-            }));
-          }
-        }}
-        placeholder="Rechercher ou ajouter un ingrédient..."
-        renderItem={(item) => <div>{item.label}</div>}
-        className="flex-1"
-      />
-      <Input
-        name="amount"
-        type="number"
-        value={newIngredient.amount}
-        onChange={handleInputChange}
-        placeholder="Quantité"
-        className="w-24"
-      />
-      <Select
-        name="unit"
-        value={newIngredient.unit}
-        onValueChange={(value) => handleSelectChange('unit', value)}
-      >
-        <SelectTrigger className="w-32 border border-gray-300 rounded-md p-2">
-          <SelectValue placeholder="Unité" />
-        </SelectTrigger>
-        <SelectContent>
-          {allowedUnits.map(unit => (
-            <SelectItem key={unit} value={unit}>{unit}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Button type="button" onClick={addNewIngredient} disabled={loading}>
-        <CirclePlus className="mr-2"/> Ajouter
-      </Button>
-      {error && <p className="text-red-500">{error}</p>}
+    <div className="space-y-3">
+      {/* Mobile: Stacked layout */}
+      <div className="sm:hidden space-y-2">
+        <Combobox
+          items={allIngredients.map(ingredient => ({ label: ingredient.name, value: ingredient.name }))}
+          onSelect={(value: string) => {
+            const selectedIngredient = allIngredients.find(ingredient => ingredient.name === value);
+            if (selectedIngredient) {
+              setNewIngredient(prev => ({
+                ...prev,
+                name: selectedIngredient.name
+              }));
+            } else {
+              setNewIngredient(prev => ({
+                ...prev,
+                name: value
+              }));
+            }
+          }}
+          placeholder="Rechercher ou ajouter un ingrédient..."
+          renderItem={(item) => <div>{item.label}</div>}
+        />
+        <div className="flex gap-2">
+          <Input
+            name="amount"
+            type="number"
+            value={newIngredient.amount}
+            onChange={handleInputChange}
+            placeholder="Quantité"
+            className="flex-1 h-11"
+          />
+          <Select
+            name="unit"
+            value={newIngredient.unit}
+            onValueChange={(value) => handleSelectChange('unit', value)}
+          >
+            <SelectTrigger className="flex-1 h-11">
+              <SelectValue placeholder="Unité" />
+            </SelectTrigger>
+            <SelectContent>
+              {allowedUnits.map(unit => (
+                <SelectItem key={unit} value={unit}>{unit}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Button type="button" onClick={addNewIngredient} disabled={loading} className="w-full" size="sm">
+          <CirclePlus className="mr-2 h-4 w-4"/> Ajouter
+        </Button>
+      </div>
+
+      {/* Desktop: Horizontal layout */}
+      <div className="hidden sm:flex sm:space-x-2 sm:items-center">
+        <Combobox
+          items={allIngredients.map(ingredient => ({ label: ingredient.name, value: ingredient.name }))}
+          onSelect={(value: string) => {
+            const selectedIngredient = allIngredients.find(ingredient => ingredient.name === value);
+            if (selectedIngredient) {
+              setNewIngredient(prev => ({
+                ...prev,
+                name: selectedIngredient.name
+              }));
+            } else {
+              setNewIngredient(prev => ({
+                ...prev,
+                name: value
+              }));
+            }
+          }}
+          placeholder="Rechercher ou ajouter un ingrédient..."
+          renderItem={(item) => <div>{item.label}</div>}
+          className="flex-1"
+        />
+        <Input
+          name="amount"
+          type="number"
+          value={newIngredient.amount}
+          onChange={handleInputChange}
+          placeholder="Quantité"
+          className="w-24 h-11"
+        />
+        <Select
+          name="unit"
+          value={newIngredient.unit}
+          onValueChange={(value) => handleSelectChange('unit', value)}
+        >
+          <SelectTrigger className="w-32 h-11">
+            <SelectValue placeholder="Unité" />
+          </SelectTrigger>
+          <SelectContent>
+            {allowedUnits.map(unit => (
+              <SelectItem key={unit} value={unit}>{unit}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button type="button" onClick={addNewIngredient} disabled={loading} size="sm">
+          <CirclePlus className="mr-2 h-4 w-4"/> Ajouter
+        </Button>
+      </div>
+      
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 };
