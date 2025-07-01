@@ -59,7 +59,7 @@ export function Combobox({ items, onSelect, placeholder, renderItem, className }
           aria-expanded={open}
           className={`w-full justify-between ${className}`}
         >
-          {inputValue || placeholder}
+          {inputValue ?? placeholder}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>

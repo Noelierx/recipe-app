@@ -71,7 +71,7 @@ const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({
             placeholder="Instructions de la sous-recette"
           />
           <IngredientHandler
-            ingredients={subRecipe.ingredients || []}
+            ingredients={subRecipe.ingredients ?? []}
             setIngredients={(ingredients) => handleSubRecipeChange(index, 'ingredients', ingredients)}
           />
           <Button 

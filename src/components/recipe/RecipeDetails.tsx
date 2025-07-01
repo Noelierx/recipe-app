@@ -29,12 +29,12 @@ const RecipeDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const recipeId = id ? parseInt(id, 10) : 0;
     const { recipe, loading, error } = useRecipeDetails(recipeId);
-    const [servings, setServings] = useState<number>(recipe?.servings || 0);
+    const [servings, setServings] = useState<number>(recipe?.servings ?? 0);
     const { deleteRecipe, isDeleting, error: deleteError } = useDeleteRecipe();
 
     useEffect(() => {
         if (recipe) {
-            setServings(recipe.servings);
+            setServings(recipe.servings ?? 0);
         }
     }, [recipe]);
 
@@ -47,17 +47,17 @@ const RecipeDetails: React.FC = () => {
             const adjustedAmount = (ing.amount / originalServings) * newServings;
             const { amount, unit } = convertUnit(adjustedAmount, ing.unit);
             return { ...ing, amount, unit };
-        }) || [];
+        }) ?? [];
     };
 
-    const adjustedMainIngredients = adjustIngredients(recipe.recipe_ingredients, recipe.servings, servings);
+    const adjustedMainIngredients = adjustIngredients(recipe.recipe_ingredients, recipe.servings ?? 1, servings);
 
     const adjustedSubRecipes = recipe.sub_recipes?.map(subRecipe => ({
         ...subRecipe,
-        ingredients: adjustIngredients(subRecipe.ingredients, recipe.servings, servings)
-    })) || [];
+        ingredients: adjustIngredients(subRecipe.ingredients, recipe.servings ?? 1, servings)
+    })) ?? [];
 
-    const hasSubRecipes = recipe.sub_recipes?.length > 0;
+    const hasSubRecipes = (recipe.sub_recipes?.length ?? 0) > 0;
 
     const handleDeleteRecipe = async () => {
         const success = await deleteRecipe(recipeId);

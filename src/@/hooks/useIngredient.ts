@@ -36,6 +36,11 @@ const useIngredient = () => {
           return;
         }
         setError('Échec de la récupération des ingrédients. Veuillez réessayer.');
+        if (error instanceof Error) {
+          console.error(error.message);
+        } else {
+          console.error(error);
+        }
       } finally {
         setLoading(false);
       }
