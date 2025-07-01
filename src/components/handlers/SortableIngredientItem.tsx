@@ -37,6 +37,7 @@ const SortableIngredientItem: React.FC<SortableIngredientItemProps> = ({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    touchAction: 'none' as const,
   };
 
   const handleAmountChange = (value: string) => {
@@ -61,7 +62,8 @@ const SortableIngredientItem: React.FC<SortableIngredientItemProps> = ({
         type="button"
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing p-1 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+        className="cursor-grab active:cursor-grabbing p-3 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded touch-none min-w-[48px] min-h-[48px] flex items-center justify-center"
+        style={{ touchAction: 'none' }}
         aria-label={`Drag to reorder ${ingredient.ingredient.name} ingredient`}
         onKeyDown={(e) => {
           if (e.key === ' ' || e.key === 'Enter') {
@@ -71,8 +73,11 @@ const SortableIngredientItem: React.FC<SortableIngredientItemProps> = ({
             e.stopPropagation();
           }
         }}
+        onTouchStart={(e) => {
+          e.stopPropagation();
+        }}
       >
-        <GripVertical className="h-4 w-4" />
+        <GripVertical className="h-5 w-5" />
       </button>
       
       <Input

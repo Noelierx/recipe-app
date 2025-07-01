@@ -37,7 +37,7 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 200,
+        delay: 250,
         tolerance: 5,
       },
     }),
