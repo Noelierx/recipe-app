@@ -1,14 +1,25 @@
 import React from 'react';
-import { Trash2 } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { RecipeIngredient } from '@/types/RecipeTypes';
 import useIngredient from '@/hooks/useIngredient';
 import IngredientForm from './IngredientForm';
-import { allowedUnits, Unit } from '@/constants';
-import { convertUnit } from '@/utils/unitConverter';
+import SortableIngredientItem from './SortableIngredientItem';
 
 interface IngredientHandlerProps {
   ingredients: RecipeIngredient[];
@@ -18,13 +29,27 @@ interface IngredientHandlerProps {
 const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setIngredients }) => {
   const { addIngredient, ingredients: existingIngredients, loading, error } = useIngredient();
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   const updateIngredient = (index: number, field: string, value: string | number) => {
     setIngredients(prev => prev.map((ing, i) => {
       if (i !== index) return ing;
-      if (field === 'amount') {
-        const { amount, unit } = convertUnit(Number(value), ing.unit as Unit);
-        return { ...ing, amount, unit };
-      } else if (field === 'name') {
+      if (field === 'name') {
         return { 
           ...ing, 
           ingredient: { 
@@ -42,42 +67,56 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
     setIngredients(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    setIngredients((items) => {
+      const oldIndex = items.findIndex((item, index) => `ingredient-${index}` === active.id);
+      const newIndex = items.findIndex((item, index) => `ingredient-${index}` === over.id);
+
+      const reorderedItems = arrayMove(items, oldIndex, newIndex);
+      
+      return reorderedItems.map((item, index) => ({
+        ...item,
+        order_position: index
+      }));
+    });
+  };
+
+  const sortedIngredients = ingredients.map((ingredient, index) => ({
+    ...ingredient,
+    order_position: ingredient.order_position ?? index
+  }));
+
   return (
     <div>
       <Label htmlFor="ingredients">Ingrédients</Label>
-      {ingredients && ingredients.length > 0 ? (
-        ingredients.map((ing, index) => (
-          <div key={index} className="flex items-center space-x-2 mb-2">
-            <Input
-              value={ing.amount}
-              onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
-              type="number"
-              className="flex-1"
-            />
-            <Select
-              name="unit"
-              value={ing.unit}
-              onValueChange={(value) => updateIngredient(index, 'unit', value)}
-            >
-              <SelectTrigger className="flex-1 border border-gray-300 rounded-md p-2">
-                <SelectValue placeholder="Sélectionner une unité" />
-              </SelectTrigger>
-              <SelectContent>
-                {allowedUnits.map(unit => (
-                  <SelectItem key={unit} value={unit}>{unit}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              value={ing.ingredient.name}
-              onChange={(e) => updateIngredient(index, 'name', e.target.value)}
-              className="flex-1"
-            />
-            <Button type="button" onClick={() => removeIngredient(index)} variant="destructive" size="sm" className="flex-1">
-              <Trash2 className="mr-2" /> Retirer l'ingrédient
-            </Button>
-          </div>
-        ))
+      {sortedIngredients && sortedIngredients.length > 0 ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={sortedIngredients.map((_, index) => `ingredient-${index}`)}
+            strategy={verticalListSortingStrategy}
+          >
+            {sortedIngredients.map((ing, index) => (
+              <SortableIngredientItem
+                key={`ingredient-${index}`}
+                id={`ingredient-${index}`}
+                ingredient={ing}
+                index={index}
+                onUpdate={updateIngredient}
+                onRemove={removeIngredient}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
       ) : (
         <p>Aucun ingrédient ajouté pour le moment.</p>
       )}

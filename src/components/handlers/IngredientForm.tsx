@@ -72,14 +72,18 @@ const IngredientForm: React.FC<IngredientFormProps> = ({ addIngredient, setIngre
           amount: newIngredient.amount,
           unit: newIngredient.unit,
         };
-        setIngredients(prev => [
-          ...prev,
-          {
-            amount: newIngredient.amount,
-            unit: newIngredient.unit,
-            ingredient: newIng
-          }
-        ]);
+        setIngredients(prev => {
+          const newOrderPosition = prev.length;
+          return [
+            ...prev,
+            {
+              amount: newIngredient.amount,
+              unit: newIngredient.unit,
+              ingredient: newIng,
+              order_position: newOrderPosition
+            }
+          ];
+        });
         setAllIngredients(prev => [...prev, newIng]);
         setNewIngredient({ name: '', amount: 0, unit: '', id: 0 });
       } else {

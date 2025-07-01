@@ -57,9 +57,11 @@ const fetchIngredientsData = async (recipeId: number) => {
     .select(`
       amount,
       unit,
+      order_position,
       ingredient:ingredients (name)
     `)
-    .eq('recipe_id', recipeId);
+    .eq('recipe_id', recipeId)
+    .order('order_position', { ascending: true });
 
   if (ingredientsError) throw new Error(ingredientsError.message);
   return ingredientsData || [];
@@ -87,6 +89,7 @@ const fetchSubRecipesData = async (recipeId: number) => {
       sub_recipe_ingredients (
         amount,
         unit,
+        order_position,
         ingredient:ingredients (id, name)
       )
     `)
@@ -104,15 +107,23 @@ const constructRecipeWithDetails = (
 ): RecipeWithDetails => {
   return {
     ...recipeData,
-    recipe_ingredients: ingredientsData,
+    recipe_ingredients: ingredientsData.map((ingredient: any) => ({
+      amount: ingredient.amount,
+      unit: ingredient.unit,
+      ingredient: ingredient.ingredient,
+      order_position: ingredient.order_position
+    })),
     tags: tagsData,
     sub_recipes: subRecipesData.map((sr: any) => ({
       ...sr,
-      ingredients: sr.sub_recipe_ingredients.map((sri: any) => ({
-        amount: sri.amount,
-        unit: sri.unit,
-        ingredient: sri.ingredient
-      }))
+      ingredients: sr.sub_recipe_ingredients
+        .sort((a: any, b: any) => (a.order_position ?? 0) - (b.order_position ?? 0))
+        .map((sri: any) => ({
+          amount: sri.amount,
+          unit: sri.unit,
+          ingredient: sri.ingredient,
+          order_position: sri.order_position
+        }))
     })),
     prep_time: typeof recipeData.prep_time === 'number' ? recipeData.prep_time : null,
     cook_time: typeof recipeData.cook_time === 'number' ? recipeData.cook_time : null,
