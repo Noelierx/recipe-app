@@ -34,11 +34,11 @@ export const useExistingSubRecipes = () => {
 
       if (subRecipesError) throw new Error(subRecipesError.message);
 
-      const transformedSubRecipes: SubRecipeWithRecipe[] = (subRecipesData || []).map((sr: any) => ({
+      const transformedSubRecipes: SubRecipeWithRecipe[] = (subRecipesData ?? []).map((sr: any) => ({
         id: sr.id,
         title: sr.title,
         instructions: sr.instructions,
-        recipe_title: sr.recipe?.title || 'Unknown Recipe',
+        recipe_title: sr.recipe?.title ?? 'Unknown Recipe',
         recipe_id: sr.recipe_id,
         ingredients: sr.sub_recipe_ingredients.map((sri: any) => ({
           amount: sri.amount,
