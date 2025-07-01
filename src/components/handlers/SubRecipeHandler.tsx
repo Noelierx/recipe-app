@@ -11,7 +11,7 @@ import { useDeleteRecipe } from '@/hooks/useDeleteRecipe';
 interface SubRecipeHandlerProps {
   subRecipes: SubRecipe[];
   setSubRecipes: React.Dispatch<React.SetStateAction<SubRecipe[]>>;
-  recvipeId?: number;
+  recipeId?: number;
 }
 
 const SubRecipeHandler: React.FC<SubRecipeHandlerProps> = ({ 
