@@ -80,7 +80,7 @@ const fetchTagsData = async (recipeId: number) => {
 };
 
 const fetchSubRecipesData = async (recipeId: number) => {
-  const { data: subRecipesData, error: subRecipesError } = await supabase
+  const { data: ownedSubRecipes, error: ownedError } = await supabase
     .from('sub_recipes')
     .select(`
       id,
@@ -94,9 +94,36 @@ const fetchSubRecipesData = async (recipeId: number) => {
       )
     `)
     .eq('recipe_id', recipeId);
+  if (ownedError) throw new Error(ownedError.message);
 
-  if (subRecipesError) throw new Error(subRecipesError.message);
-  return subRecipesData ?? [];
+  const { data: referencedLinks, error: refLinkError } = await supabase
+    .from('recipe_sub_recipes')
+    .select('sub_recipe_id')
+    .eq('recipe_id', recipeId);
+  if (refLinkError) throw new Error(refLinkError.message);
+  const referencedIds = (referencedLinks ?? []).map(link => link.sub_recipe_id);
+
+  let referencedSubRecipes: any[] = [];
+  if (referencedIds.length > 0) {
+    const { data: refSubRecipes, error: refSubError } = await supabase
+      .from('sub_recipes')
+      .select(`
+        id,
+        title,
+        instructions,
+        sub_recipe_ingredients (
+          amount,
+          unit,
+          order_position,
+          ingredient:ingredients (id, name)
+        )
+      `)
+      .in('id', referencedIds);
+    if (refSubError) throw new Error(refSubError.message);
+    referencedSubRecipes = refSubRecipes ?? [];
+  }
+
+  return [...(ownedSubRecipes ?? []), ...referencedSubRecipes];
 };
 
 const constructRecipeWithDetails = (
