@@ -64,7 +64,7 @@ const fetchIngredientsData = async (recipeId: number) => {
     .order('order_position', { ascending: true });
 
   if (ingredientsError) throw new Error(ingredientsError.message);
-  return ingredientsData || [];
+  return ingredientsData ?? [];
 };
 
 const fetchTagsData = async (recipeId: number) => {
@@ -96,7 +96,7 @@ const fetchSubRecipesData = async (recipeId: number) => {
     .eq('recipe_id', recipeId);
 
   if (subRecipesError) throw new Error(subRecipesError.message);
-  return subRecipesData || [];
+  return subRecipesData ?? [];
 };
 
 const constructRecipeWithDetails = (

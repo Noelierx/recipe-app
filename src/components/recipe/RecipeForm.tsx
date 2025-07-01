@@ -98,7 +98,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
             <div>
                 <Label htmlFor="instructions">Instructions</Label>
                 <RecipeInstructionsEditor
-                    value={recipe.instructions || ''}
+                    value={recipe.instructions ?? ''}
                     onChange={(value) => setRecipe(prev => ({ ...prev, instructions: value }))}
                     placeholder="Ajouter les instructions pour réaliser la recette"
                 />

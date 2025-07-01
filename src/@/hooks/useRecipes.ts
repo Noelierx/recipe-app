@@ -71,10 +71,10 @@ export const useRecipes = () => {
 
             handleFetchErrors(recipesError, recipesData);
 
-            const transformedRecipes: RecipeWithDetails[] = (recipesData || []).map(recipe => {
-                const recipeIngredients = recipe.recipe_ingredients || [];
+            const transformedRecipes: RecipeWithDetails[] = (recipesData ?? []).map(recipe => {
+                const recipeIngredients = recipe.recipe_ingredients ?? [];
                 const recipeTags = recipe.recipe_tags ? recipe.recipe_tags.map((rt: { tag: { name: string } }) => rt.tag) : [];
-                const subRecipes = recipe.sub_recipes || [];
+                const subRecipes = recipe.sub_recipes ?? [];
 
                 const allIngredients = [...recipeIngredients];
 

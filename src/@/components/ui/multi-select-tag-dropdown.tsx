@@ -107,7 +107,7 @@ export function MultiSelectTagDropdown({
               {selectedTags.length <= 2 ? (
                 selectedTags.map((tag) => (
                   <Badge
-                    key={tag.id || tag.name}
+                    key={tag.id ?? tag.name}
                     variant="secondary"
                     className="text-xs"
                   >
@@ -141,7 +141,7 @@ export function MultiSelectTagDropdown({
               <CommandGroup>
                 {filteredTags.map((tag) => (
                   <CommandItem
-                    key={tag.id || tag.name}
+                    key={tag.id ?? tag.name}
                     value={tag.name}
                     onSelect={() => handleTagToggle(tag)}
                   >
@@ -165,7 +165,7 @@ export function MultiSelectTagDropdown({
         <div className="flex flex-wrap gap-2 mt-2">
           {selectedTags.map((tag) => (
             <Badge
-              key={tag.id || tag.name}
+              key={tag.id ?? tag.name}
               variant="default"
               className="text-sm"
             >

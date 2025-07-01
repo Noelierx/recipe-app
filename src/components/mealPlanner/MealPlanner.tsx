@@ -111,8 +111,8 @@ const MealPlanner: React.FC<MealPlannerProps> = ({ recipes }) => {
             const meal = meals[mealType];
             const recipeId = Number(meal.recipeId);
             if (meal.recipeId && !Number.isNaN(recipeId)) {
-                const validServings = Math.max(1, meal.servings || 1);
-                acc[recipeId] = (acc[recipeId] || 0) + validServings;
+                const validServings = Math.max(1, meal.servings ?? 1);
+                acc[recipeId] = (acc[recipeId] ?? 0) + validServings;
             }
         });
         return acc;
