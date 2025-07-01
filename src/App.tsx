@@ -30,7 +30,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Header />
-      <main className="container mx-auto p-4">
+      <main className="container mx-auto px-4 py-6 min-h-screen">
         {content}
       </main>
       <Footer />

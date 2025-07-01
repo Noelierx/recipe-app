@@ -94,44 +94,55 @@ const RecipeDetails: React.FC = () => {
     return (
         <div className="max-w-7xl mx-auto px-4">
             <div className="w-full mb-8">
-                <div className="flex justify-between items-center">
-                    <h1 className="text-3xl font-semibold mb-4">{recipe.title}</h1>
-                    <div className="flex space-x-4">
-                        <CopyButton textToCopy={getTextToCopy()} buttonText="Copier les détails de la recette" copyType="text" />
-                        <CopyButton buttonText="Copier l'URL de la recette" copyType="url" />
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+                    <h1 className="text-2xl md:text-3xl font-semibold">{recipe.title}</h1>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <CopyButton 
+                            textToCopy={getTextToCopy()} 
+                            buttonText="Copier les détails" 
+                            copyType="text" 
+                        />
+                        <CopyButton 
+                            buttonText="Copier l'URL" 
+                            copyType="url" 
+                        />
                     </div>
                 </div>
-                <div className="flex items-center mb-4">
-                    <label htmlFor="servings" className="mr-2">Portions:</label>
-                    <Input
-                        type="number"
-                        id="servings"
-                        value={servings}
-                        onChange={(e) => setServings(Number(e.target.value))}
-                        min="1"
-                        className="w-20 inline-block"
-                    />
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+                    <div className="flex items-center">
+                        <label htmlFor="servings" className="mr-2 text-sm md:text-base">Portions:</label>
+                        <Input
+                            type="number"
+                            id="servings"
+                            value={servings}
+                            onChange={(e) => setServings(Number(e.target.value))}
+                            min="1"
+                            className="w-20 h-9"
+                        />
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        {recipe.prep_time ? (
+                            <div className="flex items-center">
+                                <Clock className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                                <span className="text-sm md:text-base">Préparation: {recipe.prep_time} min</span>
+                            </div>
+                        ) : null}
+                        {recipe.cook_time ? (
+                            <div className="flex items-center">
+                                <Flame className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                                <span className="text-sm md:text-base">Cuisson: {recipe.cook_time} min</span>
+                            </div>
+                        ) : null}
+                    </div>
                 </div>
-                {recipe.prep_time ? (
-                    <div className="flex items-center mb-4">
-                        <Clock className="mr-2" aria-hidden="true" />
-                        <span>Temps de préparation: {recipe.prep_time} minutes</span>
-                    </div>
-                ) : null}
-                {recipe.cook_time ? (
-                    <div className="flex items-center mb-4">
-                        <Flame className="mr-2" aria-hidden="true" />
-                        <span>Temps de cuisson: {recipe.cook_time} minutes</span>
-                    </div>
-                ) : null}
             </div>
             
-            <div className="flex flex-col md:flex-row">
-                <div className="w-full md:w-1/2 md:pr-8 mb-8 md:mb-0">
-                    <h2 className="text-2xl font-semibold mb-4">Ingrédients:</h2>
-                    <ul className="list-disc pl-5 mb-6">
+            <div className="flex flex-col lg:flex-row gap-6">
+                <div className="w-full lg:w-1/2">
+                    <h2 className="text-xl md:text-2xl font-semibold mb-4">Ingrédients:</h2>
+                    <ul className="list-disc pl-5 mb-6 space-y-1">
                         {adjustedMainIngredients.map((ing, index) => (
-                            <li key={index}>
+                            <li key={index} className="text-sm md:text-base">
                                 {ing.ingredient.name}: {formatAmount(ing.amount)} {ing.unit}
                             </li>
                         ))}
@@ -154,25 +165,38 @@ const RecipeDetails: React.FC = () => {
                         </>
                     )}
                 </div>
-                <div className="w-full md:w-1/2">
-                    <h2 className="text-2xl font-semibold mb-4">Instructions:</h2>
+                <div className="w-full lg:w-1/2">
+                    <h2 className="text-xl md:text-2xl font-semibold mb-4">Instructions:</h2>
                     {hasSubRecipes && adjustedSubRecipes.map((subRecipe, index) => (
                         <div key={index} className="mb-6">
-                            <h3 className="text-xl font-semibold mb-2">{subRecipe.title}</h3>
-                            <div dangerouslySetInnerHTML={{ 
+                            <h3 className="text-lg md:text-xl font-semibold mb-2">{subRecipe.title}</h3>
+                            <div className="text-sm md:text-base" dangerouslySetInnerHTML={{ 
                                 __html: sanitizeInstructions(subRecipe.instructions)
                             }} />
                         </div>
                     ))}
-                    {hasSubRecipes && (<h3 className="text-xl font-semibold mb-2">La suite</h3>)}
-                    <div className="mb-6" dangerouslySetInnerHTML={{ 
+                    {hasSubRecipes && (<h3 className="text-lg md:text-xl font-semibold mb-2">La suite</h3>)}
+                    <div className="mb-6 text-sm md:text-base" dangerouslySetInnerHTML={{ 
                         __html: sanitizeInstructions(recipe.instructions)
                     }} />
-                    <div className="flex space-x-4">
-                        <Button onClick={() => navigate(`/recipe/${recipe.id}/edit`)}>Modifier la recette</Button>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <Button 
+                            onClick={() => navigate(`/recipe/${recipe.id}/edit`)}
+                            className="w-full sm:w-auto"
+                            size="sm"
+                        >
+                            Modifier la recette
+                        </Button>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
-                                <Button variant="destructive" disabled={isDeleting}>Supprimer la recette</Button>
+                                <Button 
+                                    variant="destructive" 
+                                    disabled={isDeleting}
+                                    className="w-full sm:w-auto"
+                                    size="sm"
+                                >
+                                    Supprimer la recette
+                                </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                                 <AlertDialogHeader>
@@ -182,9 +206,12 @@ const RecipeDetails: React.FC = () => {
                                         et retirera les données de nos serveurs.
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDeleteRecipe()}>
+                                <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                                    <AlertDialogCancel className="w-full sm:w-auto">Annuler</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                        onClick={() => handleDeleteRecipe()}
+                                        className="w-full sm:w-auto"
+                                    >
                                         {isDeleting ? 'Suppression...' : 'Supprimer'}
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
@@ -193,7 +220,7 @@ const RecipeDetails: React.FC = () => {
                     </div>
                 </div>
             </div>
-            {deleteError && <div className="text-red-500 mt-4">Erreur en supprimant la recette: {deleteError}</div>}
+            {deleteError && <div className="text-red-500 mt-4 text-sm md:text-base">Erreur en supprimant la recette: {deleteError}</div>}
         </div>
     );
 };

@@ -92,44 +92,50 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                 loading={loading}
                 error={error}
             />
-            <Button onClick={sortRecipes} className="mb-4">
+            <Button onClick={sortRecipes} className="mb-4" size="sm">
                 Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
             </Button>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredRecipes.map(recipe => (
-                    <Card key={recipe.id}>
-                        <CardHeader>
-                            <CardTitle>{recipe.title}</CardTitle>
+                    <Card key={recipe.id} className="flex flex-col">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-lg md:text-xl line-clamp-2">{recipe.title}</CardTitle>
                             <div className="flex flex-wrap gap-1 mt-2">
                                 {recipe.tags.map((tag, index) => (
-                                    <Badge key={`${recipe.id}-${tag.id ?? index}-${tag.name}`}>
+                                    <Badge key={`${recipe.id}-${tag.id ?? index}-${tag.name}`} variant="secondary" className="text-xs">
                                         {tag.name}
                                     </Badge>
                                 ))}
                             </div>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="flex-1 pt-0">
                             {recipe.prep_time ? (
-                                <div className="flex items-center mb-4">
-                                    <Clock className="mr-2" aria-hidden="true" />
-                                    <span>Temps de préparation: {recipe.prep_time} minutes</span>
+                                <div className="flex items-center mb-3">
+                                    <Clock className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                                    <span className="text-sm">Temps de préparation: {recipe.prep_time} minutes</span>
                                 </div>
                             ) : null}
                             {recipe.cook_time ? (
-                                <div className="flex items-center mb-4">
-                                    <Flame className="mr-2" aria-hidden="true" />
-                                    <span>Temps de cuisson: {recipe.cook_time} minutes</span>
+                                <div className="flex items-center mb-3">
+                                    <Flame className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                                    <span className="text-sm">Temps de cuisson: {recipe.cook_time} minutes</span>
                                 </div>
                             ) : null}
-                            <div className="mb-6" dangerouslySetInnerHTML={{
+                            <div className="text-sm text-gray-600 line-clamp-3" dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(recipe.instructions, {
                                     ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'u', 'ol', 'ul', 'li', 'a'],
                                     ALLOWED_ATTR: []
                                 })
                             }} />
                         </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <Button onClick={() => viewRecipeDetail(recipe)}>Voir la recette</Button>
+                        <CardFooter className="pt-3">
+                            <Button 
+                                onClick={() => viewRecipeDetail(recipe)} 
+                                className="w-full"
+                                size="sm"
+                            >
+                                Voir la recette
+                            </Button>
                         </CardFooter>
                     </Card>
                 ))}
