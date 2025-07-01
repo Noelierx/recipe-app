@@ -36,7 +36,6 @@ const SubRecipeSelector: React.FC<SubRecipeSelectorProps> = ({ onSelectSubRecipe
   }, [subRecipes, searchQuery]);
 
   const handleSelectSubRecipe = (subRecipe: SubRecipeWithRecipe) => {
-    // Create a clean copy without the extra recipe metadata
     const cleanSubRecipe: SubRecipe = {
       title: subRecipe.title,
       instructions: subRecipe.instructions,
@@ -45,15 +44,14 @@ const SubRecipeSelector: React.FC<SubRecipeSelectorProps> = ({ onSelectSubRecipe
     
     onSelectSubRecipe(cleanSubRecipe);
     setIsDialogOpen(false);
-    setSearchQuery(''); // Reset search
+    setSearchQuery('');
   };
 
   const formatAmount = (amount: number): string => {
     if (amount % 1 === 0) return amount.toString();
     const fixed = amount.toFixed(2);
-    // Remove trailing zeros and decimal point if not needed (safer alternative without regex)
     if (fixed.includes('.')) {
-      return fixed.replace(/0+$/, '').replace(/\.$/, '');
+      return fixed.replace(/(?:\.?)(0+)$/, '');
     }
     return fixed;
   };
