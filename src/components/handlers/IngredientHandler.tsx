@@ -69,7 +69,6 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
 
       const reorderedItems = arrayMove(items, oldIndex, newIndex);
       
-      // Update order_position for all items
       return reorderedItems.map((item, index) => ({
         ...item,
         order_position: index
@@ -77,7 +76,6 @@ const IngredientHandler: React.FC<IngredientHandlerProps> = ({ ingredients, setI
     });
   };
 
-  // Ensure ingredients have order_position set
   const sortedIngredients = ingredients.map((ingredient, index) => ({
     ...ingredient,
     order_position: ingredient.order_position ?? index

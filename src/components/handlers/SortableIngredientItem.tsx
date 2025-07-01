@@ -57,28 +57,22 @@ const SortableIngredientItem: React.FC<SortableIngredientItemProps> = ({
           : 'shadow-sm hover:shadow-md border-gray-200'
       }`}
     >
-      <div
+      <button
         {...attributes}
         {...listeners}
         className="cursor-grab active:cursor-grabbing p-1 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
         aria-label={`Drag to reorder ${ingredient.ingredient.name} ingredient`}
-        tabIndex={0}
-        role="button"
         onKeyDown={(e) => {
-          // Enhanced keyboard support for accessibility
           if (e.key === ' ' || e.key === 'Enter') {
             e.preventDefault();
-            // The @dnd-kit library handles keyboard drag-and-drop automatically
-            // when using the KeyboardSensor with sortableKeyboardCoordinates
           }
-          // Allow arrow key navigation when focused
           if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-            e.stopPropagation(); // Prevent parent handlers
+            e.stopPropagation();
           }
         }}
       >
         <GripVertical className="h-4 w-4" />
-      </div>
+      </button>
       
       <Input
         value={ingredient.amount}

@@ -117,7 +117,7 @@ const constructRecipeWithDetails = (
     sub_recipes: subRecipesData.map((sr: any) => ({
       ...sr,
       ingredients: sr.sub_recipe_ingredients
-        .sort((a: any, b: any) => (a.order_position || 0) - (b.order_position || 0))
+        .sort((a: any, b: any) => (a.order_position ?? 0) - (b.order_position ?? 0))
         .map((sri: any) => ({
           amount: sri.amount,
           unit: sri.unit,
