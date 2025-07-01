@@ -48,13 +48,17 @@ const SubRecipeSelector: React.FC<SubRecipeSelectorProps> = ({ onSelectSubRecipe
   };
 
   const formatAmount = (amount: number): string => {
-    if (amount % 1 === 0) return amount.toString();
-    const fixed = amount.toFixed(2);
-    if (fixed.includes('.')) {
-      return fixed.replace(/(?:\.?)(0+)$/, '');
-    }
-    return fixed;
-  };
+  if (amount % 1 === 0) return amount.toString();
+
+  let fixed = amount.toFixed(2);
+
+  if (fixed.includes('.')) {
+    while (fixed.endsWith('0')) fixed = fixed.slice(0, -1);
+    if (fixed.endsWith('.')) fixed = fixed.slice(0, -1);
+  }
+
+  return fixed;
+};
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
