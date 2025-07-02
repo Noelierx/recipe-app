@@ -83,7 +83,7 @@ export const useRecipes = () => {
 
                 const allIngredients = [...recipeIngredients];
                 recipeSubRecipes.forEach((rsr: any) => {
-                    if (rsr.sub_recipe && rsr.sub_recipe.sub_recipe_ingredients) {
+                    if (rsr.sub_recipe?.sub_recipe_ingredients) {
                         mergeSubRecipeIngredients(allIngredients, rsr.sub_recipe.sub_recipe_ingredients);
                     }
                 });
