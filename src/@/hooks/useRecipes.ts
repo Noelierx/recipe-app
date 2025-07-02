@@ -29,15 +29,18 @@ export const useRecipes = () => {
         });
     };
 
-    const transformSubRecipes = (subRecipes: any[]) => {
-        return subRecipes.map((sr: any) => ({
-            ...sr,
-            ingredients: sr.sub_recipe_ingredients.map((sri: any) => ({
-                amount: sri.amount,
-                unit: sri.unit,
-                ingredient: sri.ingredient,
-            })),
-        }));
+    const transformSubRecipes = (recipeSubRecipes: any[]) => {
+        return recipeSubRecipes.map((rsr: any) => {
+            const sr = rsr.sub_recipe;
+            return {
+                ...sr,
+                ingredients: sr.sub_recipe_ingredients.map((sri: any) => ({
+                    amount: sri.amount,
+                    unit: sri.unit,
+                    ingredient: sri.ingredient,
+                })),
+            };
+        });
     };
 
     const fetchRecipes = useCallback(async () => {
@@ -57,36 +60,39 @@ export const useRecipes = () => {
                         recipe_id,
                         tag:tags (name)
                     ),
-                    sub_recipes (
-                        id,
-                        title,
-                        instructions,
-                        sub_recipe_ingredients (
-                            amount,
-                            unit,
-                            ingredient:ingredients (id, name)
+                    recipe_sub_recipes (
+                        sub_recipe:sub_recipes (
+                            id,
+                            title,
+                            instructions,
+                            sub_recipe_ingredients (
+                                amount,
+                                unit,
+                                ingredient:ingredients (id, name)
+                            )
                         )
                     )
                 `);
 
             handleFetchErrors(recipesError, recipesData);
 
-            const transformedRecipes: RecipeWithDetails[] = (recipesData ?? []).map(recipe => {
+            const transformedRecipes: RecipeWithDetails[] = (recipesData ?? []).map((recipe: any) => {
                 const recipeIngredients = recipe.recipe_ingredients ?? [];
                 const recipeTags = recipe.recipe_tags ? recipe.recipe_tags.map((rt: { tag: { name: string } }) => rt.tag) : [];
-                const subRecipes = recipe.sub_recipes ?? [];
+                const recipeSubRecipes = recipe.recipe_sub_recipes ?? [];
 
                 const allIngredients = [...recipeIngredients];
-
-                subRecipes.forEach((subRecipe: any) => {
-                    mergeSubRecipeIngredients(allIngredients, subRecipe.sub_recipe_ingredients);
+                recipeSubRecipes.forEach((rsr: any) => {
+                    if (rsr.sub_recipe && rsr.sub_recipe.sub_recipe_ingredients) {
+                        mergeSubRecipeIngredients(allIngredients, rsr.sub_recipe.sub_recipe_ingredients);
+                    }
                 });
 
                 return {
                     ...recipe,
                     recipe_ingredients: allIngredients,
                     tags: recipeTags,
-                    sub_recipes: transformSubRecipes(subRecipes),
+                    sub_recipes: transformSubRecipes(recipeSubRecipes),
                 };
             });
 
