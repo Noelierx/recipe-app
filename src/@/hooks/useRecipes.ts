@@ -29,19 +29,19 @@ export const useRecipes = () => {
         });
     };
 
-    const transformSubRecipes = (recipeSubRecipes: any[]) => {
-        return recipeSubRecipes.map((rsr: any) => {
-            const sr = rsr.sub_recipe;
-            return {
-                ...sr,
-                ingredients: sr.sub_recipe_ingredients.map((sri: any) => ({
-                    amount: sri.amount,
-                    unit: sri.unit,
-                    ingredient: sri.ingredient,
-                })),
-            };
-        });
-    };
+return recipeSubRecipes
+    .filter(rsr => rsr.sub_recipe)
+    .map(rsr => {
+        const sr = rsr.sub_recipe;
+        return {
+            ...sr,
+            ingredients: (sr.sub_recipe_ingredients ?? []).map((sri: any) => ({
+                amount: sri.amount,
+                unit: sri.unit,
+                ingredient: sri.ingredient,
+            })),
+        };
+    });
 
     const fetchRecipes = useCallback(async () => {
         try {
